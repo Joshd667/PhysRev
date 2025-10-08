@@ -1,0 +1,153 @@
+<!-- Flashcard Test Modal with 3D Flip -->
+<div x-show="showFlashcardTest"
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     @click="closeFlashcardTest()"
+     class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+
+    <!-- Modal Window -->
+    <div @click.stop
+         x-show="showFlashcardTest"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl flex flex-col overflow-hidden">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center space-x-3">
+                <i data-lucide="brain" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200">Flashcard Test</h2>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Shuffle Button -->
+                <button @click.stop="shuffleTestCards()" class="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium" title="Shuffle cards">
+                    <i data-lucide="shuffle" class="w-4 h-4"></i>
+                    <span>Shuffle</span>
+                </button>
+
+                <!-- Card Counter -->
+                <div class="text-sm font-medium text-slate-600 dark:text-slate-400">
+                    <span x-text="currentTestCardIndex + 1"></span> / <span x-text="testFlashcards.length"></span>
+                </div>
+
+                <!-- Close Button -->
+                <button @click="closeFlashcardTest()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                    <i data-lucide="x" class="w-5 h-5 text-gray-500 dark:text-gray-400"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 3D Flip Card Container -->
+        <div class="flex-1 p-8 flex items-center justify-center" style="perspective: 1000px;">
+            <div class="flashcard-flip-container w-full max-w-2xl h-96 cursor-pointer">
+                <div class="flashcard-inner w-full h-full relative"
+                     @click="flipTestCard()"
+                     :class="testCardFlipped ? 'flipped' : ''">
+
+                    <!-- Front of Card -->
+                    <div class="flashcard-face flashcard-front absolute inset-0 bg-gradient-to-br from-purple-500 to-purple-700 dark:from-purple-700 dark:to-purple-900 rounded-2xl shadow-2xl p-8 flex flex-col items-center justify-center text-white">
+                        <div class="text-sm font-semibold opacity-75 mb-4 uppercase tracking-wide">Question</div>
+                        <div class="text-2xl font-bold text-center leading-relaxed whitespace-pre-wrap" x-text="getCurrentTestCard()?.front"></div>
+                        <div class="mt-8 text-sm opacity-75 flex items-center space-x-2">
+                            <i data-lucide="mouse-pointer-click" class="w-4 h-4"></i>
+                            <span>Click to reveal answer</span>
+                        </div>
+                    </div>
+
+                    <!-- Back of Card -->
+                    <div class="flashcard-face flashcard-back absolute inset-0 bg-gradient-to-br from-green-500 to-green-700 dark:from-green-700 dark:to-green-900 rounded-2xl shadow-2xl p-8 flex flex-col items-center justify-center text-white">
+                        <div class="text-sm font-semibold opacity-75 mb-4 uppercase tracking-wide">Answer</div>
+                        <div class="text-2xl font-bold text-center leading-relaxed whitespace-pre-wrap" x-text="getCurrentTestCard()?.back"></div>
+                        <div class="mt-8 text-sm opacity-75 flex items-center space-x-2">
+                            <i data-lucide="mouse-pointer-click" class="w-4 h-4"></i>
+                            <span>Click to flip back</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Footer -->
+        <div class="flex items-center justify-between p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+            <button @click.stop="previousTestCard()"
+                    :disabled="!hasPreviousTestCard()"
+                    :class="hasPreviousTestCard() ? 'bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300' : 'bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'"
+                    class="px-6 py-3 rounded-lg transition-colors font-medium flex items-center space-x-2 border border-gray-300 dark:border-gray-600">
+                <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                <span>Previous</span>
+            </button>
+
+            <div class="flex items-center space-x-2">
+                <template x-for="(card, index) in testFlashcards" :key="index">
+                    <div @click.stop="currentTestCardIndex = index; testCardFlipped = false;"
+                         :class="index === currentTestCardIndex ? 'bg-purple-600 border-purple-600' : 'bg-gray-300 dark:bg-gray-600 border-gray-400 dark:border-gray-500 hover:bg-gray-400 dark:hover:bg-gray-500'"
+                         class="w-2.5 h-2.5 rounded-full border-2 cursor-pointer transition-all">
+                    </div>
+                </template>
+            </div>
+
+            <button @click.stop="nextTestCard()"
+                    :disabled="!hasNextTestCard()"
+                    :class="hasNextTestCard() ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-600 cursor-not-allowed'"
+                    class="px-6 py-3 rounded-lg transition-colors font-medium flex items-center space-x-2">
+                <span>Next</span>
+                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Instructions -->
+        <div class="px-6 pb-6">
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                <div class="flex items-start space-x-3">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5"></i>
+                    <div class="text-sm text-blue-800 dark:text-blue-200">
+                        <strong>How to use:</strong> Click the card to flip between question and answer. Use the arrow buttons or dots to navigate. Click <strong>Shuffle</strong> to randomize card order.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* 3D Flip Card Styles */
+.flashcard-flip-container {
+    perspective: 1000px;
+}
+
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.flashcard-inner.flipped {
+    transform: rotateY(180deg);
+}
+
+.flashcard-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+.flashcard-front {
+    transform: rotateY(0deg);
+}
+
+.flashcard-back {
+    transform: rotateY(180deg);
+}
+</style>
