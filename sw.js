@@ -1,8 +1,8 @@
 // sw.js - Fixed Service Worker for Physics Audit Tool with Analytics Support
 // Place this file in your project root (same folder as index.html)
 
-const CACHE_NAME = 'physics-audit-v2.21'; // 🔥 INCREMENT THIS WHEN YOU UPDATE THE APP
-const APP_VERSION = '2.21';
+const CACHE_NAME = 'physics-audit-v2.22'; // 🔥 INCREMENT THIS WHEN YOU UPDATE THE APP
+const APP_VERSION = '2.22';
 
 // 🎯 Core resources that should be cached
 const CRITICAL_RESOURCES = [
@@ -171,7 +171,7 @@ self.addEventListener('fetch', event => {
     }
 });
 
-// 🎯 Smart request handler with network-first for JS files
+// 🎯 Smart request handler with network-first for templates and JS files
 async function handleRequest(request) {
     const url = new URL(request.url);
     const isJavaScript = url.pathname.endsWith('.js') || url.pathname.includes('/js/');
@@ -179,25 +179,31 @@ async function handleRequest(request) {
     const isTemplate = url.pathname.includes('/templates/') || url.pathname.includes('/components/');
 
     try {
-        // Cache-first strategy for templates (they're part of the app structure)
+        // Network-first strategy for templates (ensures fresh updates during development)
         if (isTemplate) {
-            const cachedResponse = await caches.match(request);
-            if (cachedResponse) {
-                return cachedResponse;
-            }
+            try {
+                const networkResponse = await fetch(request);
 
-            const networkResponse = await fetch(request);
-
-            if (networkResponse.ok) {
-                try {
-                    const cache = await caches.open(CACHE_NAME);
-                    await cache.put(request, networkResponse.clone());
-                } catch (cacheError) {
-                    console.warn(`Failed to cache template ${url.pathname}:`, cacheError);
+                if (networkResponse.ok) {
+                    try {
+                        const cache = await caches.open(CACHE_NAME);
+                        await cache.put(request, networkResponse.clone());
+                        console.log(`✅ Updated template cache: ${url.pathname}`);
+                    } catch (cacheError) {
+                        console.warn(`Failed to cache template ${url.pathname}:`, cacheError);
+                    }
                 }
-            }
 
-            return networkResponse;
+                return networkResponse;
+            } catch (networkError) {
+                // Network failed, fall back to cache
+                console.log(`⚠️ Network failed for template ${url.pathname}, using cache`);
+                const cachedResponse = await caches.match(request);
+                if (cachedResponse) {
+                    return cachedResponse;
+                }
+                throw networkError;
+            }
         }
 
         // Cache-first with background update for JavaScript and HTML files
