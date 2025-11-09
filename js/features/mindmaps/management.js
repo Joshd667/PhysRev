@@ -16,6 +16,10 @@ export const mindmapManagementMethods = {
             viewport: { x: 0, y: 0, scale: 1 }
         };
 
+        // Reset shapes for new diagram
+        this.shapes = {};
+        this.selectedShapeId = null;
+
         // Auto-assign tags from current context
         if (topicId) {
             // Single topic provided
@@ -85,8 +89,13 @@ export const mindmapManagementMethods = {
         };
         this.mindmapEditorTags = [];
 
+        // Clean up shapes
+        this.shapes = {};
+        this.selectedShapeId = null;
+        this.isDraggingShape = false;
+
         // Clean up canvas listeners
-        if (this.mindmapCanvas) {
+        if (this.cleanupMindmapCanvas) {
             this.cleanupMindmapCanvas();
         }
     },
@@ -101,8 +110,11 @@ export const mindmapManagementMethods = {
             return;
         }
 
-        if (this.mindmapEditorData.nodes.length === 0) {
-            alert('Please add at least one node to your mindmap');
+        // Convert shapes object map to array for storage
+        const shapesArray = Object.values(this.shapes || {});
+
+        if (shapesArray.length === 0) {
+            alert('Please add at least one shape to your diagram');
             return;
         }
 
@@ -116,9 +128,9 @@ export const mindmapManagementMethods = {
                 id: mindmapId,
                 sectionId: this.mindmapEditorSectionId,
                 title: this.mindmapEditorTitle.trim(),
-                nodes: this.mindmapEditorData.nodes,
-                connections: this.mindmapEditorData.connections,
-                viewport: this.mindmapEditorData.viewport,
+                nodes: shapesArray,  // Save shapes array
+                connections: [],  // No connections in MVP
+                viewport: { x: 0, y: 0, scale: this.canvasZoom },
                 tags: this.mindmapEditorTags,
                 createdAt: timestamp,
                 updatedAt: timestamp
@@ -127,9 +139,9 @@ export const mindmapManagementMethods = {
             // Update existing mindmap
             if (this.mindmaps[this.mindmapEditorId]) {
                 this.mindmaps[this.mindmapEditorId].title = this.mindmapEditorTitle.trim();
-                this.mindmaps[this.mindmapEditorId].nodes = this.mindmapEditorData.nodes;
-                this.mindmaps[this.mindmapEditorId].connections = this.mindmapEditorData.connections;
-                this.mindmaps[this.mindmapEditorId].viewport = this.mindmapEditorData.viewport;
+                this.mindmaps[this.mindmapEditorId].nodes = shapesArray;  // Save shapes array
+                this.mindmaps[this.mindmapEditorId].connections = [];  // No connections in MVP
+                this.mindmaps[this.mindmapEditorId].viewport = { x: 0, y: 0, scale: this.canvasZoom };
                 this.mindmaps[this.mindmapEditorId].tags = this.mindmapEditorTags;
                 this.mindmaps[this.mindmapEditorId].updatedAt = timestamp;
             }
