@@ -106,54 +106,50 @@
                             @mousedown.prevent.stop="startMove($event, shape.id)"
                             style="cursor: move;">
 
-                            <!-- Rectangle -->
-                            <template x-if="shape.type === 'rect'">
-                                <rect
-                                    :x="shape.x"
-                                    :y="shape.y"
-                                    :width="shape.width"
-                                    :height="shape.height"
-                                    :fill="shape.fill"
-                                    :stroke="shape.stroke"
-                                    :stroke-width="shape.strokeWidth"
-                                    rx="4"
-                                ></rect>
-                            </template>
+                            <!-- Rectangle (using x-show instead of x-if) -->
+                            <rect
+                                x-show="shape.type === 'rect'"
+                                :x="shape.x"
+                                :y="shape.y"
+                                :width="shape.width"
+                                :height="shape.height"
+                                :fill="shape.fill"
+                                :stroke="shape.stroke"
+                                :stroke-width="shape.strokeWidth"
+                                rx="4"
+                            ></rect>
 
                             <!-- Circle -->
-                            <template x-if="shape.type === 'circle'">
-                                <circle
-                                    :cx="shape.x + shape.width / 2"
-                                    :cy="shape.y + shape.height / 2"
-                                    :r="Math.min(shape.width, shape.height) / 2"
-                                    :fill="shape.fill"
-                                    :stroke="shape.stroke"
-                                    :stroke-width="shape.strokeWidth"
-                                ></circle>
-                            </template>
+                            <circle
+                                x-show="shape.type === 'circle'"
+                                :cx="shape.x + shape.width / 2"
+                                :cy="shape.y + shape.height / 2"
+                                :r="Math.min(shape.width, shape.height) / 2"
+                                :fill="shape.fill"
+                                :stroke="shape.stroke"
+                                :stroke-width="shape.strokeWidth"
+                            ></circle>
 
                             <!-- Ellipse -->
-                            <template x-if="shape.type === 'ellipse'">
-                                <ellipse
-                                    :cx="shape.x + shape.width / 2"
-                                    :cy="shape.y + shape.height / 2"
-                                    :rx="shape.width / 2"
-                                    :ry="shape.height / 2"
-                                    :fill="shape.fill"
-                                    :stroke="shape.stroke"
-                                    :stroke-width="shape.strokeWidth"
-                                ></ellipse>
-                            </template>
+                            <ellipse
+                                x-show="shape.type === 'ellipse'"
+                                :cx="shape.x + shape.width / 2"
+                                :cy="shape.y + shape.height / 2"
+                                :rx="shape.width / 2"
+                                :ry="shape.height / 2"
+                                :fill="shape.fill"
+                                :stroke="shape.stroke"
+                                :stroke-width="shape.strokeWidth"
+                            ></ellipse>
 
                             <!-- Diamond -->
-                            <template x-if="shape.type === 'diamond'">
-                                <polygon
-                                    :points="`${shape.x + shape.width/2},${shape.y} ${shape.x + shape.width},${shape.y + shape.height/2} ${shape.x + shape.width/2},${shape.y + shape.height} ${shape.x},${shape.y + shape.height/2}`"
-                                    :fill="shape.fill"
-                                    :stroke="shape.stroke"
-                                    :stroke-width="shape.strokeWidth"
-                                ></polygon>
-                            </template>
+                            <polygon
+                                x-show="shape.type === 'diamond'"
+                                :points="`${shape.x + shape.width/2},${shape.y} ${shape.x + shape.width},${shape.y + shape.height/2} ${shape.x + shape.width/2},${shape.y + shape.height} ${shape.x},${shape.y + shape.height/2}`"
+                                :fill="shape.fill"
+                                :stroke="shape.stroke"
+                                :stroke-width="shape.strokeWidth"
+                            ></polygon>
 
                             <!-- Text -->
                             <text
@@ -167,19 +163,18 @@
                             ></text>
 
                             <!-- Selection Indicator -->
-                            <template x-if="selectedShapeId === shape.id">
-                                <rect
-                                    :x="shape.x - 4"
-                                    :y="shape.y - 4"
-                                    :width="shape.width + 8"
-                                    :height="shape.height + 8"
-                                    fill="none"
-                                    stroke="#3b82f6"
-                                    stroke-width="2"
-                                    stroke-dasharray="4"
-                                    pointer-events="none"
-                                ></rect>
-                            </template>
+                            <rect
+                                x-show="selectedShapeId === shape.id"
+                                :x="shape.x - 4"
+                                :y="shape.y - 4"
+                                :width="shape.width + 8"
+                                :height="shape.height + 8"
+                                fill="none"
+                                stroke="#3b82f6"
+                                stroke-width="2"
+                                stroke-dasharray="4"
+                                pointer-events="none"
+                            ></rect>
                         </g>
                     </template>
 
