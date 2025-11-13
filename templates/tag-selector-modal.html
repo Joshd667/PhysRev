@@ -1,0 +1,144 @@
+<!-- Tag Selector Modal -->
+<div x-show="showTagSelector"
+     x-data="{ mouseDownOnBackdrop: false }"
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     @mousedown.self="mouseDownOnBackdrop = true"
+     @mouseup.self="if (mouseDownOnBackdrop) closeTagSelector(); mouseDownOnBackdrop = false"
+     @mouseleave="mouseDownOnBackdrop = false"
+     class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+
+    <!-- Modal Window -->
+    <div @click.stop
+         x-show="showTagSelector"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl max-h-[80vh] flex flex-col overflow-hidden">
+
+        <!-- Header with Search -->
+        <div class="border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-3 px-6 py-4">
+                <i data-lucide="tag" class="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0"></i>
+
+                <!-- Search Box -->
+                <div class="flex-1 relative">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+                    <input
+                        x-model="tagSelectorQuery"
+                        type="text"
+                        placeholder="Search topics by ID, title, or section..."
+                        class="w-full pl-10 pr-4 py-2 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-gray-700 border border-slate-300 dark:border-slate-600 rounded-lg focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors"
+                    />
+                </div>
+
+                <button @click="closeTagSelector()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0">
+                    <i data-lucide="x" class="w-5 h-5 text-gray-500 dark:text-gray-400"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Show Selected Tags Dropdown -->
+        <div x-show="getCurrentTags().length > 0" class="border-b border-gray-200 dark:border-gray-700">
+            <button
+                @click="tagSelectorShowSelected = !tagSelectorShowSelected"
+                class="w-full flex items-center justify-between px-6 py-3 bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <div class="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+                    <i data-lucide="tag" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i>
+                    <span>Show selected tags</span>
+                    <span class="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs font-bold" x-text="getCurrentTags().length"></span>
+                </div>
+                <i :data-lucide="tagSelectorShowSelected ? 'chevron-down' : 'chevron-right'" class="w-4 h-4 text-slate-600 dark:text-slate-400"></i>
+            </button>
+
+            <div x-show="tagSelectorShowSelected"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 -translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 -translate-y-2"
+                 class="px-6 py-3 bg-white dark:bg-gray-800 max-h-32 overflow-y-auto minimal-scrollbar">
+                <div class="flex flex-wrap items-center gap-2">
+                    <template x-for="tagId in getCurrentTags()" :key="tagId">
+                        <div class="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs border border-blue-300 dark:border-blue-700">
+                            <span class="font-mono font-bold" x-text="tagId"></span>
+                            <span x-text="topicLookup[tagId] ? topicLookup[tagId].topicTitle : ''"></span>
+                            <button
+                                @click="removeTag(tagId)"
+                                class="hover:bg-blue-200 dark:hover:bg-blue-800 rounded p-0.5 transition-colors">
+                                <i data-lucide="x" class="w-2.5 h-2.5"></i>
+                            </button>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topics List -->
+        <div class="flex-1 overflow-y-auto p-6 space-y-2 minimal-scrollbar">
+            <template x-for="section in getFilteredTopicsForSelector()" :key="section.sectionName">
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+                    <!-- Section Header (Clickable) -->
+                    <button
+                        @click="toggleTagSelectorSection(section.sectionName)"
+                        class="w-full flex items-center justify-between px-4 py-3 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                        <div class="flex items-center space-x-2">
+                            <i :data-lucide="section.sectionIcon" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i>
+                            <span class="font-semibold text-sm text-slate-700 dark:text-slate-300" x-text="section.sectionTitle"></span>
+                            <span class="text-xs text-slate-500 dark:text-slate-400" x-text="`(${section.sectionPaper})`"></span>
+                        </div>
+                        <i :data-lucide="isTagSelectorSectionExpanded(section.sectionName) ? 'chevron-down' : 'chevron-right'"
+                           class="w-5 h-5 text-slate-600 dark:text-slate-400 transition-transform"></i>
+                    </button>
+
+                    <!-- Topics in Section (Collapsible) -->
+                    <div x-show="isTagSelectorSectionExpanded(section.sectionName)"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-2"
+                         class="bg-white dark:bg-gray-800 p-3 space-y-1">
+                        <template x-for="topic in section.topics" :key="topic.topicId">
+                            <button
+                                @click="isTopicTagged(topic.topicId) ? removeTag(topic.topicId) : addTag(topic.topicId)"
+                                class="w-full flex items-center space-x-3 p-3 rounded-lg border transition-all duration-200 hover:shadow-md"
+                                :class="isTopicTagged(topic.topicId) ?
+                                    'bg-blue-50 dark:bg-blue-900/20 border-blue-300 dark:border-blue-700' :
+                                    'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-600'">
+                                <span class="font-mono text-sm font-bold text-blue-600 dark:text-blue-400" x-text="topic.topicId"></span>
+                                <span class="text-sm text-slate-700 dark:text-slate-300" x-text="topic.topicTitle"></span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+            </template>
+
+            <!-- Empty State -->
+            <template x-if="getFilteredTopicsForSelector().length === 0">
+                <div class="text-center py-12">
+                    <i data-lucide="search" class="w-12 h-12 text-gray-400 mx-auto mb-3"></i>
+                    <p class="text-gray-500 dark:text-gray-400">No topics found matching your search</p>
+                </div>
+            </template>
+        </div>
+
+        <!-- Footer -->
+        <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 p-4 flex justify-end">
+            <button
+                @click="closeTagSelector()"
+                class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-lg font-medium transition-colors shadow-sm hover:shadow">
+                Done
+            </button>
+        </div>
+    </div>
+</div>

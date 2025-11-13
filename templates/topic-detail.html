@@ -1,0 +1,109 @@
+                        <div x-show="viewType === 'audit' && !searchVisible && !showingAnalytics && !showingRevision && currentSection && !showSectionCards() && !showMainMenuCards()" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95 -translate-y-4" x-transition:enter-end="opacity-100 transform scale-100 translate-y-0">
+                            <div x-show="lastExpandedGroup" class="mb-4">
+                                <div class="flex items-center justify-between">
+                                    <button @click="goBackToGroupCards()" class="flex items-center space-x-2 px-4 py-2 bg-white/60 dark:bg-gray-700/60 hover:bg-white/80 dark:hover:bg-gray-600/80 backdrop-blur-sm rounded-lg transition-colors text-gray-700 dark:text-gray-300">
+                                        <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                        </svg>
+                                        <span class="text-sm font-medium" x-text="`Back to ${lastExpandedGroup}`"></span>
+                                    </button>
+                                    <span x-show="currentSection" class="text-sm bg-white/60 dark:bg-gray-700/60 backdrop-blur-sm text-blue-700 dark:text-blue-300 px-2 py-1 rounded" x-text="currentSection.paper"></span>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+                                <template x-for="topic in currentSection.topics" :key="topic.id">
+                                    <div :data-topic-id="topic.id"
+                                         @click="openRevisionForTopic(topic.id)"
+                                         class="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow cursor-pointer relative overflow-hidden"
+                                         :style="revisionAreaIndicatorStyle === 'outline' ? `border-left: 4px solid ${getColorForTopic(topic.id).hex}; border-top: 2px solid ${getColorForTopic(topic.id).hex};` : ''">
+
+                                        <!-- Color bar indicator (from top to just under spec number) -->
+                                        <div x-show="revisionAreaIndicatorStyle === 'bar'"
+                                             class="absolute left-0 top-0 w-1.5 rounded-bl-sm"
+                                             :style="`background: ${getColorForTopic(topic.id).hsl}; height: 2.5rem;`"></div>
+
+                                        <div class="mb-3" :class="revisionAreaIndicatorStyle === 'bar' ? 'pl-2' : ''">
+                                            <h3 class="font-semibold text-blue-600 dark:text-blue-400 text-sm mb-1" x-text="topic.id"></h3>
+                                            <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-2" x-text="topic.title"></h4>
+                                            <p class="text-xs text-gray-600 dark:text-gray-400 italic mb-3" x-text="topic.prompt"></p>
+
+                                            <div class="mb-3" x-data="{ objectivesOpen: false }">
+                                                <template x-if="topic.learningObjectives && topic.learningObjectives.length > 0">
+                                                    <button @click.stop="objectivesOpen = !objectivesOpen" class="flex items-center justify-between w-full text-left mb-1">
+                                                        <h5 class="font-bold text-xs text-gray-700 dark:text-gray-300">Learning Objectives</h5>
+                                                        <svg class="w-3 h-3 transition-transform duration-200 text-gray-400 dark:text-gray-500" :class="objectivesOpen ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                                        </svg>
+                                                    </button>
+                                                </template>
+                                                <template x-if="!topic.learningObjectives || topic.learningObjectives.length === 0">
+                                                    <h5 class="font-bold text-xs text-gray-700 dark:text-gray-300 mb-1">Learning Objectives</h5>
+                                                </template>
+                                                <div x-show="objectivesOpen || (!topic.learningObjectives || topic.learningObjectives.length === 0)" x-transition class="mt-1">
+                                                    <template x-if="topic.learningObjectives && topic.learningObjectives.length > 0">
+                                                        <ul class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                                                            <template x-for="objective in topic.learningObjectives" :key="objective">
+                                                                <li class="flex items-start">
+                                                                    <span class="text-blue-500 mr-1">•</span>
+                                                                    <span x-text="objective"></span>
+                                                                </li>
+                                                            </template>
+                                                        </ul>
+                                                    </template>
+                                                    <template x-if="!topic.learningObjectives || topic.learningObjectives.length === 0">
+                                                        <p class="text-xs text-gray-400 dark:text-gray-500 italic">Learning objectives will be added here</p>
+                                                    </template>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-3" x-data="{ examplesOpen: false }">
+                                                <template x-if="topic.examples && topic.examples.length > 0">
+                                                    <button @click.stop="examplesOpen = !examplesOpen" class="flex items-center justify-between w-full text-left mb-1">
+                                                        <h5 class="font-bold text-xs text-gray-700 dark:text-gray-300">Examples</h5>
+                                                        <svg class="w-3 h-3 transition-transform duration-200 text-gray-400 dark:text-gray-500" :class="examplesOpen ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                                        </svg>
+                                                    </button>
+                                                </template>
+                                                <template x-if="!topic.examples || topic.examples.length === 0">
+                                                    <h5 class="font-bold text-xs text-gray-700 dark:text-gray-300 mb-1">Examples</h5>
+                                                </template>
+                                                <div x-show="examplesOpen || (!topic.examples || topic.examples.length === 0)" x-transition class="mt-1">
+                                                    <template x-if="topic.examples && topic.examples.length > 0">
+                                                        <ul class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                                                            <template x-for="example in topic.examples" :key="example">
+                                                                <li class="flex items-start">
+                                                                    <span class="text-green-500 mr-1">•</span>
+                                                                    <span x-text="example"></span>
+                                                                </li>
+                                                            </template>
+                                                        </ul>
+                                                    </template>
+                                                    <template x-if="!topic.examples || topic.examples.length === 0">
+                                                        <p class="text-xs text-gray-400 dark:text-gray-500 italic">Examples will be added here</p>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex justify-between items-center" @click.stop>
+                                            <div class="flex space-x-1">
+                                                <template x-for="scale in confidenceScale" :key="scale.value">
+                                                    <button @click="updateConfidence(topic.id, scale.value)"
+                                                            :class="(confidenceLevels[topic.id] || null) === scale.value ? `${scale.color} text-white border-2 border-gray-800 dark:border-gray-200` : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600'"
+                                                            class="w-8 h-8 rounded text-xs font-bold transition-all"
+                                                            :title="scale.description"
+                                                            x-text="scale.value"></button>
+                                                </template>
+                                            </div>
+                                        </div>
+                                        <template x-if="confidenceLevels[topic.id] && confidenceLevels[topic.id] > 0">
+                                            <div class="mt-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg border-l-4 border-blue-400 dark:border-blue-500">
+                                                <span class="text-sm font-medium text-gray-800 dark:text-gray-200" x-text="confidenceScale.find(c => c.value === confidenceLevels[topic.id])?.description"></span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
