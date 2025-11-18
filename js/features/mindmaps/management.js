@@ -111,6 +111,11 @@ export const mindmapManagementMethods = {
      * Saves the current mindmap (create or update)
      */
     async saveMindmap() {
+        // CRITICAL FIX: Save any currently editing shape text before saving mindmap
+        if (this.editingShape && this.editingShape._saveEditFn) {
+            this.editingShape._saveEditFn();
+        }
+
         // Validation
         if (!this.mindmapEditorTitle.trim()) {
             await this.showAlert('Please enter a title for your mindmap', 'Missing Title');
