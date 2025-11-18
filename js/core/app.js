@@ -281,6 +281,23 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 return enhancedDataManagement.loadDataType.call(this, type, defaultValue);
             },
 
+            // Add async helper methods to Alpine component context
+            async _serializeAsync(data) {
+                return enhancedDataManagement._serializeAsync.call(this, data);
+            },
+
+            async _handleQuotaExceeded(type, error) {
+                return enhancedDataManagement._handleQuotaExceeded.call(this, type, error);
+            },
+
+            _getStorageSize() {
+                return enhancedDataManagement._getStorageSize.call(this);
+            },
+
+            async getStorageInfo() {
+                return enhancedDataManagement.getStorageInfo.call(this);
+            },
+
             migrateOldData() {
                 return enhancedDataManagement.migrateOldData.call(this);
             },
