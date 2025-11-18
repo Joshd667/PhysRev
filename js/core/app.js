@@ -172,7 +172,20 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 this.loadTestSets();
 
                 this.sidebarVisible = true;
-                window.addEventListener('resize', () => { if (window.innerWidth >= 768) this.sidebarVisible = true; });
+
+                // Store reference for cleanup
+                this._resizeHandler = () => {
+                    if (window.innerWidth >= 768) this.sidebarVisible = true;
+                };
+                window.addEventListener('resize', this._resizeHandler);
+
+                // Set up cleanup on component destruction
+                this.$watch('$el', (value, oldValue) => {
+                    if (!value && oldValue && this._resizeHandler) {
+                        window.removeEventListener('resize', this._resizeHandler);
+                        this._resizeHandler = null;
+                    }
+                });
 
                 // Set up watchers
                 setupWatchers(this);
@@ -306,8 +319,12 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
              */
             renderContentWithMath(htmlContent) {
                 if (!htmlContent) return '';
+
+                // SECURITY: Sanitize first to prevent XSS
+                const sanitized = this.sanitizeHTML(htmlContent);
+
                 const div = document.createElement('div');
-                div.innerHTML = htmlContent;
+                div.innerHTML = sanitized;
                 if (window.renderMathInElement) {
                     window.renderMathInElement(div, {
                         delimiters: [
@@ -319,6 +336,65 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                     });
                 }
                 return div.innerHTML;
+            },
+
+            /**
+             * SECURITY: Sanitize HTML to prevent XSS attacks
+             * @param {string} dirty - Untrusted HTML content
+             * @returns {string} Sanitized HTML safe for rendering
+             */
+            sanitizeHTML(dirty) {
+                if (!dirty) return '';
+
+                // Use DOMPurify if available
+                if (typeof DOMPurify !== 'undefined') {
+                    return DOMPurify.sanitize(dirty, {
+                        ALLOWED_TAGS: ['b', 'i', 'u', 'strong', 'em', 'p', 'br', 'ul', 'ol', 'li',
+                                       'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                                       'table', 'thead', 'tbody', 'tr', 'td', 'th',
+                                       'blockquote', 'code', 'pre', 'span', 'div', 'a',
+                                       'img', 'hr', 'mark'],
+                        ALLOWED_ATTR: ['href', 'class', 'style', 'src', 'alt', 'title', 'width', 'height'],
+                        ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                        ALLOW_DATA_ATTR: false,
+                        ALLOW_UNKNOWN_PROTOCOLS: false,
+                        SAFE_FOR_TEMPLATES: true
+                    });
+                }
+
+                // Fallback: text-only escape (no HTML)
+                const div = document.createElement('div');
+                div.textContent = dirty;
+                return div.innerHTML;
+            },
+
+            /**
+             * Debounce utility for performance optimization
+             */
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func.apply(this, args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+
+            /**
+             * Throttle utility for scroll/resize events
+             */
+            throttle(func, limit) {
+                let inThrottle;
+                return function(...args) {
+                    if (!inThrottle) {
+                        func.apply(this, args);
+                        inThrottle = true;
+                        setTimeout(() => inThrottle = false, limit);
+                    }
+                };
             }
         };
     };

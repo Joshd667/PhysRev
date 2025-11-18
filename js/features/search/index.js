@@ -235,11 +235,18 @@ export const searchMethods = {
 
     _searchAuditCards(query) {
         const results = [];
+
+        // OPTIMIZATION: Convert arrays to Sets for O(1) lookup instead of O(n)
+        const tagSet = new Set(this.selectedSearchTags);
+        const hasTagFilter = tagSet.size > 0;
+        const confidenceLevelSet = new Set(this.selectedConfidenceLevels);
+        const hasConfidenceLevelFilter = confidenceLevelSet.size > 0;
+
         Object.entries(this.specificationData).forEach(([sectionKey, section]) => {
             if (!section.topics) return;
             section.topics.forEach(topic => {
-                // Filter by tags if advanced search is active
-                if (this.selectedSearchTags.length > 0 && !this.selectedSearchTags.includes(topic.id)) {
+                // Filter by tags if advanced search is active - O(1) lookup with Set
+                if (hasTagFilter && !tagSet.has(topic.id)) {
                     return;
                 }
 
@@ -251,9 +258,9 @@ export const searchMethods = {
                     }
                 }
 
-                // Filter by confidence levels if selected (multi-select)
-                if (this.selectedConfidenceLevels.length > 0) {
-                    if (!this.selectedConfidenceLevels.includes(topicConfidence)) {
+                // Filter by confidence levels if selected (multi-select) - O(1) lookup with Set
+                if (hasConfidenceLevelFilter) {
+                    if (!confidenceLevelSet.has(topicConfidence)) {
                         return;
                     }
                 }

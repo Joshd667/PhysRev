@@ -26,16 +26,127 @@ export const enhancedDataManagement = {
     },
 
     /**
-     * Save specific data type to localStorage
+     * Save specific data type to localStorage (async to avoid blocking)
      */
-    saveDataType(type, data) {
+    async saveDataType(type, data) {
         try {
             const prefix = this.getStoragePrefix();
             const key = prefix + STORAGE_KEYS[type];
-            localStorage.setItem(key, JSON.stringify(data));
+
+            // Use async serialization
+            const serialized = await this._serializeAsync(data);
+            localStorage.setItem(key, serialized);
+            return { success: true };
         } catch (error) {
+            if (error.name === 'QuotaExceededError') {
+                return await this._handleQuotaExceeded(type, error);
+            }
             console.error(`Failed to save ${type}:`, error);
+            return { success: false, error: error.message };
         }
+    },
+
+    /**
+     * Serialize data asynchronously using requestIdleCallback
+     */
+    _serializeAsync(data) {
+        return new Promise((resolve, reject) => {
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(() => {
+                    try {
+                        const serialized = JSON.stringify(data);
+                        resolve(serialized);
+                    } catch (e) {
+                        reject(e);
+                    }
+                }, { timeout: 2000 });
+            } else {
+                setTimeout(() => {
+                    try {
+                        const serialized = JSON.stringify(data);
+                        resolve(serialized);
+                    } catch (e) {
+                        reject(e);
+                    }
+                }, 0);
+            }
+        });
+    },
+
+    /**
+     * Handle quota exceeded error
+     */
+    async _handleQuotaExceeded(type, error) {
+        const usage = this._getStorageSize();
+        const usageMB = (usage / 1024 / 1024).toFixed(2);
+
+        console.error(`Storage quota exceeded while saving ${type}. Usage: ${usageMB}MB`);
+
+        // Show user-friendly error using modal if available
+        if (this.showCustomModal && this.showAlert) {
+            await this.showAlert(
+                'Storage Quota Exceeded',
+                `You've used approximately ${usageMB}MB of storage. Please export your data as backup and clear old items.`,
+                [
+                    { label: 'Export Backup', primary: true, onClick: () => this.exportDataBackup() },
+                    { label: 'Cancel', onClick: () => {} }
+                ]
+            );
+        } else {
+            // Fallback to browser alert
+            alert(`Storage quota exceeded! You've used ${usageMB}MB. Please export your data and clear old items.`);
+        }
+
+        return {
+            success: false,
+            quotaExceeded: true,
+            currentUsageMB: usageMB,
+            error: error.message
+        };
+    },
+
+    /**
+     * Get current localStorage size
+     */
+    _getStorageSize() {
+        let total = 0;
+        for (let key in localStorage) {
+            if (localStorage.hasOwnProperty(key)) {
+                total += localStorage[key].length + key.length;
+            }
+        }
+        return total;
+    },
+
+    /**
+     * Get storage info for display
+     */
+    async getStorageInfo() {
+        if ('storage' in navigator && 'estimate' in navigator.storage) {
+            try {
+                const estimate = await navigator.storage.estimate();
+                return {
+                    usage: estimate.usage || 0,
+                    quota: estimate.quota || 10 * 1024 * 1024,
+                    percentUsed: estimate.quota ?
+                        ((estimate.usage || 0) / estimate.quota * 100).toFixed(1) : 0,
+                    usageMB: ((estimate.usage || 0) / 1024 / 1024).toFixed(2),
+                    quotaMB: ((estimate.quota || 10 * 1024 * 1024) / 1024 / 1024).toFixed(2)
+                };
+            } catch (e) {
+                console.warn('Storage estimate failed:', e);
+            }
+        }
+
+        const usage = this._getStorageSize();
+        const quota = 10 * 1024 * 1024;
+        return {
+            usage,
+            quota,
+            percentUsed: (usage / quota * 100).toFixed(1),
+            usageMB: (usage / 1024 / 1024).toFixed(2),
+            quotaMB: (quota / 1024 / 1024).toFixed(2)
+        };
     },
 
     /**

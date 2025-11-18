@@ -191,6 +191,29 @@ export const noteEditorMethods = {
     },
 
     /**
+     * SECURITY: Handle paste events to sanitize content before insertion
+     */
+    handleEditorPaste(event) {
+        event.preventDefault();
+
+        // Get pasted content (try HTML first, fallback to plain text)
+        let paste = '';
+        if (event.clipboardData || window.clipboardData) {
+            paste = (event.clipboardData || window.clipboardData).getData('text/html') ||
+                    (event.clipboardData || window.clipboardData).getData('text/plain') ||
+                    (event.clipboardData || window.clipboardData).getData('text');
+        }
+
+        if (!paste) return;
+
+        // SECURITY: Sanitize before inserting
+        const clean = this.sanitizeHTML(paste);
+
+        // Insert at cursor using execCommand
+        document.execCommand('insertHTML', false, clean);
+    },
+
+    /**
      * Export note as HTML and open in new window for printing
      */
     exportNoteAsHTML() {
