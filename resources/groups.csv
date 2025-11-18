@@ -1,0 +1,63 @@
+paper,order,type,group_title,icon,section_name
+Paper 1,1,group,3.1 Measurements and their errors,settings,measurements_errors
+Paper 1,1,group,3.1 Measurements and their errors,settings,number_work
+Paper 1,2,group,3.2 Particles & Radiation,atom,atomic_structure
+Paper 1,2,group,3.2 Particles & Radiation,atom,particle_interactions
+Paper 1,2,group,3.2 Particles & Radiation,atom,quantum_phenomena
+Paper 1,3,group,3.3 Waves,waves,waves_properties
+Paper 1,3,group,3.3 Waves,waves,stationary_waves
+Paper 1,3,group,3.3 Waves,waves,interference_patterns
+Paper 1,3,group,3.3 Waves,waves,waves_optics
+Paper 1,4,group,3.4 Mechanics & Materials,target,vectors_scalars
+Paper 1,4,group,3.4 Mechanics & Materials,target,mechanics_moments
+Paper 1,4,group,3.4 Mechanics & Materials,target,motion_kinematics
+Paper 1,4,group,3.4 Mechanics & Materials,target,mechanics_dynamics
+Paper 1,4,group,3.4 Mechanics & Materials,target,mechanics_energy
+Paper 1,4,group,3.4 Mechanics & Materials,target,mechanics_materials
+Paper 1,5,group,3.5 Electricity,zap,current_voltage
+Paper 1,5,group,3.5 Electricity,zap,dc_circuits
+Paper 1,6,single,,,circular_motion
+Paper 2,1,single,,,simple_harmonic_motion
+Paper 2,2,group,3.6.2 Thermal Physics,settings,thermal_energy_transfer
+Paper 2,2,group,3.6.2 Thermal Physics,settings,ideal_gases
+Paper 2,2,group,3.6.2 Thermal Physics,settings,kinetic_theory
+Paper 2,3,group,3.7a G and E Fields,globe,gravitational_fields
+Paper 2,3,group,3.7a G and E Fields,globe,electric_fields
+Paper 2,3,group,3.7a G and E Fields,globe,fields_capacitance
+Paper 2,4,group,3.7b Magnetic Fields,settings,magnetic_forces
+Paper 2,4,group,3.7b Magnetic Fields,settings,electromagnetic_induction
+Paper 2,4,group,3.7b Magnetic Fields,settings,ac_transformers
+Paper 2,5,group,3.8 Nuclear Physics,shield,nuclear_radioactivity
+Paper 2,5,group,3.8 Nuclear Physics,shield,nuclear_structure_energy
+Paper 2,5,group,3.8 Nuclear Physics,shield,nuclear_applications_safety
+All Topics,1,group,3.1 Measurements and their errors,settings,measurements_errors
+All Topics,1,group,3.1 Measurements and their errors,settings,number_work
+All Topics,2,group,3.2 Particles & Radiation,atom,atomic_structure
+All Topics,2,group,3.2 Particles & Radiation,atom,particle_interactions
+All Topics,2,group,3.2 Particles & Radiation,atom,quantum_phenomena
+All Topics,3,group,3.3 Waves,waves,waves_properties
+All Topics,3,group,3.3 Waves,waves,stationary_waves
+All Topics,3,group,3.3 Waves,waves,interference_patterns
+All Topics,3,group,3.3 Waves,waves,waves_optics
+All Topics,4,group,3.4 Mechanics & Materials,target,vectors_scalars
+All Topics,4,group,3.4 Mechanics & Materials,target,mechanics_moments
+All Topics,4,group,3.4 Mechanics & Materials,target,motion_kinematics
+All Topics,4,group,3.4 Mechanics & Materials,target,mechanics_dynamics
+All Topics,4,group,3.4 Mechanics & Materials,target,mechanics_energy
+All Topics,4,group,3.4 Mechanics & Materials,target,mechanics_materials
+All Topics,5,group,3.5 Electricity,zap,current_voltage
+All Topics,5,group,3.5 Electricity,zap,dc_circuits
+All Topics,6,group,3.6.1 Periodic motion,target,circular_motion
+All Topics,6,group,3.6.1 Periodic motion,target,simple_harmonic_motion
+All Topics,7,group,3.6.2 Thermal Physics,settings,thermal_energy_transfer
+All Topics,7,group,3.6.2 Thermal Physics,settings,ideal_gases
+All Topics,7,group,3.6.2 Thermal Physics,settings,kinetic_theory
+All Topics,8,group,3.7a G and E Fields,globe,gravitational_fields
+All Topics,8,group,3.7a G and E Fields,globe,electric_fields
+All Topics,8,group,3.7a G and E Fields,globe,fields_capacitance
+All Topics,9,group,3.7b Magnetic Fields,settings,magnetic_forces
+All Topics,9,group,3.7b Magnetic Fields,settings,electromagnetic_induction
+All Topics,9,group,3.7b Magnetic Fields,settings,ac_transformers
+All Topics,10,group,3.8 Nuclear Physics,shield,nuclear_radioactivity
+All Topics,10,group,3.8 Nuclear Physics,shield,nuclear_structure_energy
+All Topics,10,group,3.8 Nuclear Physics,shield,nuclear_applications_safety
