@@ -263,7 +263,7 @@
                                 </div>
                                 <div class="inline-grid gap-1 bg-gray-100 dark:bg-gray-800 p-2 rounded"
                                      :style="`grid-template-columns: repeat(${maxTableCols}, 20px); grid-template-rows: repeat(${maxTableRows}, 20px);`">
-                                    <template x-for="idx in (maxTableRows * maxTableCols)" :key="idx">
+                                    <template x-for="idx in (maxTableRows * maxTableCols)" :key="`cell-${maxTableRows}-${maxTableCols}-${idx}`">
                                         <div @mouseenter="
                                             let row = Math.ceil(idx / maxTableCols);
                                             let col = ((idx - 1) % maxTableCols) + 1;
@@ -341,6 +341,7 @@
                 <div
                     id="noteContentEditor"
                     contenteditable="true"
+                    @paste="handleEditorPaste($event)"
                     @mouseup="editorSelectionUpdate++"
                     @keyup="editorSelectionUpdate++"
                     @click="editorSelectionUpdate++"
