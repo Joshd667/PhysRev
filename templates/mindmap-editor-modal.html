@@ -1,0 +1,480 @@
+<!-- Mindmap Editor Modal - Professional Diagram Editor -->
+<div x-show="showMindmapEditor"
+     x-data="{ mouseDownOnBackdrop: false, showFormatMenu: false }"
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     @mousedown.self="mouseDownOnBackdrop = true"
+     @mouseup.self="if (mouseDownOnBackdrop) closeMindmapEditor(); mouseDownOnBackdrop = false"
+     @mouseleave="mouseDownOnBackdrop = false"
+     @keydown.delete="deleteSelectedShape()"
+     @keydown.ctrl.z.prevent="undo()"
+     @keydown.ctrl.y.prevent="redo()"
+     @keydown.ctrl.shift.z.prevent="redo()"
+     class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+
+    <!-- Modal Window -->
+    <div @click.stop
+         x-show="showMindmapEditor"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-[98vw] h-[95vh] flex flex-col overflow-hidden">
+
+        <!-- Top Menu Bar -->
+        <div class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+            <div class="flex items-center justify-between px-4 py-2">
+                <!-- Left: Title Input -->
+                <div class="flex items-center gap-3">
+                    <i data-lucide="network" class="w-5 h-5 text-cyan-600 dark:text-cyan-400"></i>
+                    <input
+                        id="mindmap-title"
+                        name="mindmap-title"
+                        x-model="mindmapEditorTitle"
+                        type="text"
+                        placeholder="Diagram title..."
+                        class="px-3 py-1.5 text-sm font-semibold text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 bg-white dark:bg-gray-700 border border-slate-300 dark:border-slate-600 rounded focus:border-cyan-500 focus:outline-none w-64"
+                    />
+                </div>
+
+                <!-- Center: Stats -->
+                <div class="flex items-center gap-3 text-xs text-gray-600 dark:text-gray-400">
+                    <span><strong x-text="mindmapEditorData.nodes.length"></strong> shapes</span>
+                    <span>•</span>
+                    <span><strong x-text="mindmapEditorData.connections.length"></strong> connections</span>
+                </div>
+
+                <!-- Right: Close Button -->
+                <button @click="closeMindmapEditor()" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors">
+                    <i data-lucide="x" class="w-5 h-5 text-gray-600 dark:text-gray-400"></i>
+                </button>
+            </div>
+
+            <!-- Toolbar -->
+            <div class="flex items-center justify-between px-4 py-2 border-t border-gray-200 dark:border-gray-700">
+                <!-- Left: Tools -->
+                <div class="flex items-center gap-1">
+                    <!-- Undo/Redo -->
+                    <button @click="undo()" :disabled="undoStack.length === 0" class="p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" title="Undo (Ctrl+Z)">
+                        <i data-lucide="undo" class="w-4 h-4"></i>
+                    </button>
+                    <button @click="redo()" :disabled="redoStack.length === 0" class="p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700" title="Redo (Ctrl+Y)">
+                        <i data-lucide="redo" class="w-4 h-4"></i>
+                    </button>
+
+                    <div class="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+
+                    <!-- Delete -->
+                    <button @mousedown.prevent @click="deleteSelectedShape()" :disabled="!selectedShape && !selectedConnection" class="p-1.5 rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400" title="Delete (Del)">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+
+                    <div class="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+
+                    <!-- View Options -->
+                    <button @click="showGrid = !showGrid" :class="showGrid ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'" class="p-1.5 rounded transition-colors" title="Toggle Grid">
+                        <i data-lucide="grid-3x3" class="w-4 h-4"></i>
+                    </button>
+                    <button @click="snapToGrid = !snapToGrid" :class="snapToGrid ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'" class="p-1.5 rounded transition-colors" title="Snap to Grid">
+                        <i data-lucide="magnet" class="w-4 h-4"></i>
+                    </button>
+
+
+                    <!-- Text Editing Toolbar for Shapes (from Note Editor) -->
+                    <template x-if="editingShape && !selectedConnection">
+                        <div class="flex items-center gap-1 ml-2 pl-2 border-l border-gray-300 dark:border-gray-600" x-data="{ showColorPicker: false, showHighlightPicker: false }">
+                            <!-- Font Size -->
+                            <select id="mindmap-font-size" name="mindmap-font-size" @mousedown.stop="saveSelection()" @click.stop @change="changeFontSize($event.target.value); showColorPicker = false; showHighlightPicker = false" @focus="showColorPicker = false; showHighlightPicker = false" class="px-2 py-1 text-xs bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                <option value="">Size</option>
+                                <option value="1">8pt</option>
+                                <option value="2">10pt</option>
+                                <option value="3">12pt</option>
+                                <option value="4">14pt</option>
+                                <option value="5">18pt</option>
+                                <option value="6">24pt</option>
+                                <option value="7">36pt</option>
+                            </select>
+
+                            <div class="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+
+                            <!-- Text Style -->
+                            <button @mousedown.prevent="saveSelection()" @click.prevent="formatText('bold'); showColorPicker = false; showHighlightPicker = false" type="button" :class="_activeFormats && _activeFormats.bold ? 'bg-blue-100 dark:bg-blue-900/50' : ''" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors text-gray-700 dark:text-gray-300" title="Bold">
+                                <i data-lucide="bold" class="w-4 h-4"></i>
+                            </button>
+                            <button @mousedown.prevent="saveSelection()" @click.prevent="formatText('italic'); showColorPicker = false; showHighlightPicker = false" type="button" :class="_activeFormats && _activeFormats.italic ? 'bg-blue-100 dark:bg-blue-900/50' : ''" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors text-gray-700 dark:text-gray-300" title="Italic">
+                                <i data-lucide="italic" class="w-4 h-4"></i>
+                            </button>
+                            <button @mousedown.prevent="saveSelection()" @click.prevent="formatText('underline'); showColorPicker = false; showHighlightPicker = false" type="button" :class="_activeFormats && _activeFormats.underline ? 'bg-blue-100 dark:bg-blue-900/50' : ''" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors text-gray-700 dark:text-gray-300" title="Underline">
+                                <i data-lucide="underline" class="w-4 h-4"></i>
+                            </button>
+                            <button @mousedown.prevent="saveSelection()" @click.prevent="formatText('strikeThrough'); showColorPicker = false; showHighlightPicker = false" type="button" :class="_activeFormats && _activeFormats.strikeThrough ? 'bg-blue-100 dark:bg-blue-900/50' : ''" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors text-gray-700 dark:text-gray-300" title="Strikethrough">
+                                <i data-lucide="strikethrough" class="w-4 h-4"></i>
+                            </button>
+
+                            <div class="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+
+                            <!-- Text Color -->
+                            <div class="relative">
+                                <button @mousedown.prevent="saveSelection()" @click.prevent="showColorPicker = !showColorPicker; showHighlightPicker = false" type="button" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors flex items-center gap-0.5 text-gray-700 dark:text-gray-300" title="Text Color">
+                                    <i data-lucide="palette" class="w-4 h-4"></i>
+                                    <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                                </button>
+                                <div x-show="showColorPicker" @click.away="showColorPicker = false" x-transition class="absolute top-full left-0 mt-1 p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded shadow-lg z-50 grid grid-cols-4 gap-1.5 w-32">
+                                    <button @mousedown.prevent @click.prevent="changeTextColor('#000000'); showColorPicker = false" type="button" class="w-6 h-6 bg-black border rounded hover:ring-1 hover:ring-blue-500"></button>
+                                    <button @mousedown.prevent @click.prevent="changeTextColor('#ef4444'); showColorPicker = false" type="button" class="w-6 h-6 bg-red-500 border rounded hover:ring-1 hover:ring-blue-500"></button>
+                                    <button @mousedown.prevent @click.prevent="changeTextColor('#f59e0b'); showColorPicker = false" type="button" class="w-6 h-6 bg-orange-500 border rounded hover:ring-1 hover:ring-blue-500"></button>
+                                    <button @mousedown.prevent @click.prevent="changeTextColor('#22c55e'); showColorPicker = false" type="button" class="w-6 h-6 bg-green-500 border rounded hover:ring-1 hover:ring-blue-500"></button>
+                                    <button @mousedown.prevent @click.prevent="changeTextColor('#3b82f6'); showColorPicker = false" type="button" class="w-6 h-6 bg-blue-500 border rounded hover:ring-1 hover:ring-blue-500"></button>
+                                    <button @mousedown.prevent @click.prevent="changeTextColor('#8b5cf6'); showColorPicker = false" type="button" class="w-6 h-6 bg-purple-500 border rounded hover:ring-1 hover:ring-blue-500"></button>
+                                </div>
+                            </div>
+
+                            <!-- Highlight Color -->
+                            <div class="relative">
+                                <button @mousedown.prevent="saveSelection()" @click.prevent="showHighlightPicker = !showHighlightPicker; showColorPicker = false" type="button" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors flex items-center gap-0.5 text-gray-700 dark:text-gray-300" title="Highlight">
+                                    <i data-lucide="highlighter" class="w-4 h-4"></i>
+                                    <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                                </button>
+                                <div x-show="showHighlightPicker" @click.away="showHighlightPicker = false" x-transition class="absolute top-full left-0 mt-1 p-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded shadow-lg z-50 grid grid-cols-3 gap-1.5 w-24">
+                                    <button @mousedown.prevent @click.prevent="changeHighlightColor('transparent'); showHighlightPicker = false" type="button" class="w-6 h-6 bg-white border rounded hover:ring-1 hover:ring-blue-500 relative">
+                                        <div class="absolute inset-0 flex items-center justify-center"><div class="w-4 h-0.5 bg-red-500 rotate-45"></div></div>
+                                    </button>
+                                    <button @mousedown.prevent @click.prevent="changeHighlightColor('#fef08a'); showHighlightPicker = false" type="button" class="w-6 h-6 bg-yellow-200 border rounded hover:ring-1 hover:ring-blue-500"></button>
+                                    <button @mousedown.prevent @click.prevent="changeHighlightColor('#bbf7d0'); showHighlightPicker = false" type="button" class="w-6 h-6 bg-green-200 border rounded hover:ring-1 hover:ring-blue-500"></button>
+                                    <button @mousedown.prevent @click.prevent="changeHighlightColor('#bfdbfe'); showHighlightPicker = false" type="button" class="w-6 h-6 bg-blue-200 border rounded hover:ring-1 hover:ring-blue-500"></button>
+                                    <button @mousedown.prevent @click.prevent="changeHighlightColor('#fecaca'); showHighlightPicker = false" type="button" class="w-6 h-6 bg-red-200 border rounded hover:ring-1 hover:ring-blue-500"></button>
+                                    <button @mousedown.prevent @click.prevent="changeHighlightColor('#e9d5ff'); showHighlightPicker = false" type="button" class="w-6 h-6 bg-purple-200 border rounded hover:ring-1 hover:ring-blue-500"></button>
+                                </div>
+                            </div>
+
+                            <div class="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+
+                            <!-- Alignment -->
+                            <button @mousedown.prevent="saveSelection()" @click.prevent="formatText('justifyLeft'); showColorPicker = false; showHighlightPicker = false" type="button" :class="_activeFormats && _activeFormats.justifyLeft ? 'bg-blue-100 dark:bg-blue-900/50' : ''" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors text-gray-700 dark:text-gray-300" title="Align Left">
+                                <i data-lucide="align-left" class="w-4 h-4"></i>
+                            </button>
+                            <button @mousedown.prevent="saveSelection()" @click.prevent="formatText('justifyCenter'); showColorPicker = false; showHighlightPicker = false" type="button" :class="_activeFormats && _activeFormats.justifyCenter ? 'bg-blue-100 dark:bg-blue-900/50' : ''" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors text-gray-700 dark:text-gray-300" title="Align Center">
+                                <i data-lucide="align-center" class="w-4 h-4"></i>
+                            </button>
+                            <button @mousedown.prevent="saveSelection()" @click.prevent="formatText('justifyRight'); showColorPicker = false; showHighlightPicker = false" type="button" :class="_activeFormats && _activeFormats.justifyRight ? 'bg-blue-100 dark:bg-blue-900/50' : ''" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors text-gray-700 dark:text-gray-300" title="Align Right">
+                                <i data-lucide="align-right" class="w-4 h-4"></i>
+                            </button>
+                            <button @mousedown.prevent="saveSelection()" @click.prevent="formatText('justifyFull'); showColorPicker = false; showHighlightPicker = false" type="button" :class="_activeFormats && _activeFormats.justifyFull ? 'bg-blue-100 dark:bg-blue-900/50' : ''" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors text-gray-700 dark:text-gray-300" title="Justify">
+                                <i data-lucide="align-justify" class="w-4 h-4"></i>
+                            </button>
+
+                            <div class="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+
+                            <!-- Equation -->
+                            <button @mousedown.prevent="saveSelection()" @click.prevent="openEquationEditorForShape(editingShape); showColorPicker = false; showHighlightPicker = false" type="button" class="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors text-gray-700 dark:text-gray-300" title="Add Equation">
+                                <i data-lucide="function-square" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </template>
+
+                    <!-- Inline Format Options for Selected Connection -->
+                    <template x-if="selectedConnection && !editingShape">
+                        <div class="flex items-center gap-1 ml-2 pl-2 border-l border-gray-300 dark:border-gray-600">
+                            <span class="text-xs text-gray-600 dark:text-gray-400 mr-1">Line:</span>
+                            <button @click="updateConnectorStyle('strokeColor', '#64748b')" class="w-6 h-6 rounded border border-gray-300 dark:border-gray-500" style="background: #64748b" title="Gray"></button>
+                            <button @click="updateConnectorStyle('strokeColor', '#1976d2')" class="w-6 h-6 rounded border border-gray-300 dark:border-gray-500" style="background: #1976d2" title="Blue"></button>
+                            <button @click="updateConnectorStyle('strokeColor', '#388e3c')" class="w-6 h-6 rounded border border-gray-300 dark:border-gray-500" style="background: #388e3c" title="Green"></button>
+                            <button @click="updateConnectorStyle('strokeColor', '#f57c00')" class="w-6 h-6 rounded border border-gray-300 dark:border-gray-500" style="background: #f57c00" title="Orange"></button>
+                            <button @click="updateConnectorStyle('strokeColor', '#d32f2f')" class="w-6 h-6 rounded border border-gray-300 dark:border-gray-500" style="background: #d32f2f" title="Red"></button>
+                            <button @click="updateConnectorStyle('strokeColor', '#000000')" class="w-6 h-6 rounded border border-gray-300 dark:border-gray-500" style="background: #000000" title="Black"></button>
+
+                            <span class="text-xs text-gray-600 dark:text-gray-400 ml-2 mr-1">Style:</span>
+                            <button @click="updateConnectorStyle('lineStyle', 'solid')" :class="(selectedConnection?.style?.lineStyle || 'solid') === 'solid' ? 'bg-blue-100 dark:bg-blue-900/30' : ''" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300" title="Solid">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                </svg>
+                            </button>
+                            <button @click="updateConnectorStyle('lineStyle', 'dashed')" :class="selectedConnection?.style?.lineStyle === 'dashed' ? 'bg-blue-100 dark:bg-blue-900/30' : ''" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300" title="Dashed">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="4,2">
+                                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                                </svg>
+                            </button>
+
+                            <span class="text-xs text-gray-600 dark:text-gray-400 ml-2 mr-1">Type:</span>
+                            <button @click="updateConnectorStyle('pathType', 'direct')" :class="(selectedConnection?.style?.pathType || 'direct') === 'direct' ? 'bg-blue-100 dark:bg-blue-900/30' : ''" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300" title="Direct">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="4" y1="20" x2="20" y2="4"></line>
+                                </svg>
+                            </button>
+                            <button @click="updateConnectorStyle('pathType', 'orthogonal')" :class="selectedConnection?.style?.pathType === 'orthogonal' ? 'bg-blue-100 dark:bg-blue-900/30' : ''" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300" title="Orthogonal">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 20 L4 12 L20 12 L20 4"></path>
+                                </svg>
+                            </button>
+
+                            <span class="text-xs text-gray-600 dark:text-gray-400 ml-2 mr-1">Arrow:</span>
+                            <button @click="updateConnectorStyle('arrowType', 'none')" :class="selectedConnection?.style?.arrowType === 'none' ? 'bg-blue-100 dark:bg-blue-900/30' : ''" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300" title="None">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="4" y1="12" x2="20" y2="12"></line>
+                                </svg>
+                            </button>
+                            <button @click="updateConnectorStyle('arrowType', 'arrow')" :class="(selectedConnection?.style?.arrowType || 'arrow') === 'arrow' ? 'bg-blue-100 dark:bg-blue-900/30' : ''" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300" title="Arrow">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="4" y1="12" x2="20" y2="12" marker-end="url(#preview-arrow)"></line>
+                                    <defs><marker id="preview-arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="currentColor"/></marker></defs>
+                                </svg>
+                            </button>
+                            <button @click="updateConnectorStyle('arrowType', 'circle')" :class="selectedConnection?.style?.arrowType === 'circle' ? 'bg-blue-100 dark:bg-blue-900/30' : ''" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300" title="Circle">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="4" y1="12" x2="18" y2="12"></line>
+                                    <circle cx="20" cy="12" r="2" fill="currentColor"></circle>
+                                </svg>
+                            </button>
+                            <button @click="updateConnectorStyle('arrowType', 'diamond')" :class="selectedConnection?.style?.arrowType === 'diamond' ? 'bg-blue-100 dark:bg-blue-900/30' : ''" class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300" title="Diamond">
+                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="4" y1="12" x2="16" y2="12"></line>
+                                    <path d="M20,12 L18,10 L16,12 L18,14 Z" fill="currentColor"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Right: Empty for now (zoom will be on canvas) -->
+                <div></div>
+            </div>
+        </div>
+
+        <!-- Main Content: Two Panel Layout -->
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Left: Shape Library -->
+            <div class="w-16 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 overflow-y-auto flex-shrink-0">
+                <div class="p-2 space-y-1.5">
+                    <!-- Rectangle -->
+                    <div draggable="true" @dragstart="handleShapeDragStart($event, 'rectangle')" @dragend="handleShapeDragEnd($event)" class="cursor-move p-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 rounded transition-all" title="Rectangle">
+                        <div class="w-full h-6 border border-gray-500 dark:border-gray-400 rounded"></div>
+                    </div>
+                    <!-- Rounded Rectangle -->
+                    <div draggable="true" @dragstart="handleShapeDragStart($event, 'rounded')" @dragend="handleShapeDragEnd($event)" class="cursor-move p-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 rounded transition-all" title="Rounded Rectangle">
+                        <div class="w-full h-6 border border-gray-500 dark:border-gray-400 rounded-md"></div>
+                    </div>
+                    <!-- Circle -->
+                    <div draggable="true" @dragstart="handleShapeDragStart($event, 'circle')" @dragend="handleShapeDragEnd($event)" class="cursor-move p-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 rounded transition-all" title="Circle">
+                        <div class="w-7 h-7 mx-auto border border-gray-500 dark:border-gray-400 rounded-full"></div>
+                    </div>
+                    <!-- Ellipse -->
+                    <div draggable="true" @dragstart="handleShapeDragStart($event, 'ellipse')" @dragend="handleShapeDragEnd($event)" class="cursor-move p-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 rounded transition-all" title="Ellipse">
+                        <div class="w-full h-5 border border-gray-500 dark:border-gray-400 rounded-full"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center: Canvas Area -->
+            <div class="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900">
+                <div id="canvasDropZone" @drop="handleCanvasDrop($event)" @dragover="handleCanvasDragOver($event)" @dragleave="handleCanvasDragLeave($event)" class="flex-1 relative overflow-hidden">
+                    <!-- Grid Background -->
+                    <svg x-show="showGrid" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index: 0;">
+                        <defs>
+                            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                                <rect width="20" height="20" fill="none"></rect>
+                                <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" stroke-width="0.5" opacity="0.3"></path>
+                            </pattern>
+                        </defs>
+                        <rect width="100%" height="100%" fill="url(#grid)"></rect>
+                    </svg>
+
+                    <!-- SVG Canvas for Connections -->
+                    <svg id="connectionsCanvas" class="absolute inset-0 w-full h-full" style="z-index: 1;">
+                        <defs>
+                            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                <path d="M0,0 L0,6 L9,3 z" fill="#64748b"></path>
+                            </marker>
+                        </defs>
+                    </svg>
+
+                    <!-- Shapes Container -->
+                    <div id="shapesContainer" class="absolute inset-0" style="z-index: 2; pointer-events: none;"></div>
+
+                    <!-- Floating Style Menu for Selected Shape (appears above shape when border is clicked) -->
+                    <template x-if="selectedShape && !editingShape">
+                        <div :style="`position: absolute; left: ${(selectedShape.x + selectedShape.width / 2) * canvasZoom + canvasPan.x}px; top: ${(selectedShape.y - 70) * canvasZoom + canvasPan.y}px; transform: translateX(-50%); z-index: 15;`"
+                             class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-xl"
+                             @mousedown.stop>
+                            <!-- Fill Color -->
+                            <div class="relative" x-data="{ showPicker: false }">
+                                <button @click="showPicker = !showPicker" type="button" class="flex items-center gap-1.5 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <span class="text-xs text-gray-600 dark:text-gray-400">Fill</span>
+                                    <div class="w-5 h-5 rounded border-2 border-gray-300 dark:border-gray-500" :style="`background: ${selectedShape.style.fill}`"></div>
+                                </button>
+                                <div x-show="showPicker" @click.away="showPicker = false" x-transition class="absolute left-0 top-full mt-1 p-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded shadow-lg z-50 grid grid-cols-3 gap-1 w-24">
+                                    <button @click="updateShapeStyle('fill', '#ffffff'); showPicker = false" class="w-6 h-6 bg-white border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" title="White"></button>
+                                    <button @click="updateShapeStyle('fill', '#e3f2fd'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #e3f2fd" title="Light Blue"></button>
+                                    <button @click="updateShapeStyle('fill', '#e8f5e9'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #e8f5e9" title="Light Green"></button>
+                                    <button @click="updateShapeStyle('fill', '#fff3e0'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #fff3e0" title="Light Orange"></button>
+                                    <button @click="updateShapeStyle('fill', '#fce4ec'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #fce4ec" title="Light Pink"></button>
+                                    <button @click="updateShapeStyle('fill', '#f3e5f5'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #f3e5f5" title="Light Purple"></button>
+                                    <button @click="updateShapeStyle('fill', '#fff9c4'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #fff9c4" title="Light Yellow"></button>
+                                    <button @click="updateShapeStyle('fill', '#f5f5f5'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #f5f5f5" title="Light Gray"></button>
+                                    <button @click="updateShapeStyle('fill', '#ffccbc'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #ffccbc" title="Light Coral"></button>
+                                </div>
+                            </div>
+
+                            <div class="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
+
+                            <!-- Border Color -->
+                            <div class="relative" x-data="{ showPicker: false }">
+                                <button @click="showPicker = !showPicker" type="button" class="flex items-center gap-1.5 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <span class="text-xs text-gray-600 dark:text-gray-400">Border</span>
+                                    <div class="w-5 h-5 rounded border-2 border-gray-300 dark:border-gray-500" :style="`background: ${selectedShape.style.borderColor}`"></div>
+                                </button>
+                                <div x-show="showPicker" @click.away="showPicker = false" x-transition class="absolute left-0 top-full mt-1 p-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded shadow-lg z-50 grid grid-cols-3 gap-1 w-24">
+                                    <button @click="updateShapeStyle('borderColor', '#1976d2'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #1976d2" title="Blue"></button>
+                                    <button @click="updateShapeStyle('borderColor', '#388e3c'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #388e3c" title="Green"></button>
+                                    <button @click="updateShapeStyle('borderColor', '#f57c00'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #f57c00" title="Orange"></button>
+                                    <button @click="updateShapeStyle('borderColor', '#d32f2f'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #d32f2f" title="Red"></button>
+                                    <button @click="updateShapeStyle('borderColor', '#7b1fa2'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #7b1fa2" title="Purple"></button>
+                                    <button @click="updateShapeStyle('borderColor', '#000000'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #000000" title="Black"></button>
+                                    <button @click="updateShapeStyle('borderColor', '#fbc02d'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #fbc02d" title="Yellow"></button>
+                                    <button @click="updateShapeStyle('borderColor', '#00796b'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #00796b" title="Teal"></button>
+                                    <button @click="updateShapeStyle('borderColor', '#5d4037'); showPicker = false" class="w-6 h-6 border border-gray-300 dark:border-gray-600 rounded hover:ring-2 hover:ring-blue-500" style="background: #5d4037" title="Brown"></button>
+                                </div>
+                            </div>
+
+                            <div class="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
+
+                            <!-- Border Width -->
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs text-gray-600 dark:text-gray-400">Width</span>
+                                <input id="mindmap-border-width" name="mindmap-border-width" type="range" min="1" max="8" step="1"
+                                       :value="selectedShape.style.borderWidth"
+                                       @input="updateShapeStyle('borderWidth', parseInt($event.target.value))"
+                                       class="w-20 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-blue-500">
+                                <span class="text-xs font-medium text-gray-700 dark:text-gray-300 w-6" x-text="selectedShape.style.borderWidth + 'px'"></span>
+                            </div>
+
+                            <div class="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
+
+                            <!-- Shape Type -->
+                            <div class="relative" x-data="{ showPicker: false }">
+                                <button @click="showPicker = !showPicker" type="button" class="flex items-center gap-1.5 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                    <span class="text-xs text-gray-600 dark:text-gray-400">Shape</span>
+                                    <i data-lucide="chevron-down" class="w-3 h-3 text-gray-600 dark:text-gray-400"></i>
+                                </button>
+                                <div x-show="showPicker" @click.away="showPicker = false" x-transition class="absolute left-0 top-full mt-1 p-1.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded shadow-lg z-50 grid grid-cols-2 gap-1 w-28">
+                                    <button @click="changeShapeType('rectangle'); showPicker = false" :class="selectedShape.type === 'rectangle' ? 'ring-2 ring-blue-500' : ''" class="p-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" title="Rectangle">
+                                        <div class="w-full h-6 border-2 border-gray-500 dark:border-gray-400"></div>
+                                    </button>
+                                    <button @click="changeShapeType('rounded'); showPicker = false" :class="selectedShape.type === 'rounded' ? 'ring-2 ring-blue-500' : ''" class="p-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" title="Rounded">
+                                        <div class="w-full h-6 border-2 border-gray-500 dark:border-gray-400 rounded-md"></div>
+                                    </button>
+                                    <button @click="changeShapeType('circle'); showPicker = false" :class="selectedShape.type === 'circle' ? 'ring-2 ring-blue-500' : ''" class="p-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" title="Circle">
+                                        <div class="w-7 h-7 mx-auto border-2 border-gray-500 dark:border-gray-400 rounded-full"></div>
+                                    </button>
+                                    <button @click="changeShapeType('ellipse'); showPicker = false" :class="selectedShape.type === 'ellipse' ? 'ring-2 ring-blue-500' : ''" class="p-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors" title="Ellipse">
+                                        <div class="w-full h-5 border-2 border-gray-500 dark:border-gray-400 rounded-full"></div>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Zoom Controls (bottom right on canvas) -->
+                    <div class="absolute bottom-4 right-4 flex flex-col gap-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-1" style="z-index: 10;">
+                        <button @click="zoomIn()" class="p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <i data-lucide="zoom-in" class="w-4 h-4"></i>
+                        </button>
+                        <span class="text-xs font-mono text-center text-gray-700 dark:text-gray-300 py-1" x-text="Math.round(canvasZoom * 100) + '%'"></span>
+                        <button @click="zoomOut()" class="p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <i data-lucide="zoom-out" class="w-4 h-4"></i>
+                        </button>
+                        <div class="w-full h-px bg-gray-200 dark:bg-gray-600"></div>
+                        <button @click="resetZoom()" class="p-2 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" title="Reset Zoom">
+                            <i data-lucide="maximize-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div x-show="!mindmapEditorData.nodes || mindmapEditorData.nodes.length === 0" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <div class="text-center px-8 py-6 bg-gray-50/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600">
+                            <i data-lucide="mouse-pointer-click" class="w-12 h-12 mx-auto text-gray-400 dark:text-gray-500 mb-3"></i>
+                            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Drag shapes here</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Drag shapes from the left panel and drop them on the canvas</p>
+                        </div>
+                    </div>
+
+                    <!-- Drop indicator -->
+                    <div x-show="isDraggingShape" class="absolute inset-0 border-4 border-dashed border-blue-400 dark:border-blue-500 pointer-events-none bg-blue-50/10 dark:bg-blue-900/10" style="z-index: 9;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer: Tags and Actions -->
+        <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 p-4">
+            <div class="flex items-center justify-between gap-4">
+                <!-- Left: Topic Tags -->
+                <div class="flex items-center gap-2 min-h-[28px] overflow-hidden">
+                    <div class="flex items-center gap-1.5 text-xs font-medium text-slate-600 dark:text-slate-400 flex-shrink-0">
+                        <i data-lucide="tag" class="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400"></i>
+                    </div>
+
+                    <template x-if="mindmapEditorTags.length === 0">
+                        <span class="text-xs text-slate-500 dark:text-slate-400 italic flex-shrink-0">None</span>
+                    </template>
+
+                    <template x-for="(tagId, index) in mindmapEditorTags.slice(0, 2)" :key="tagId">
+                        <div class="flex items-center gap-1 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-xs border border-blue-300 dark:border-blue-700 flex-shrink-0">
+                            <span class="font-mono font-bold" x-text="tagId"></span>
+                            <span class="whitespace-nowrap" x-text="topicLookup[tagId] ? topicLookup[tagId].topicTitle : ''"></span>
+                            <button @click="removeTagDirect('mindmap', tagId)" class="hover:bg-blue-200 dark:hover:bg-blue-800 rounded p-0.5 transition-colors">
+                                <i data-lucide="x" class="w-2.5 h-2.5"></i>
+                            </button>
+                        </div>
+                    </template>
+
+                    <template x-if="mindmapEditorTags.length > 2">
+                        <button @click="openTagSelector('mindmap')" type="button" class="flex items-center gap-1 px-2 py-1 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded text-xs font-medium hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors flex-shrink-0">
+                            <span x-text="`+${mindmapEditorTags.length - 2}`"></span>
+                        </button>
+                    </template>
+
+                    <button @click="openTagSelector('mindmap')" type="button" class="flex items-center gap-1 px-2 py-1 text-xs border border-dashed border-cyan-400 dark:border-cyan-600 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 rounded transition-colors flex-shrink-0 ml-auto">
+                        <i data-lucide="plus" class="w-3 h-3"></i>
+                        <span>Add Tag</span>
+                    </button>
+                </div>
+
+                <!-- Right: Action Buttons -->
+                <div class="flex items-center gap-2">
+                    <button @click="closeMindmapEditor()" class="px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded transition-colors">
+                        Cancel
+                    </button>
+
+                    <div class="w-px h-6 bg-gray-300 dark:bg-gray-600"></div>
+
+                    <button @click="exportMindmapAsSVG()" class="px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-green-50 dark:hover:bg-green-900/20 border border-gray-300 dark:border-gray-600 rounded transition-colors flex items-center gap-1.5">
+                        <i data-lucide="external-link" class="w-3.5 h-3.5 text-green-600 dark:text-green-400"></i>
+                        <span>Export SVG</span>
+                    </button>
+
+                    <button @click="saveMindmap()" class="px-3 py-1.5 text-sm bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white rounded transition-colors flex items-center gap-1.5">
+                        <i data-lucide="save" class="w-3.5 h-3.5"></i>
+                        <span x-text="mindmapEditorMode === 'create' ? 'Create' : 'Save'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSS Animations for Connection Points -->
+<style>
+@keyframes pulse-connection-point {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(76, 175, 80, 0.6), 0 0 0 4px rgba(76, 175, 80, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 16px rgba(76, 175, 80, 1), 0 0 0 8px rgba(76, 175, 80, 0.4);
+    }
+}
+</style>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Knowledge Audit Tool</title>
+
+    <!-- 🚀 Preload critical resources -->
+    <link rel="preload" href="./resources/combined-data.json" as="fetch" crossorigin>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/module.esm.js" as="script" crossorigin>
+    <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
+
+    <!-- 🔧 Service Worker registration - MUCH CLEANER! -->
+    <script type="module">
+        import { registerServiceWorker } from './js/sw-registration.js';
+        registerServiceWorker();
+    </script>
+
+    <!-- Icons -->
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <link rel="apple-touch-icon" href="./favicon.ico">
+    <link rel="shortcut icon" href="./favicon.ico">
+
+    <!-- Styles -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <link rel="stylesheet" href="css/style.css">
+
+    <!-- NEW: KaTeX for beautiful math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+
+    <!-- External scripts (deferred for faster page load) -->
+    <script defer src="https://unpkg.com/lucide@0.546.0/dist/umd/lucide.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Your app loader (must be last) -->
+    <script type="module" src="./js/app-loader.js"></script>
+</head>
+<body>
+    <div
+        x-data="physicsAuditTool"
+        x-init="init"
+        x-cloak
+        class="relative h-screen"
+        :class="darkMode ? 'dark' : ''"
+    >
+        <div class="absolute inset-0 animated-gradient dark:bg-gray-900 z-0"></div>
+
+        <!-- ============================================ -->
+        <!-- LOGIN SCREEN (INLINED FOR FASTER FIRST PAINT) -->
+        <!-- ============================================ -->
+        <div id="login-screen-container">
+            <div x-show="showLoginScreen" class="relative z-10 h-screen flex items-center justify-center bg-transparent">
+                <div class="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg shadow-xl p-8 w-full max-w-md mx-4">
+                    <div class="text-center mb-8">
+                        <div class="flex items-center justify-center space-x-2 mb-4">
+                            <i data-lucide="book-open" class="w-8 h-8 text-blue-600 dark:text-blue-400"></i>
+                            <h1 class="text-2xl font-bold text-slate-800 dark:text-slate-200">Physics Audit</h1>
+                        </div>
+                        <p class="text-gray-600 dark:text-gray-400">Choose your login method to save your progress</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Teams Login Button -->
+                        <button @click="loginWithTeams()" :disabled="isLoading" class="w-full flex items-center justify-center space-x-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-6 py-4 rounded-lg transition-colors">
+                            <div class="flex items-center space-x-3">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M20.625 7.5l-7.5-7.5H4.5a1.5 1.5 0 00-1.5 1.5v19.5a1.5 1.5 0 001.5 1.5h15a1.5 1.5 0 001.5-1.5V7.5zM12 3.75L18.75 10.5H12V3.75z"/>
+                                </svg>
+                                <div class="text-left">
+                                    <div class="font-semibold">Login with Microsoft Teams</div>
+                                    <div class="text-sm opacity-90">Data synced to your Teams account</div>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Guest Login Button -->
+                        <div class="text-center pt-2">
+                            <button @click="loginAsGuest()" class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 underline">
+                                Continue as Guest (local storage only)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div x-show="isLoading" class="mt-4 flex items-center justify-center space-x-2">
+                        <svg class="animate-spin h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Authenticating...</span>
+                    </div>
+
+                    <!-- Error State -->
+                    <div x-show="loginError" x-transition class="mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+                        <p class="text-sm text-red-700 dark:text-red-300" x-text="loginError"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================ -->
+        <!-- SETTINGS MODAL -->
+        <!-- Component: templates/settings-modal.html -->
+        <!-- ============================================ -->
+        <div id="settings-modal-container"></div>
+
+        <!-- ============================================ -->
+        <!-- NOTE EDITOR MODAL -->
+        <!-- Component: templates/note-editor-modal.html -->
+        <!-- ============================================ -->
+        <div id="note-editor-modal-container"></div>
+
+        <!-- ============================================ -->
+        <!-- NEW: EQUATION EDITOR MODAL -->
+        <!-- Component: templates/equation-editor-modal.html -->
+        <!-- ============================================ -->
+        <div id="equation-editor-modal-container"></div>
+
+        <!-- ============================================ -->
+        <!-- FLASHCARD EDITOR MODAL -->
+        <!-- Component: templates/flashcard-editor-modal.html -->
+        <!-- ============================================ -->
+        <div id="flashcard-editor-modal-container"></div>
+
+        <!-- ============================================ -->
+        <!-- FLASHCARD TEST MODAL -->
+        <!-- Component: templates/flashcard-test-modal.html -->
+        <!-- ============================================ -->
+        <div id="flashcard-test-modal-container"></div>
+
+        <!-- ============================================ -->
+        <!-- MINDMAP EDITOR MODAL -->
+        <!-- Component: templates/mindmap-editor-modal.html -->
+        <!-- ============================================ -->
+        <div id="mindmap-editor-modal-container"></div>
+
+        <!-- ============================================ -->
+        <!-- MINDMAP NODE EDITOR MODAL -->
+        <!-- Component: templates/mindmap-node-editor.html -->
+        <!-- ============================================ -->
+        <div id="mindmap-node-editor-container"></div>
+
+        <!-- ============================================ -->
+        <!-- TAG SELECTOR MODAL -->
+        <!-- Component: templates/tag-selector-modal.html -->
+        <!-- ============================================ -->
+        <div id="tag-selector-modal-container"></div>
+
+        <!-- ============================================ -->
+        <!-- CUSTOM MODAL DIALOG -->
+        <!-- Component: templates/custom-modal.html -->
+        <!-- ============================================ -->
+        <div id="custom-modal-container"></div>
+
+        <!-- ============================================ -->
+        <!-- MAIN APP (Authenticated View) -->
+        <!-- ============================================ -->
+        <div x-show="isAuthenticated && !showLoginScreen" class="relative z-10 h-screen flex bg-transparent">
+
+            <!-- ============================================ -->
+            <!-- SIDEBAR -->
+            <!-- Component: components/sidebar/sidebar.html -->
+            <!-- ============================================ -->
+            <div id="sidebar-container"></div>
+
+            <!-- Sidebar divider -->
+            <div x-show="sidebarVisible" class="w-px bg-white/30 dark:bg-gray-600/30 backdrop-blur-sm hidden md:block"></div>
+
+            <!-- ============================================ -->
+            <!-- MAIN CONTENT AREA -->
+            <!-- ============================================ -->
+            <div class="flex-1 flex flex-col bg-transparent">
+
+                <!-- Sidebar overlay for mobile -->
+                <div x-show="sidebarVisible" @click="sidebarVisible = false" class="fixed inset-0 bg-black/50 z-20 md:hidden" x-transition></div>
+
+                <!-- ============================================ -->
+                <!-- TOP NAVIGATION BAR -->
+                <!-- Component: components/navigation/top-bar.html -->
+                <!-- ============================================ -->
+                <div id="top-bar-container"></div>
+
+                <!-- Divider -->
+                <div class="h-px bg-white/30 dark:bg-gray-600/30 backdrop-blur-sm"></div>
+
+                <!-- ============================================ -->
+                <!-- SCROLLABLE CONTENT AREA -->
+                <!-- ============================================ -->
+                <div class="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-900 relative z-10 minimal-scrollbar">
+                    <div class="p-6">
+
+                        <!-- ============================================ -->
+                        <!-- SEARCH RESULTS VIEW -->
+                        <!-- Template: templates/search-results.html -->
+                        <!-- ============================================ -->
+                        <div id="search-results-container"></div>
+
+                        <!-- ============================================ -->
+                        <!-- ANALYTICS DASHBOARD VIEW -->
+                        <!-- Template: templates/analytics-dashboard.html -->
+                        <!-- ============================================ -->
+                        <div id="analytics-dashboard-container"></div>
+
+                        <!-- ============================================ -->
+                        <!-- REVISION VIEW -->
+                        <!-- Template: templates/revision-view.html -->
+                        <!-- ============================================ -->
+                        <div id="revision-view-container"></div>
+
+                        <!-- ============================================ -->
+                        <!-- ALL NOTES VIEW -->
+                        <!-- Template: templates/all-notes-view.html -->
+                        <!-- ============================================ -->
+                        <div id="all-notes-view-container"></div>
+
+                        <!-- ============================================ -->
+                        <!-- ALL FLASHCARDS VIEW -->
+                        <!-- Template: templates/all-flashcards-view.html -->
+                        <!-- ============================================ -->
+                        <div id="all-flashcards-view-container"></div>
+
+                        <!-- ============================================ -->
+                        <!-- ALL MINDMAPS VIEW -->
+                        <!-- Template: templates/all-mindmaps-view.html -->
+                        <!-- ============================================ -->
+                        <div id="all-mindmaps-view-container"></div>
+
+                        <!-- ============================================ -->
+                        <!-- MAIN MENU (Group Cards) -->
+                        <!-- Template: templates/main-menu.html -->
+                        <!-- ============================================ -->
+                        <div id="main-menu-container"></div>
+
+                        <!-- ============================================ -->
+                        <!-- SECTION CARDS VIEW -->
+                        <!-- Template: templates/section-cards.html -->
+                        <!-- ============================================ -->
+                        <div id="section-cards-container"></div>
+
+                        <!-- ============================================ -->
+                        <!-- TOPIC DETAIL VIEW -->
+                        <!-- Template: templates/topic-detail.html -->
+                        <!-- ============================================ -->
+                        <div id="topic-detail-container"></div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
