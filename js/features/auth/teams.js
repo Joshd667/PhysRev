@@ -1,5 +1,7 @@
 // js/features/auth/teams.js - Microsoft Teams Authentication
 
+import { idbGet, idbSet, idbRemove } from '../../utils/indexeddb.js';
+
 // Configuration for Microsoft Teams/Azure AD
 const TEAMS_CONFIG = {
     // Replace with your actual Azure AD application configuration
@@ -18,16 +20,16 @@ export const teamsAuthMethods = {
     teamsToken: null,
     autoSaveTimer: null,
 
-    completeLogin() {
+    async completeLogin() {
         const authData = {
             user: this.user,
             method: this.authMethod,
             expires: Date.now() + (24 * 60 * 60 * 1000)
         };
-        localStorage.setItem('physicsAuditAuth', JSON.stringify(authData));
+        await idbSet('physicsAuditAuth', authData);
         this.isAuthenticated = true;
         this.showLoginScreen = false;
-        this.loadSavedData();
+        await this.loadSavedData();
     },
 
     async loginWithTeams() {
@@ -261,21 +263,16 @@ export const teamsAuthMethods = {
     async loadDataFromTeams() {
         try {
             console.log('📁 Loading data from Teams...');
-            
-            // For now, we'll store in localStorage with user-specific key
+
+            // For now, we'll store in IndexedDB with user-specific key
             // In production, you might want to use SharePoint or Teams storage
             const userSpecificKey = `physicsAuditData_teams_${this.user.id}`;
-            const savedData = localStorage.getItem(userSpecificKey);
-            
-            if (savedData) {
-                try {
-                    const parsedData = JSON.parse(savedData);
-                    this.confidenceLevels = parsedData.confidenceLevels || {};
-                    this.analyticsHistoryData = parsedData.analyticsHistory || [];
-                    console.log('✅ Data loaded from Teams storage successfully');
-                } catch (parseError) {
-                    console.warn('⚠️ Could not parse saved data file');
-                }
+            const parsedData = await idbGet(userSpecificKey);
+
+            if (parsedData) {
+                this.confidenceLevels = parsedData.confidenceLevels || {};
+                this.analyticsHistoryData = parsedData.analyticsHistory || [];
+                console.log('✅ Data loaded from Teams storage successfully');
             } else {
                 console.log('📝 No physics audit data found - starting fresh');
             }
@@ -308,11 +305,11 @@ export const teamsAuthMethods = {
                 }
             };
 
-            // For now, save to localStorage with user-specific key
+            // For now, save to IndexedDB with user-specific key
             // In production, implement SharePoint/Teams storage
             const userSpecificKey = `physicsAuditData_teams_${this.user.id}`;
-            localStorage.setItem(userSpecificKey, JSON.stringify(dataToSave));
-            
+            await idbSet(userSpecificKey, dataToSave);
+
             console.log('✅ Data saved to Teams successfully');
             return true;
 

@@ -1,6 +1,8 @@
 // js/utils/data-integrity.js
 // Data integrity verification using HMAC signatures
 
+import { idbGet, idbSet } from './indexeddb.js';
+
 export class DataIntegrity {
     constructor() {
         this.algorithm = { name: 'HMAC', hash: 'SHA-256' };
@@ -12,15 +14,15 @@ export class DataIntegrity {
      * This prevents tampering but isn't encryption - data is still readable
      */
     async getDeviceSecret() {
-        // Try to get existing secret from localStorage
-        let secret = localStorage.getItem('_device_secret');
+        // Try to get existing secret from IndexedDB
+        let secret = await idbGet('_device_secret');
 
         if (!secret) {
             // Generate new random secret (32 bytes = 256 bits)
             const randomBytes = new Uint8Array(32);
             crypto.getRandomValues(randomBytes);
             secret = btoa(String.fromCharCode(...randomBytes));
-            localStorage.setItem('_device_secret', secret);
+            await idbSet('_device_secret', secret);
         }
 
         return secret;
