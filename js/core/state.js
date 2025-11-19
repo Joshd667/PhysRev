@@ -1,6 +1,3 @@
-// js/core/state.js
-// Defines the reactive state for the Alpine.js app
-
 // ⚡ PERFORMANCE: Static confidence scale outside reactive system
 const CONFIDENCE_SCALE = [
     { value: 1, label: "1", description: "Not confident", color: "bg-red-500" },
@@ -12,17 +9,14 @@ const CONFIDENCE_SCALE = [
 
 export function createState() {
     return {
-        // --- DARK MODE STATE ---
         darkMode: false,
-
-        // --- UI & NAVIGATION STATE ---
         selectedPaper: 'All Topics',
         activeSection: 'measurements_errors',
         sidebarVisible: true,
         expandedGroups: {},
-        viewMode: 'spec', // 'paper' or 'spec'
-        viewType: 'audit', // 'audit', 'notes', 'flashcards', 'mindmaps'
-        showViewSelector: false, // Shows the view type dropdown
+        viewMode: 'spec',
+        viewType: 'audit',
+        showViewSelector: false,
         lastExpandedGroup: null,
         showingSpecificSection: false,
         showingMainMenu: true,
@@ -30,37 +24,31 @@ export function createState() {
         showSettingsModal: false,
         showPrivacyNoticeModal: false,
 
-        // --- BREADCRUMB CACHE (reduces initial RAM spike) ---
+        // ⚡ PERFORMANCE: Breadcrumb cache reduces initial RAM spike
         _cachedBannerTitle: null,
         _cachedBannerIcon: null,
         _bannerCacheDirty: true,
 
-        // --- PROGRESS TITLE CACHE (prevents string concatenation in reactive context) ---
+        // ⚡ PERFORMANCE: Progress title cache prevents string concatenation in reactive context
         _cachedProgressTitle: null,
         _progressTitleCacheDirty: true,
-
-        // --- APP UPDATE STATE ---
         updateAvailable: false,
         checkingForUpdates: false,
         updateCheckMessage: '',
         showBackupPrompt: false,
-
-        // --- SEARCH STATE ---
         searchVisible: false,
         searchQuery: '',
         searchResults: [],
         searchTimer: null,
-        searchFilters: ['audit', 'notes', 'flashcards', 'mindmaps'], // Array of active filters (all selected by default)
-        searchSortBy: 'relevance', // 'relevance', 'alphabetical', 'numerical', 'confidence', 'date'
-        searchSortDirection: 'asc', // 'asc' or 'desc'
+        searchFilters: ['audit', 'notes', 'flashcards', 'mindmaps'],
+        searchSortBy: 'relevance',
+        searchSortDirection: 'asc',
         showAdvancedSearch: false,
-        selectedSearchTags: [], // Array of topic IDs to filter by
-        selectedConfidenceRating: null, // null or 1-5 for confidence filter
-        selectedConfidenceLevels: [], // Array of confidence levels (1-5) to filter by
-        searchConfidenceDropdownOpen: false, // Confidence level filter dropdown state
-        searchSortDropdownOpen: false, // Sort dropdown state
-
-        // --- AUTHENTICATION STATE ---
+        selectedSearchTags: [],
+        selectedConfidenceRating: null,
+        selectedConfidenceLevels: [],
+        searchConfidenceDropdownOpen: false,
+        searchSortDropdownOpen: false,
         isAuthenticated: false,
         showLoginScreen: true,
         user: null,
@@ -68,143 +56,111 @@ export function createState() {
         authToken: null,
         loginError: null,
         isLoading: false,
-
-        // --- OFFLINE/ONLINE SYNC STATE ---
         isOnline: navigator.onLine,
         lastSyncTime: null,
         syncInProgress: false,
-
-        // --- REVISION STATE ---
         currentRevisionSection: '',
         currentRevisionSectionTitle: '',
         currentRevisionTopics: [],
         currentRevisionResources: null,
 
-        // --- USER NOTES STATE ---
-        userNotes: {}, // { noteId: { id, sectionId, title, content, tags: [], createdAt, updatedAt } }
+        userNotes: {},
         showNoteEditor: false,
-        noteEditorMode: 'create', // 'create' or 'edit'
+        noteEditorMode: 'create',
         noteEditorSectionId: null,
         noteEditorTitle: '',
         noteEditorContent: '',
         noteEditorId: null,
-        noteEditorTags: [], // Tags for current editing session
-        editorSelectionUpdate: 0, // Triggers reactivity for formatting buttons
-        noteEditorSelection: null, // Holds the selection range for the editor
-    notesViewMode: 'card', // 'list' or 'card' view mode for notes
-    notePreviewId: null,
-        notesSort: 'updated', // Sorting option for notes: 'updated', 'name'
-
-        // --- NEW: EQUATION EDITOR STATE ---
+        noteEditorTags: [],
+        editorSelectionUpdate: 0,
+        noteEditorSelection: null,
+        notesViewMode: 'card',
+        notePreviewId: null,
+        notesSort: 'updated',
         showEquationEditor: false,
         equationLatex: '',
-        equationEditorMode: 'note', // 'note' or 'mindmap' - determines which insert function to call
-        equationTargetShape: null, // For mindmap equation insertion
+        equationEditorMode: 'note',
+        equationTargetShape: null,
 
-        // --- USER FLASHCARDS STATE ---
-        flashcardDecks: {}, // { deckId: { id, sectionId, name, cards: [], tags: [], createdAt, updatedAt } }
+        flashcardDecks: {},
         showFlashcardEditor: false,
-        flashcardEditorMode: 'create', // 'create' or 'edit'
+        flashcardEditorMode: 'create',
         flashcardEditorSectionId: null,
         flashcardEditorDeckName: '',
         flashcardEditorDeckId: null,
-        flashcardEditorCards: [], // Array of { front, back } for current editing session
+        flashcardEditorCards: [],
         flashcardEditorCurrentCardFront: '',
         flashcardEditorCurrentCardBack: '',
-        flashcardEditorTags: [], // Tags for current editing session
-        flashcardEditorCardsExpanded: false, // Whether cards list is expanded
-        flashcardEditorEditingCardIndex: null, // Index of card being edited
-
-        // --- FLASHCARD TEST STATE ---
+        flashcardEditorTags: [],
+        flashcardEditorCardsExpanded: false,
+        flashcardEditorEditingCardIndex: null,
         showFlashcardTest: false,
-        testFlashcards: [], // Array of flashcards in current test
+        testFlashcards: [],
         currentTestCardIndex: 0,
         testCardFlipped: false,
-        currentTestTitle: '', // Title of the current flashcard test
-        testAnswers: {}, // { cardIndex: 'correct' | 'incorrect' }
-        testCompleted: false, // Whether the test has been completed
-        showTestResults: false, // Whether to show the results screen
-        testReviewMode: null, // null | 'correct' | 'incorrect' - which cards to review
-        testResultsHistory: [], // Array of { deckName, totalCards, correctCount, incorrectCount, timestamp }
+        currentTestTitle: '',
+        testAnswers: {},
+        testCompleted: false,
+        showTestResults: false,
+        testReviewMode: null,
+        testResultsHistory: [],
 
-        // --- TEST AREA STATE ---
-        showTestArea: false, // Show test area main view
-        showTestSetList: false, // Show saved test sets
-        showTestSetBuilder: false, // Show test set builder
-        testSets: {}, // Saved test sets { id: { name, cards: [], createdAt, updatedAt } }
-        currentTestSetId: null, // ID of test set being edited
-        testSetBuilderName: '', // Name for new/edited test set
-        testSetBuilderCards: [], // Cards added to test set builder
-        testSetBuilderSearch: '', // Search query in builder
-        testSetBuilderExpandedDecks: {}, // { deckId: true/false } - which decks are expanded
-        testSetSort: 'updated', // Sorting option for test sets
-        
-        // --- FLASHCARD VIEW STATE ---
-        flashcardViewMode: 'card', // 'list' or 'card' view mode (default: card)
-        flashcardCardSort: 'updated', // Sorting option for flashcard card view
-        
-        // --- ADVANCED SEARCH STATE (Test Area) ---
-        showAdvancedSearch: false, // Show/hide advanced search dropdown
-        advancedSearchTags: [], // Selected tags for filtering
+        showTestArea: false,
+        showTestSetList: false,
+        showTestSetBuilder: false,
+        testSets: {},
+        currentTestSetId: null,
+        testSetBuilderName: '',
+        testSetBuilderCards: [],
+        testSetBuilderSearch: '',
+        testSetBuilderExpandedDecks: {},
+        testSetSort: 'updated',
+        flashcardViewMode: 'card',
+        flashcardCardSort: 'updated',
+        showAdvancedSearch: false,
+        advancedSearchTags: [],
+        studyMaterialsFilter: 'all',
+        contentFilterSection: null,
+        contentFilterGroup: null,
 
-        // --- STUDY MATERIALS FILTER STATE ---
-        studyMaterialsFilter: 'all', // 'all', 'notes', 'flashcards', 'mindmaps'
-
-        // --- SHARED CONTENT FILTER STATE (for notes, flashcards, mindmaps) ---
-        contentFilterSection: null, // Filter content by section (null = show all)
-        contentFilterGroup: null, // Filter content by group (null = show all)
-
-        // --- USER MINDMAPS STATE ---
-        mindmaps: {}, // { mindmapId: { id, sectionId, title, nodes: [], connections: [], viewport: {}, tags: [], createdAt, updatedAt } }
+        mindmaps: {},
         showMindmapEditor: false,
-        mindmapEditorMode: 'create', // 'create' or 'edit'
+        mindmapEditorMode: 'create',
         mindmapEditorSectionId: null,
         mindmapEditorTitle: '',
         mindmapEditorId: null,
         mindmapEditorData: { nodes: [], connections: [], viewport: { x: 0, y: 0, scale: 1 } },
-        mindmapEditorTags: [], // Tags for current editing session
-        mindmapsViewMode: 'card', // 'list' or 'card' view mode for mindmaps
-        mindmapsSort: 'updated', // Sorting option for mindmaps: 'updated', 'name', 'nodes'
-
-        // Node Editor Modal
+        mindmapEditorTags: [],
+        mindmapsViewMode: 'card',
+        mindmapsSort: 'updated',
         showMindmapNodeEditor: false,
-        mindmapNodeEditorMode: 'create', // 'create' or 'edit'
+        mindmapNodeEditorMode: 'create',
         mindmapNodeEditorContent: '',
         mindmapNodeEditorPosition: { x: 0, y: 0 },
         mindmapNodeEditorId: null,
-
-        // --- ANALYTICS STATE ---
         showingAnalytics: false,
         analyticsData: null,
         analyticsHistoryData: [],
         criticalTopicsPage: 0,
         strongTopicsPage: 0,
         recommendationsPage: 0,
-        // ⚡ MEMORY FIX: chartInstances moved outside reactive state (see app.js)
-        // Storing Map in reactive state prevents garbage collection of destroyed charts
+        // ⚡ MEMORY FIX: chartInstances moved outside reactive state (see app.js) to prevent garbage collection issues
 
-        // --- DATA ---
-        // NOTE: Large read-only data (specificationData, groups, topicLookup) are stored
-        // outside reactive state to save 300-400MB of memory. Access via app methods.
-        confidenceLevels: {}, // User-specific data
-
-        // Getter for static confidence scale (non-reactive)
+        // NOTE: Large read-only data (specificationData, groups, topicLookup) stored outside reactive state to save 300-400MB
+        confidenceLevels: {},
         get confidenceScale() {
             return CONFIDENCE_SCALE;
         },
 
-        // --- TAG SELECTOR STATE ---
-        showTagSelector: false, // Shows the tag selector modal
-        tagSelectorQuery: '', // Search query for tags
-        tagSelectorContext: null, // 'note', 'flashcard', or 'mindmap' - context for which editor is open
-        tagSelectorExpandedSections: {}, // Tracks which sections are expanded { sectionName: true/false }
-        tagSelectorShowSelected: false, // Toggle for showing selected tags dropdown
+        showTagSelector: false,
+        tagSelectorQuery: '',
+        tagSelectorContext: null,
+        tagSelectorExpandedSections: {},
+        tagSelectorShowSelected: false,
 
-        // --- REVISION AREA INDICATOR SETTINGS ---
-        revisionAreaIndicatorStyle: 'outline', // 'bar', 'outline', or 'none'
+        revisionAreaIndicatorStyle: 'outline',
 
-        // --- PERFORMANCE: CACHED COMPUTED VALUES ---
-        // These cache expensive template computations to avoid recalculating on every render
+        // ⚡ PERFORMANCE: Cached computed values to avoid recalculating on every render
         _cachedNotesGrouped: [],
         _cachedNotesGroupedDirty: true,
         _cachedFlashcardsGrouped: [],
@@ -229,16 +185,11 @@ export function createState() {
         _cachedFlashcardDecksForCurrentSectionDirty: true,
         _cachedMindmapsForCurrentSection: [],
         _cachedMindmapsForCurrentSectionDirty: true,
-
-        // --- CUSTOM MODAL DIALOG STATE ---
         showCustomModal: false,
-        modalType: 'alert', // 'alert', 'confirm', 'prompt'
+        modalType: 'alert',
         modalTitle: '',
         modalMessage: '',
         modalInputValue: '',
-        modalCallback: null, // Callback for confirm/prompt results
-
-        // NOTE: Computed properties (currentGroups, currentSection, availablePapers, bannerTitle, bannerIcon)
-        // are defined in app.js to preserve reactivity with Alpine.js
+        modalCallback: null
     };
 }
