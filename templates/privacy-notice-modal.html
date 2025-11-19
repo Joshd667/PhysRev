@@ -4,9 +4,17 @@
      style="display: none;"
      x-data="{
          documentsRead: { privacy: false, terms: false, retention: false, accessibility: false },
-         isTeamsLogin: window.isTeamsPrivacyMode || false
+         isTeamsLogin: false,
+         init() {
+             // Watch for modal visibility changes and update Teams mode
+             this.$watch('showPrivacyNoticeModal', value => {
+                 if (value) {
+                     this.isTeamsLogin = window.isTeamsPrivacyMode || false;
+                     console.log('Privacy modal opened, Teams mode:', this.isTeamsLogin);
+                 }
+             });
+         }
      }"
-     x-init="isTeamsLogin = window.isTeamsPrivacyMode || false"
      @click.stop>
 
     <!-- Modal Window -->
