@@ -18,10 +18,10 @@ export const settingsMethods = {
 
         this.showSettingsModal = true;
 
-        // Refresh icons after modal opens
+        // ⚡ Refresh icons after modal opens (debounced)
         this.$nextTick(() => {
-            if (window.lucide) {
-                lucide.createIcons();
+            if (window.refreshIconsDebounced) {
+                window.refreshIconsDebounced();
             }
         });
     },
@@ -237,10 +237,10 @@ export const settingsMethods = {
     openPrivacyNotice() {
         this.showPrivacyNoticeModal = true;
 
-        // Refresh icons after modal opens
+        // ⚡ Refresh icons after modal opens (debounced)
         this.$nextTick(() => {
-            if (window.lucide) {
-                lucide.createIcons();
+            if (window.refreshIconsDebounced) {
+                window.refreshIconsDebounced();
             }
         });
     },
@@ -301,10 +301,10 @@ export const settingsMethods = {
         // Store Teams mode for the modal to access
         window.isTeamsPrivacyMode = isTeamsMode;
 
-        // Refresh icons after modal opens
+        // ⚡ Refresh icons after modal opens (debounced)
         this.$nextTick(() => {
-            if (window.lucide) {
-                lucide.createIcons();
+            if (window.refreshIconsDebounced) {
+                window.refreshIconsDebounced();
             }
         });
     },

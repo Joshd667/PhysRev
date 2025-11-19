@@ -33,8 +33,8 @@ export const flashcardManagementMethods = {
         this.showFlashcardEditor = true;
 
         this.$nextTick(() => {
-            if (window.lucide) {
-                lucide.createIcons();
+            if (window.refreshIconsDebounced) {
+                window.refreshIconsDebounced();
             }
         });
     },
@@ -60,8 +60,8 @@ export const flashcardManagementMethods = {
         this.showFlashcardEditor = true;
 
         this.$nextTick(() => {
-            if (window.lucide) {
-                lucide.createIcons();
+            if (window.refreshIconsDebounced) {
+                window.refreshIconsDebounced();
             }
         });
     },
@@ -182,8 +182,8 @@ export const flashcardManagementMethods = {
 
         // Refresh icons
         this.$nextTick(() => {
-            if (window.lucide) {
-                lucide.createIcons();
+            if (window.refreshIconsDebounced) {
+                window.refreshIconsDebounced();
             }
         });
     },
@@ -246,8 +246,8 @@ export const flashcardManagementMethods = {
 
         // Refresh icons
         this.$nextTick(() => {
-            if (window.lucide) {
-                lucide.createIcons();
+            if (window.refreshIconsDebounced) {
+                window.refreshIconsDebounced();
             }
         });
     }
