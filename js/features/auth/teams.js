@@ -21,11 +21,12 @@ export const teamsAuthMethods = {
     autoSaveTimer: null,
 
     async completeLogin() {
-        const authData = {
+        // Serialize to plain object to avoid DataCloneError with Alpine.js proxies
+        const authData = JSON.parse(JSON.stringify({
             user: this.user,
             method: this.authMethod,
             expires: Date.now() + (24 * 60 * 60 * 1000)
-        };
+        }));
         await idbSet('physicsAuditAuth', authData);
         this.isAuthenticated = true;
         this.showLoginScreen = false;
@@ -292,8 +293,8 @@ export const teamsAuthMethods = {
         try {
             console.log('💾 Saving data to Teams...');
 
-            // Prepare the data to save
-            const dataToSave = {
+            // Prepare the data to save (serialize to plain object)
+            const dataToSave = JSON.parse(JSON.stringify({
                 confidenceLevels: this.confidenceLevels,
                 analyticsHistory: this.analyticsHistoryData || [],
                 lastUpdated: new Date().toISOString(),
@@ -303,7 +304,7 @@ export const teamsAuthMethods = {
                     name: this.user.name,
                     email: this.user.email
                 }
-            };
+            }));
 
             // For now, save to IndexedDB with user-specific key
             // In production, implement SharePoint/Teams storage

@@ -14,11 +14,12 @@ export const guestAuthMethods = {
     },
 
     async completeLogin() {
-        const authData = {
+        // Serialize to plain object to avoid DataCloneError with Alpine.js proxies
+        const authData = JSON.parse(JSON.stringify({
             user: this.user,
             method: this.authMethod,
             expires: Date.now() + (24 * 60 * 60 * 1000)
-        };
+        }));
         await idbSet('physicsAuditAuth', authData);
         this.isAuthenticated = true;
         this.showLoginScreen = false;
