@@ -170,6 +170,72 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
 - `js/core/app.js` - Module-level static storage + getters
 - `js/core/state.js` - Removed large data from reactive state
 
+### Storage & Caching Architecture
+
+**📦 Multi-Layer Storage System**
+
+The app uses a sophisticated caching and storage strategy combining Service Workers, IndexedDB, and Web Workers:
+
+**1. Service Worker Cache (HTTP/Asset Cache)**
+- **Purpose**: Offline support and fast loading
+- **Strategy**: Cache-first with background updates
+- **Location**: `sw.js`
+- **What's Cached**: HTML, CSS, JS, templates, external libraries (44 resources)
+- **Version**: v2.42 (silent operation, only errors logged)
+- **Benefits**:
+  - Instant page loads (serve from cache immediately)
+  - Background updates keep content fresh
+  - Works completely offline after first visit
+
+**2. IndexedDB (User Data Storage)**
+- **Purpose**: Persistent user data with ~50MB+ capacity
+- **Location**: `js/utils/indexeddb.js`
+- **Database**: `PhysicsAuditDB`
+- **What's Stored**: Notes, flashcards, mindmaps, confidence levels, analytics history
+- **Features**:
+  - Automatic migration from localStorage on first load
+  - 30-day analytics cleanup to prevent quota issues
+  - Asynchronous operations (non-blocking)
+
+**3. Web Worker (Serialization)**
+- **Purpose**: Offload heavy JSON processing from main thread
+- **Location**: `js/utils/storage-worker.js`
+- **Trigger**: Data >100KB triggers worker usage
+- **Lifecycle**: v2.42 added proper termination on page unload
+- **Benefits**: Prevents UI freezing during large data saves
+
+**Storage Management (v2.42)**
+```javascript
+// From browser console:
+clearAllAppStorage()  // Clear ALL storage (IndexedDB + SW cache + localStorage)
+getStorageStats()     // View storage usage statistics
+```
+
+**Storage Flow:**
+```
+User saves data → storage.js checks size
+                ↓
+        > 100KB? Use Web Worker for serialization
+        < 100KB? Use requestIdleCallback
+                ↓
+        Serialized data → IndexedDB
+                ↓
+        Success or Quota handling
+```
+
+**Memory Leak Prevention (v2.42):**
+- Web Workers properly terminated on page unload (`beforeunload` event)
+- Workers terminated when tab hidden (`visibilitychange` event)
+- Prevents RAM doubling on repeated reloads
+- Clean console output (no cache spam)
+
+**Files:**
+- `sw.js` - Service Worker with silent operation
+- `js/utils/storage.js` - Storage abstraction with worker management
+- `js/utils/indexeddb.js` - IndexedDB wrapper
+- `js/utils/storage-worker.js` - Background serialization worker
+- `js/sw-registration.js` - SW lifecycle management
+
 ### External Dependencies (CDN)
 
 The app loads these libraries from CDNs on first visit:
@@ -2650,6 +2716,68 @@ This update focuses on reducing code duplication, improving maintainability, and
 - ✅ **Faster input** - Smart shortcuts for frequent operations
 - ✅ **Professional output** - Beautiful KaTeX-rendered equations
 - ✅ **Easy corrections** - Double-click to edit any equation
+
+---
+
+### v2.42 - Cache & Memory Leak Fixes (2025-11-19)
+
+**🐛 Critical Bug Fixes:**
+
+**Memory Leak - Web Worker Accumulation**
+- **Issue**: Web Workers were created on each page load but never terminated, causing RAM to double with each reload
+- **Fix**: Added proper worker lifecycle management with `terminateWorker()` function
+- **Impact**: Prevents memory accumulation across page reloads
+- **Files**: `js/utils/storage.js:51-80`
+
+**Console Spam - Service Worker Installation**
+- **Issue**: Service Worker logged 10+ messages during installation, causing console spam that flashed on alternating reloads
+- **Fix**: Silenced all non-error logging in Service Worker (install, activate, fetch events)
+- **Impact**: Clean console output during normal operation; only errors and user-initiated actions are logged
+- **Files**: `sw.js:73-321`
+
+**Auto-Reload - Unwanted Page Refreshes**
+- **Issue**: Service Worker reinstalls (e.g., after clearing cache) triggered unwanted auto-reloads via `controllerchange` event
+- **Fix**: Added `skipWaitingCalled` flag to only reload when user explicitly activates an update
+- **Impact**: No more auto-reloads when clearing cache; updates still work when user activates them
+- **Files**: `js/sw-registration.js:9,43-49,100`
+
+**Missing Files - 404 Errors**
+- **Issue**: Service Worker tried to cache non-existent files, causing 404 warnings
+- **Fix**: Removed missing files from `CRITICAL_RESOURCES` array
+- **Files**: `sw.js:18,56` (removed `revision-mappings.js` and `login-screen.html`)
+
+**🛠️ Improvements:**
+
+**Storage Management**
+- Added comprehensive `clearAllStorage()` function that clears IndexedDB, Service Worker cache, localStorage, and terminates workers
+- New global helper functions for debugging:
+  - `clearAllAppStorage()` - Clear all storage and reload page
+  - `getStorageStats()` - View storage/worker statistics in console
+- Files: `js/utils/storage.js:270-352`, `js/sw-registration.js:135-206`
+
+**Worker Cleanup**
+- Added `beforeunload` event listener to terminate workers when page unloads
+- Added `visibilitychange` event listener to terminate workers when tab is hidden
+- Prevents worker accumulation during development/testing
+- Files: `js/utils/storage.js:68-80`
+
+**Version History:**
+- v2.38 → v2.39: Initial console spam reduction attempt
+- v2.39 → v2.40: Complete Service Worker silencing
+- v2.40 → v2.41: Removed missing files from cache list
+- v2.41 → v2.42: Fixed auto-reload pattern with skipWaitingCalled flag
+
+**Testing Instructions:**
+1. Clear site data in DevTools
+2. Hard reload (Ctrl+Shift+R)
+3. Verify: Clean console (no cache messages)
+4. Reload again: Still clean (no alternating pattern)
+5. Check RAM usage: Stays consistent across reloads
+
+**Files Modified:**
+- `sw.js` - Silent operation, removed missing files, bumped to v2.42
+- `js/utils/storage.js` - Worker lifecycle management, comprehensive storage clearing
+- `js/sw-registration.js` - Auto-reload fix, debug helpers
 
 ---
 
