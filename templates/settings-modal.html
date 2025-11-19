@@ -398,6 +398,51 @@
                                 </p>
                             </div>
                         </div>
+
+                        <!-- PWA Installation Section -->
+                        <div class="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800 space-y-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <i data-lucide="smartphone" class="w-5 h-5 text-blue-600 dark:text-blue-400"></i>
+                                <h4 class="text-lg font-bold text-slate-800 dark:text-slate-200">Install as App</h4>
+                            </div>
+
+                            <!-- Android/Chrome Install Button -->
+                            <template x-if="window.deferredInstallPrompt">
+                                <button @click="installPWA()" class="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg transition-colors font-medium shadow-lg">
+                                    <i data-lucide="download" class="w-5 h-5"></i>
+                                    <span>Install App (Android/Chrome)</span>
+                                </button>
+                            </template>
+
+                            <!-- iOS Install Instructions -->
+                            <div class="bg-white/50 dark:bg-gray-800/50 rounded-lg p-4 space-y-2">
+                                <div class="flex items-center space-x-2 text-slate-700 dark:text-slate-300 font-semibold text-sm">
+                                    <i data-lucide="smartphone" class="w-4 h-4"></i>
+                                    <span>iOS/Safari Installation:</span>
+                                </div>
+                                <ol class="text-xs text-slate-600 dark:text-slate-400 space-y-1 pl-6">
+                                    <li class="flex items-center space-x-2">
+                                        <span class="font-mono bg-blue-100 dark:bg-blue-900/40 px-1.5 py-0.5 rounded text-blue-700 dark:text-blue-300">1.</span>
+                                        <span>Tap the Share button <svg class="w-3 h-3 inline" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16v2H6v-2H4v4h16v-4zM17 11l-5-6-5 6h3v6h4v-6z"/></svg> at the bottom</span>
+                                    </li>
+                                    <li class="flex items-center space-x-2">
+                                        <span class="font-mono bg-blue-100 dark:bg-blue-900/40 px-1.5 py-0.5 rounded text-blue-700 dark:text-blue-300">2.</span>
+                                        <span>Select "Add to Home Screen"</span>
+                                    </li>
+                                    <li class="flex items-center space-x-2">
+                                        <span class="font-mono bg-blue-100 dark:bg-blue-900/40 px-1.5 py-0.5 rounded text-blue-700 dark:text-blue-300">3.</span>
+                                        <span>Tap "Add" to confirm</span>
+                                    </li>
+                                </ol>
+                            </div>
+
+                            <div class="text-xs text-slate-600 dark:text-slate-400 text-center pt-2">
+                                <p class="flex items-center justify-center space-x-1">
+                                    <i data-lucide="info" class="w-3 h-3"></i>
+                                    <span>Installing lets you use the app offline with a native app experience</span>
+                                </p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

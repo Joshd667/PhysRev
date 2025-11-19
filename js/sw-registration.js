@@ -127,3 +127,44 @@ window.clearSWCache = function() {
         });
     }
 };
+
+/**
+ * PWA Installation Support
+ * Captures the beforeinstallprompt event for Android/Chrome users
+ */
+window.deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the default install prompt
+    e.preventDefault();
+    // Store the event for later use
+    window.deferredInstallPrompt = e;
+    console.log('📱 PWA install prompt captured - Install button available in Settings → About');
+});
+
+/**
+ * Trigger PWA installation
+ * Called from the Install button in Settings
+ */
+window.installPWA = async function() {
+    if (!window.deferredInstallPrompt) {
+        console.log('⚠️ Install prompt not available');
+        return;
+    }
+
+    // Show the install prompt
+    window.deferredInstallPrompt.prompt();
+
+    // Wait for the user's response
+    const { outcome } = await window.deferredInstallPrompt.userChoice;
+    console.log(`📱 User ${outcome === 'accepted' ? 'accepted' : 'dismissed'} the install prompt`);
+
+    // Clear the deferred prompt
+    window.deferredInstallPrompt = null;
+};
+
+// Track successful installation
+window.addEventListener('appinstalled', () => {
+    console.log('🎉 PWA installed successfully!');
+    window.deferredInstallPrompt = null;
+});
