@@ -30,7 +30,7 @@ let authMethodsLoaded = false;
 let authLoadingPromise = null;
 
 // ⚡ PERFORMANCE: Store large read-only data OUTSIDE Alpine's reactive system
-// This saves 300-400MB by preventing Alpine from wrapping these in Proxies
+// This saves RAM by preventing Alpine from wrapping these in Proxies
 let staticSpecificationData = null;
 let staticPaperModeGroups = null;
 let staticSpecModeGroups = null;
