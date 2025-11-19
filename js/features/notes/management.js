@@ -112,7 +112,7 @@ export const noteManagementMethods = {
             // Create new note
             const noteId = `note_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-            this.userNotes[noteId] = {
+            const newNote = {
                 id: noteId,
                 sectionId: this.noteEditorSectionId,
                 title: this.noteEditorTitle.trim(),
@@ -121,6 +121,11 @@ export const noteManagementMethods = {
                 createdAt: timestamp,
                 updatedAt: timestamp
             };
+
+            this.userNotes[noteId] = newNote;
+
+            // ⚡ PERFORMANCE: Update search index
+            this._addNoteToIndex(newNote);
         } else {
             // Update existing note
             if (this.userNotes[this.noteEditorId]) {
@@ -128,6 +133,9 @@ export const noteManagementMethods = {
                 this.userNotes[this.noteEditorId].content = content;
                 this.userNotes[this.noteEditorId].tags = this.noteEditorTags;
                 this.userNotes[this.noteEditorId].updatedAt = timestamp;
+
+                // ⚡ PERFORMANCE: Update search index
+                this._updateNoteInIndex(this.userNotes[this.noteEditorId]);
             }
         }
 
@@ -157,6 +165,10 @@ export const noteManagementMethods = {
 
         if (confirmed) {
             delete this.userNotes[noteId];
+
+            // ⚡ PERFORMANCE: Update search index
+            this._removeNoteFromIndex(noteId);
+
             this.saveNotes();
             if (this.notePreviewId === noteId) {
                 this.notePreviewId = null;

@@ -242,57 +242,86 @@ export const searchMethods = {
         const confidenceLevelSet = new Set(this.selectedConfidenceLevels);
         const hasConfidenceLevelFilter = confidenceLevelSet.size > 0;
 
-        Object.entries(this.specificationData).forEach(([sectionKey, section]) => {
-            if (!section.topics) return;
-            section.topics.forEach(topic => {
-                // Filter by tags if advanced search is active - O(1) lookup with Set
-                if (hasTagFilter && !tagSet.has(topic.id)) {
+        // ⚡ PERFORMANCE: Use search index for O(1) lookup
+        let matchingTopics;
+        if (query) {
+            // Use index to find matching topics
+            const matchingIds = this._getAuditCardsIndex().search(query);
+            matchingTopics = this._getAuditCardsIndex().getItems(matchingIds);
+        } else {
+            // No query - get all topics from index
+            matchingTopics = Array.from(this._getAuditCardsIndex().items.values());
+        }
+
+        matchingTopics.forEach(topic => {
+            // Filter by tags if advanced search is active - O(1) lookup with Set
+            if (hasTagFilter && !tagSet.has(topic.id)) {
+                return;
+            }
+
+            // Filter by confidence rating if selected (legacy single-select)
+            const topicConfidence = this.confidenceLevels[topic.id] || null;
+            if (this.selectedConfidenceRating !== null) {
+                if (topicConfidence !== this.selectedConfidenceRating) {
                     return;
                 }
+            }
 
-                // Filter by confidence rating if selected (legacy single-select)
-                const topicConfidence = this.confidenceLevels[topic.id] || null;
-                if (this.selectedConfidenceRating !== null) {
-                    if (topicConfidence !== this.selectedConfidenceRating) {
-                        return;
-                    }
+            // Filter by confidence levels if selected (multi-select) - O(1) lookup with Set
+            if (hasConfidenceLevelFilter) {
+                if (!confidenceLevelSet.has(topicConfidence)) {
+                    return;
                 }
+            }
 
-                // Filter by confidence levels if selected (multi-select) - O(1) lookup with Set
-                if (hasConfidenceLevelFilter) {
-                    if (!confidenceLevelSet.has(topicConfidence)) {
-                        return;
-                    }
-                }
+            // Build search text for snippet generation
+            const searchText = `${topic.id || ''} ${topic.title || ''} ${topic.prompt || ''} ${(topic.learningObjectives || []).join(' ')} ${(topic.examples || []).join(' ')}`.toLowerCase();
 
-                // Optimized: Build search string directly without intermediate arrays (saves 40-50MB RAM)
-                const searchText = `${topic.id || ''} ${topic.title || ''} ${topic.prompt || ''} ${(topic.learningObjectives || []).join(' ')} ${(topic.examples || []).join(' ')}`.toLowerCase();
-
-                // If no query, show all results that match filters (for confidence level filtering)
-                // If query exists, match against search text
-                if (!query || searchText.includes(query)) {
-                    results.push({
-                        type: 'audit',
-                        topicId: topic.id,
-                        topicTitle: topic.title,
-                        topicPrompt: topic.prompt,
-                        sectionKey: sectionKey,
-                        sectionTitle: section.title,
-                        paper: section.paper,
-                        confidence: topicConfidence,
-                        snippet: this.createSearchSnippet(searchText, query, topic),
-                        borderClass: 'border-l-green-500 hover:border-green-600',
-                        badgeClass: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                    });
-                }
+            results.push({
+                type: 'audit',
+                topicId: topic.id,
+                topicTitle: topic.title,
+                topicPrompt: topic.prompt,
+                sectionKey: topic.sectionKey,
+                sectionTitle: topic.sectionTitle,
+                paper: topic.paper,
+                confidence: topicConfidence,
+                snippet: this.createSearchSnippet(searchText, query, topic),
+                borderClass: 'border-l-green-500 hover:border-green-600',
+                badgeClass: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
             });
         });
+
         return results;
+    },
+
+    // Helper to get audit cards index
+    _getAuditCardsIndex() {
+        // Access the module-level index from app.js
+        return window.physicsAuditApp?._getAuditCardsIndex?.() || { search: () => new Set(), getItems: () => [], items: new Map() };
+    },
+
+    _getNotesIndex() {
+        return window.physicsAuditApp?._getNotesIndex?.() || { search: () => new Set(), getItems: () => [], items: new Map() };
+    },
+
+    _getFlashcardsIndex() {
+        return window.physicsAuditApp?._getFlashcardsIndex?.() || { search: () => new Set(), getItems: () => [], items: new Map() };
+    },
+
+    _getMindmapsIndex() {
+        return window.physicsAuditApp?._getMindmapsIndex?.() || { search: () => new Set(), getItems: () => [], items: new Map() };
     },
 
     _searchNotes(query) {
         const results = [];
-        Object.values(this.userNotes).forEach(note => {
+
+        // ⚡ PERFORMANCE: Use search index for O(1) lookup
+        const matchingNotes = query
+            ? this._getNotesIndex().searchItems(query)
+            : Array.from(this._getNotesIndex().items.values());
+
+        matchingNotes.forEach(note => {
             // Filter by tags if advanced search is active
             if (this.selectedSearchTags.length > 0) {
                 const hasMatchingTag = note.tags && note.tags.some(tag => this.selectedSearchTags.includes(tag));
@@ -302,30 +331,34 @@ export const searchMethods = {
             }
 
             const searchText = `${note.title || ''} ${note.content || ''} ${(note.tags || []).join(' ')}`.toLowerCase();
-            if (searchText.includes(query)) {
-                const sectionInfo = this.specificationData[note.sectionId];
-                results.push({
-                    type: 'note',
-                    id: note.id,
-                    title: note.title,
-                    content: note.content,
-                    sectionId: note.sectionId,
-                    sectionTitle: sectionInfo?.title || 'Unknown Section',
-                    tags: note.tags || [],
-                    createdAt: note.createdAt,
-                    updatedAt: note.updatedAt,
-                    snippet: this._createNoteSnippet(searchText, query, note),
-                    borderClass: 'border-l-blue-500 hover:border-blue-600',
-                    badgeClass: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                });
-            }
+            const sectionInfo = this.specificationData[note.sectionId];
+            results.push({
+                type: 'note',
+                id: note.id,
+                title: note.title,
+                content: note.content,
+                sectionId: note.sectionId,
+                sectionTitle: sectionInfo?.title || 'Unknown Section',
+                tags: note.tags || [],
+                createdAt: note.createdAt,
+                updatedAt: note.updatedAt,
+                snippet: this._createNoteSnippet(searchText, query, note),
+                borderClass: 'border-l-blue-500 hover:border-blue-600',
+                badgeClass: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+            });
         });
         return results;
     },
 
     _searchFlashcards(query) {
         const results = [];
-        Object.values(this.flashcardDecks).forEach(deck => {
+
+        // ⚡ PERFORMANCE: Use search index for O(1) lookup
+        const matchingDecks = query
+            ? this._getFlashcardsIndex().searchItems(query)
+            : Array.from(this._getFlashcardsIndex().items.values());
+
+        matchingDecks.forEach(deck => {
             // Filter by tags if advanced search is active
             if (this.selectedSearchTags.length > 0) {
                 const hasMatchingTag = deck.tags && deck.tags.some(tag => this.selectedSearchTags.includes(tag));
@@ -337,31 +370,35 @@ export const searchMethods = {
             const deckText = `${deck.name || ''} ${(deck.tags || []).join(' ')}`.toLowerCase();
             const cardsText = (deck.cards || []).map(card => `${card.front || ''} ${card.back || ''}`).join(' ').toLowerCase();
             const searchText = `${deckText} ${cardsText}`;
+            const sectionInfo = this.specificationData[deck.sectionId];
 
-            if (searchText.includes(query)) {
-                const sectionInfo = this.specificationData[deck.sectionId];
-                results.push({
-                    type: 'flashcard',
-                    id: deck.id,
-                    title: deck.name,
-                    sectionId: deck.sectionId,
-                    sectionTitle: sectionInfo?.title || 'Unknown Section',
-                    cardCount: deck.cards?.length || 0,
-                    tags: deck.tags || [],
-                    createdAt: deck.createdAt,
-                    updatedAt: deck.updatedAt,
-                    snippet: this._createFlashcardSnippet(searchText, query, deck),
-                    borderClass: 'border-l-purple-500 hover:border-purple-600',
-                    badgeClass: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
-                });
-            }
+            results.push({
+                type: 'flashcard',
+                id: deck.id,
+                title: deck.name,
+                sectionId: deck.sectionId,
+                sectionTitle: sectionInfo?.title || 'Unknown Section',
+                cardCount: deck.cards?.length || 0,
+                tags: deck.tags || [],
+                createdAt: deck.createdAt,
+                updatedAt: deck.updatedAt,
+                snippet: this._createFlashcardSnippet(searchText, query, deck),
+                borderClass: 'border-l-purple-500 hover:border-purple-600',
+                badgeClass: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+            });
         });
         return results;
     },
 
     _searchMindmaps(query) {
         const results = [];
-        Object.values(this.mindmaps).forEach(mindmap => {
+
+        // ⚡ PERFORMANCE: Use search index for O(1) lookup
+        const matchingMindmaps = query
+            ? this._getMindmapsIndex().searchItems(query)
+            : Array.from(this._getMindmapsIndex().items.values());
+
+        matchingMindmaps.forEach(mindmap => {
             // Filter by tags if advanced search is active
             if (this.selectedSearchTags.length > 0) {
                 const hasMatchingTag = mindmap.tags && mindmap.tags.some(tag => this.selectedSearchTags.includes(tag));
@@ -372,24 +409,22 @@ export const searchMethods = {
 
             const shapesText = (mindmap.shapes || []).map(shape => shape.text || '').join(' ').toLowerCase();
             const searchText = `${mindmap.title || ''} ${shapesText} ${(mindmap.tags || []).join(' ')}`.toLowerCase();
+            const sectionInfo = this.specificationData[mindmap.sectionId];
 
-            if (searchText.includes(query)) {
-                const sectionInfo = this.specificationData[mindmap.sectionId];
-                results.push({
-                    type: 'mindmap',
-                    id: mindmap.id,
-                    title: mindmap.title,
-                    sectionId: mindmap.sectionId,
-                    sectionTitle: sectionInfo?.title || 'Unknown Section',
-                    shapeCount: mindmap.shapes?.length || 0,
-                    tags: mindmap.tags || [],
-                    createdAt: mindmap.createdAt,
-                    updatedAt: mindmap.updatedAt,
-                    snippet: this._createMindmapSnippet(searchText, query, mindmap),
-                    borderClass: 'border-l-cyan-500 hover:border-cyan-600',
-                    badgeClass: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300'
-                });
-            }
+            results.push({
+                type: 'mindmap',
+                id: mindmap.id,
+                title: mindmap.title,
+                sectionId: mindmap.sectionId,
+                sectionTitle: sectionInfo?.title || 'Unknown Section',
+                shapeCount: mindmap.shapes?.length || 0,
+                tags: mindmap.tags || [],
+                createdAt: mindmap.createdAt,
+                updatedAt: mindmap.updatedAt,
+                snippet: this._createMindmapSnippet(searchText, query, mindmap),
+                borderClass: 'border-l-cyan-500 hover:border-cyan-600',
+                badgeClass: 'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300'
+            });
         });
         return results;
     },

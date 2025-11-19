@@ -133,7 +133,7 @@ export const mindmapManagementMethods = {
             // Create new mindmap
             const mindmapId = `mindmap_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-            this.mindmaps[mindmapId] = {
+            const newMindmap = {
                 id: mindmapId,
                 sectionId: this.mindmapEditorSectionId,
                 title: this.mindmapEditorTitle.trim(),
@@ -144,6 +144,12 @@ export const mindmapManagementMethods = {
                 createdAt: timestamp,
                 updatedAt: timestamp
             };
+
+            this.mindmaps[mindmapId] = newMindmap;
+
+            // ⚡ PERFORMANCE: Update search index
+            // Note: mindmaps use "nodes" not "shapes" in storage
+            this._addMindmapToIndex({ ...newMindmap, shapes: newMindmap.nodes });
         } else {
             // Update existing mindmap
             if (this.mindmaps[this.mindmapEditorId]) {
@@ -153,6 +159,10 @@ export const mindmapManagementMethods = {
                 this.mindmaps[this.mindmapEditorId].viewport = this.mindmapEditorData.viewport;
                 this.mindmaps[this.mindmapEditorId].tags = this.mindmapEditorTags;
                 this.mindmaps[this.mindmapEditorId].updatedAt = timestamp;
+
+                // ⚡ PERFORMANCE: Update search index
+                // Note: mindmaps use "nodes" not "shapes" in storage
+                this._updateMindmapInIndex({ ...this.mindmaps[this.mindmapEditorId], shapes: this.mindmaps[this.mindmapEditorId].nodes });
             }
         }
 
@@ -184,6 +194,10 @@ export const mindmapManagementMethods = {
 
         if (confirmed) {
             delete this.mindmaps[mindmapId];
+
+            // ⚡ PERFORMANCE: Update search index
+            this._removeMindmapFromIndex(mindmapId);
+
             this.saveMindmaps();
         }
     },

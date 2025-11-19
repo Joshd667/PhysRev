@@ -442,6 +442,9 @@ export const enhancedDataManagement = {
                             this.saveDataType('testResults', importedData.testResults);
                         }
 
+                        // ⚡ PERFORMANCE: Rebuild search indexes after import
+                        this._rebuildSearchIndexes();
+
                         alert('Data imported successfully!');
                     }
                 } else {
