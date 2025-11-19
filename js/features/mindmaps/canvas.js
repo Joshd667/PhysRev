@@ -57,6 +57,8 @@ export const mindmapCanvasMethods = {
     // Event listener storage for cleanup
     canvasEventListeners: null,
     connectionGroupClickHandler: null,
+    connectionPointHandler: null,
+    resizeHandleHandler: null,
 
     // Undo/Redo (reduced from 50 to 20 to save memory)
     undoStack: [],
@@ -508,6 +510,17 @@ export const mindmapCanvasMethods = {
             if (this.shapeClickHandler) shapesContainer.removeEventListener('click', this.shapeClickHandler);
             if (this.shapeMousedownHandler) shapesContainer.removeEventListener('mousedown', this.shapeMousedownHandler);
             if (this.shapeMousemoveHandler) shapesContainer.removeEventListener('mousemove', this.shapeMousemoveHandler);
+
+            // ✅ Clean up new delegated event listeners
+            if (this.connectionPointHandler) {
+                shapesContainer.removeEventListener('mousedown', this.connectionPointHandler);
+                this.connectionPointHandler = null;
+            }
+            if (this.resizeHandleHandler) {
+                shapesContainer.removeEventListener('mousedown', this.resizeHandleHandler);
+                this.resizeHandleHandler = null;
+            }
+
             // Clear all shape elements to help garbage collection
             shapesContainer.innerHTML = '';
         }
@@ -1460,11 +1473,36 @@ export const mindmapCanvasMethods = {
             { pos: 'left', x: '-8px', y: '50%', transform: 'translate(0, -50%)' }
         ];
 
+        // Set up event delegation handler if not already set
+        if (!this.connectionPointHandler) {
+            const shapesContainer = document.getElementById('shapesContainer');
+            if (shapesContainer) {
+                this.connectionPointHandler = (e) => {
+                    const point = e.target.closest('.connection-point');
+                    if (!point) return;
+
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    const shapeId = point.dataset.shapeId;
+                    const position = point.dataset.position;
+                    const shape = this.mindmapEditorData.nodes.find(s => s.id === shapeId);
+
+                    if (shape && position) {
+                        this.startConnection(shape, position, e);
+                    }
+                };
+
+                shapesContainer.addEventListener('mousedown', this.connectionPointHandler);
+            }
+        }
+
         positions.forEach(({ pos, x, y, transform }) => {
             const point = document.createElement('div');
             point.className = 'connection-point';
             point.dataset.position = pos;
             point.dataset.shapeId = shape.id;
+            point.dataset.baseTransform = transform; // Store for hover effects
             point.style.position = 'absolute';
             point.style.left = x;
             point.style.top = y;
@@ -1492,29 +1530,22 @@ export const mindmapCanvasMethods = {
             point.style.transition = 'all 0.2s';
             point.style.pointerEvents = 'all';
 
-            // Add hover effect
-            point.addEventListener('mouseenter', () => {
-                if (isDraggingConnection && !isSource) {
-                    point.style.transform = `${transform} scale(1.3)`;
-                    point.style.boxShadow = '0 0 12px rgba(76, 175, 80, 0.8), 0 0 0 6px rgba(76, 175, 80, 0.3)';
-                }
-            });
-
-            point.addEventListener('mouseleave', () => {
-                if (isDraggingConnection && !isSource) {
-                    point.style.transform = transform;
-                    point.style.boxShadow = '0 0 8px rgba(76, 175, 80, 0.6), 0 0 0 4px rgba(76, 175, 80, 0.2)';
-                }
-            });
-
-            point.addEventListener('mousedown', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                this.startConnection(shape, pos, e);
-            }, { once: true }); // Use once:true to auto-remove listener
+            // ✅ NO individual event listeners - handled by delegation
 
             shapeEl.appendChild(point);
         });
+
+        // Add hover effect handler via CSS (no JS listeners needed)
+        const style = document.createElement('style');
+        style.textContent = `
+            .connection-point:hover {
+                transform: var(--hover-transform, translate(-50%, 0)) !important;
+            }
+        `;
+        if (!document.querySelector('#connection-point-hover-style')) {
+            style.id = 'connection-point-hover-style';
+            document.head.appendChild(style);
+        }
     },
 
     /**
@@ -1950,10 +1981,35 @@ export const mindmapCanvasMethods = {
             { pos: 'se', cursor: 'nwse-resize' }
         ];
 
+        // Set up event delegation handler if not already set
+        if (!this.resizeHandleHandler) {
+            const shapesContainer = document.getElementById('shapesContainer');
+            if (shapesContainer) {
+                this.resizeHandleHandler = (e) => {
+                    const handle = e.target.closest('.resize-handle');
+                    if (!handle) return;
+
+                    e.stopPropagation();
+                    e.preventDefault();
+
+                    const shapeId = handle.dataset.shapeId;
+                    const position = handle.dataset.position;
+                    const shape = this.mindmapEditorData.nodes.find(s => s.id === shapeId);
+
+                    if (shape && position) {
+                        this.startResize(shape, position, e);
+                    }
+                };
+
+                shapesContainer.addEventListener('mousedown', this.resizeHandleHandler);
+            }
+        }
+
         positions.forEach(({ pos, cursor }) => {
             const handle = document.createElement('div');
             handle.className = 'resize-handle';
             handle.dataset.position = pos;
+            handle.dataset.shapeId = shape.id; // Add shape ID for delegation
             handle.style.position = 'absolute';
             handle.style.width = '8px';
             handle.style.height = '8px';
@@ -1977,11 +2033,7 @@ export const mindmapCanvasMethods = {
                 handle.style.bottom = '-4px';
             }
 
-            handle.addEventListener('mousedown', (e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                this.startResize(shape, pos, e);
-            }, { once: true }); // Use once:true to auto-remove listener
+            // ✅ NO individual event listeners - handled by delegation
 
             shapeEl.appendChild(handle);
         });

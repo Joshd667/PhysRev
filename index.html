@@ -5,14 +5,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Physics Knowledge Audit Tool</title>
 
-    <!-- Security: Content Security Policy -->
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="description" content="Physics revision and knowledge tracking PWA for comprehensive learning and analytics">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Physics Audit">
+
+    <!-- Security: Strengthened Content Security Policy -->
     <meta http-equiv="Content-Security-Policy"
           content="default-src 'self';
                    script-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://cdn.tailwindcss.com 'unsafe-inline' 'unsafe-eval';
                    style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.tailwindcss.com;
                    img-src 'self' data: https:;
                    font-src 'self' data: https://cdn.jsdelivr.net;
-                   connect-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://graph.microsoft.com https://login.microsoftonline.com;">
+                   connect-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://graph.microsoft.com https://login.microsoftonline.com;
+                   frame-src 'none';
+                   object-src 'none';
+                   base-uri 'self';
+                   form-action 'self';">
+
+    <!-- Security: Additional Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
 
     <!-- 🚀 Preload critical resources -->
     <link rel="preload" href="./resources/combined-data.json" as="fetch" crossorigin>
@@ -28,7 +45,7 @@
 
     <!-- Icons -->
     <link rel="icon" type="image/x-icon" href="./favicon.ico">
-    <link rel="apple-touch-icon" href="./favicon.ico">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
     <link rel="shortcut icon" href="./favicon.ico">
 
     <!-- Styles -->

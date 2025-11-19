@@ -31,8 +31,13 @@ export function setupWatchers(app) {
         app.saveToLocalStorage();
     });
 
-    // Confidence levels watcher (auto-save)
-    app.$watch('confidenceLevels', () => app.saveData(), { deep: true });
+    // Confidence levels watcher (auto-save with debouncing)
+    // ✅ PERFORMANCE: Shallow watch with debouncing instead of deep watch
+    let confidenceSaveTimer = null;
+    app.$watch('confidenceLevels', () => {
+        if (confidenceSaveTimer) clearTimeout(confidenceSaveTimer);
+        confidenceSaveTimer = setTimeout(() => app.saveData(), 500);
+    });
 
     // ⚡ PERFORMANCE: Banner cache invalidation watchers (reduces initial RAM spike by 25-35MB)
     const bannerDependencies = ['searchVisible', 'showingAnalytics', 'showingRevision',
@@ -95,11 +100,12 @@ export function setupWatchers(app) {
     });
 
     // Close analytics when dropdowns are toggled
+    // ✅ PERFORMANCE: Shallow watch instead of deep watch
     app.$watch('expandedGroups', () => {
         if (app.showingAnalytics) {
             app.showingAnalytics = false;
         }
-    }, { deep: true });
+    });
 
     // Listen for app update events from service worker
     window.addEventListener('app-update-available', () => {
