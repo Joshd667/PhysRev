@@ -56,9 +56,9 @@ export const storageUtils = {
      */
     async save(key, data) {
         try {
-            // No need to serialize for IndexedDB - it handles objects natively
-            // But we keep serialization for consistency and web worker benefits
-            await idbSet(key, data);
+            // Serialize to plain object to avoid DataCloneError with Alpine.js proxies
+            const serializedData = JSON.parse(JSON.stringify(data));
+            await idbSet(key, serializedData);
             return { success: true };
         } catch (error) {
             if (error.name === 'QuotaExceededError') {
@@ -174,7 +174,8 @@ export const storageUtils = {
         // 2. Try saving again after cleanup
         if (cleaned > 0) {
             try {
-                await idbSet(key, data);
+                const serializedData = JSON.parse(JSON.stringify(data));
+                await idbSet(key, serializedData);
                 console.log(`✅ Save succeeded after cleanup (removed ${cleaned} entries)`);
                 return { success: true, cleaned };
             } catch (retryError) {
