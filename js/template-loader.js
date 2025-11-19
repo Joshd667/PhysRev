@@ -15,6 +15,7 @@ export async function loadTemplates() {
         { id: 'mindmap-node-editor-container', path: './templates/mindmap-node-editor.html' },
         { id: 'tag-selector-modal-container', path: './templates/tag-selector-modal.html' },
         { id: 'custom-modal-container', path: './templates/custom-modal.html' },
+        { id: 'privacy-notice-modal-container', path: './templates/privacy-notice-modal.html' }, // Privacy notice modal
         { id: 'sidebar-container', path: './templates/sidebar.html' },
         { id: 'top-bar-container', path: './templates/top-bar.html' },
         { id: 'search-results-container', path: './templates/search-results.html' },

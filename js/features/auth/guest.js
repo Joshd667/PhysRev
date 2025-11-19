@@ -24,6 +24,9 @@ export const guestAuthMethods = {
         this.isAuthenticated = true;
         this.showLoginScreen = false;
         await this.loadSavedData();
+
+        // Check and show privacy notice if first time user
+        await this.checkAndShowPrivacyNotice();
     },
 
     async checkExistingAuth() {
@@ -42,6 +45,9 @@ export const guestAuthMethods = {
                     }
 
                     await this.loadSavedData();
+
+                    // Check and show privacy notice if first time user
+                    await this.checkAndShowPrivacyNotice();
                     return;
                 }
             } catch (error) {

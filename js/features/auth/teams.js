@@ -31,6 +31,9 @@ export const teamsAuthMethods = {
         this.isAuthenticated = true;
         this.showLoginScreen = false;
         await this.loadSavedData();
+
+        // Check and show privacy notice if first time user
+        await this.checkAndShowPrivacyNotice();
     },
 
     async loginWithTeams() {

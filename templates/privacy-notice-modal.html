@@ -1,0 +1,157 @@
+<!-- First-Time Privacy Notice Modal -->
+<div x-show="showPrivacyNoticeModal"
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-150"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     @click="closePrivacyNotice()"
+     class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
+     style="display: none;">
+
+    <!-- Modal Window -->
+    <div @click.stop
+         x-show="showPrivacyNoticeModal"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200">Welcome to Physics Knowledge Audit Tool</h2>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">Your privacy matters to us</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="flex-1 overflow-y-auto p-6 minimal-scrollbar space-y-5">
+
+            <!-- Introduction -->
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-5 border border-blue-200 dark:border-blue-800">
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                    This is a <strong>privacy-first educational tool</strong> designed to help you track your physics learning progress. We want you to understand how your data is handled.
+                </p>
+            </div>
+
+            <!-- Key Points -->
+            <div class="space-y-3">
+                <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">How Your Data is Processed</h3>
+
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 mt-0.5">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <strong class="text-slate-800 dark:text-slate-200">Stored Locally on Your Device</strong>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">All your confidence ratings, notes, flashcards, and study materials are stored in your browser's IndexedDB. Your data never leaves your device (except when using Microsoft Teams integration).</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 mt-0.5">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <strong class="text-slate-800 dark:text-slate-200">No Cookies or Tracking</strong>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">We don't use cookies, Google Analytics, or any tracking technologies. Your learning progress is private.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 mt-0.5">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <strong class="text-slate-800 dark:text-slate-200">30-Day Analytics Retention</strong>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Historical analytics data is automatically deleted after 30 days to minimise data storage.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 mt-0.5">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <strong class="text-slate-800 dark:text-slate-200">Full Control Over Your Data</strong>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">You can export your data (JSON/CSV), delete individual items, or clear all data at any time via Settings → Data Management.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legal Basis -->
+            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+                <h3 class="font-bold text-slate-800 dark:text-slate-200 mb-2">Legal Basis (UK GDPR)</h3>
+                <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+                    We process your data under <strong>Legitimate Interest (Article 6(1)(f))</strong> for providing educational tools to support your learning. You are not required to give explicit consent as your data remains on your device.
+                </p>
+            </div>
+
+            <!-- Your Rights -->
+            <div class="space-y-2">
+                <h3 class="font-bold text-slate-800 dark:text-slate-200">Your Rights</h3>
+                <div class="text-sm text-slate-700 dark:text-slate-300 space-y-1">
+                    <p>✓ <strong>Right to Access:</strong> Export your data anytime (Settings → Export CSV/Backup Data)</p>
+                    <p>✓ <strong>Right to Erasure:</strong> Delete all data (Settings → Clear All Data or Logout)</p>
+                    <p>✓ <strong>Right to Data Portability:</strong> Export in JSON format for use elsewhere</p>
+                </div>
+            </div>
+
+            <!-- Learn More -->
+            <div class="border-t border-gray-200 dark:border-gray-600 pt-4">
+                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">
+                    For full details, please read our legal documents:
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <a href="./legal/privacy-notice.html" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors text-sm font-medium">
+                        <i data-lucide="shield" class="w-3.5 h-3.5 mr-1.5"></i>
+                        Privacy Notice
+                    </a>
+                    <a href="./legal/terms-of-service.html" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg hover:bg-green-200 dark:hover:bg-green-800 transition-colors text-sm font-medium">
+                        <i data-lucide="file-text" class="w-3.5 h-3.5 mr-1.5"></i>
+                        Terms of Service
+                    </a>
+                    <a href="./legal/data-retention-policy.html" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors text-sm font-medium">
+                        <i data-lucide="clock" class="w-3.5 h-3.5 mr-1.5"></i>
+                        Data Retention
+                    </a>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-3 italic">
+                    You can access these documents anytime via Settings → Privacy & Legal
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="border-t border-gray-200 dark:border-gray-700 p-6 bg-gray-50 dark:bg-gray-900/50">
+            <div class="flex items-center justify-between">
+                <p class="text-xs text-slate-600 dark:text-slate-400">
+                    By continuing to use this app, you acknowledge this information notice.
+                </p>
+                <button @click="closePrivacyNotice()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium">
+                    Got it, thanks!
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
