@@ -90,6 +90,19 @@
                     </div>
                 </div>
 
+                <!-- Teams Online Storage Summary (only shown for Teams mode) -->
+                <div x-show="isTeamsLogin" class="flex items-start space-x-3">
+                    <div class="flex-shrink-0 mt-0.5">
+                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM14 11a1 1 0 011 1v1h1a1 1 0 110 2h-1v1a1 1 0 11-2 0v-1h-1a1 1 0 110-2h1v-1a1 1 0 011-1z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <strong class="text-slate-800 dark:text-slate-200">Online Storage with Backup</strong>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Your data is stored with us and automatically backed up to your Microsoft Teams user area. Your teacher can view your confidence ratings for progress monitoring.</p>
+                    </div>
+                </div>
+
                 <!-- Teams-specific data sharing notice -->
                 <div x-show="isTeamsLogin" class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-4 border border-orange-200 dark:border-orange-800 mt-3">
                     <div class="flex items-start space-x-3">
