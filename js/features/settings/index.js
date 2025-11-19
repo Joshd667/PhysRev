@@ -3,11 +3,19 @@
 
 import { checkForUpdates, activateUpdate } from '../../sw-registration.js';
 
+// ⚡ PERFORMANCE: Cache privacy notice status in memory
+let privacyNoticeSeenCache = null;
+
 export const settingsMethods = {
     /**
      * Opens the settings modal
+     * ⚡ OPTIMIZED: Lazy-loads template on first use
      */
-    openSettings() {
+    async openSettings() {
+        // ⚡ Lazy-load settings modal template (57 KB) on first use
+        const { loadTemplateLazy } = await import('../../template-loader.js');
+        await loadTemplateLazy('settings-modal-container', './templates/settings-modal.html');
+
         this.showSettingsModal = true;
 
         // Refresh icons after modal opens
@@ -239,14 +247,16 @@ export const settingsMethods = {
 
     /**
      * Closes the privacy notice modal and marks it as seen
+     * ⚡ OPTIMIZED: Updates memory cache
      */
     async closePrivacyNotice() {
         this.showPrivacyNoticeModal = false;
 
-        // Mark as seen in IndexedDB
+        // Mark as seen in IndexedDB and cache
         try {
             const { idbSet } = await import('../../utils/indexeddb.js');
             await idbSet('privacyNoticeSeen', true);
+            privacyNoticeSeenCache = true; // ⚡ Update cache
             console.log('✅ Privacy notice marked as seen');
         } catch (error) {
             console.warn('Failed to save privacy notice status:', error);
@@ -256,16 +266,24 @@ export const settingsMethods = {
     /**
      * Checks if user has seen the privacy notice, and shows it if not
      * Should be called after authentication
+     * ⚡ OPTIMIZED: Caches result in memory, lazy-loads template
      * @param {boolean} isTeamsMode - Whether this is for Teams login (shows Teams-specific info)
      */
     async checkAndShowPrivacyNotice(isTeamsMode = false) {
         try {
-            const { idbGet } = await import('../../utils/indexeddb.js');
-            const hasSeenNotice = await idbGet('privacyNoticeSeen');
+            // ⚡ Check memory cache first (instant)
+            if (privacyNoticeSeenCache === null) {
+                const { idbGet } = await import('../../utils/indexeddb.js');
+                privacyNoticeSeenCache = await idbGet('privacyNoticeSeen');
+            }
 
             // Only show if user hasn't seen it before
-            if (!hasSeenNotice) {
-                // Show immediately (templates should be loaded via template-loader)
+            if (!privacyNoticeSeenCache) {
+                // ⚡ Lazy-load privacy modal template (17 KB) only when needed
+                const { loadTemplateLazy } = await import('../../template-loader.js');
+                await loadTemplateLazy('privacy-notice-modal-container', './templates/privacy-notice-modal.html');
+
+                // Show modal
                 this.openPrivacyNotice(isTeamsMode);
             }
         } catch (error) {
@@ -294,6 +312,7 @@ export const settingsMethods = {
     /**
      * Continue to Teams login after privacy notice acknowledgment
      * This is called from the privacy modal when user clicks "Continue to Login"
+     * ⚡ OPTIMIZED: Updates memory cache
      */
     async continueToTeamsLogin() {
         // Close privacy modal
@@ -303,6 +322,7 @@ export const settingsMethods = {
         try {
             const { idbSet } = await import('../../utils/indexeddb.js');
             await idbSet('privacyNoticeSeen', true);
+            privacyNoticeSeenCache = true; // ⚡ Update cache
             console.log('✅ Privacy notice marked as seen');
         } catch (error) {
             console.warn('Failed to save privacy notice status:', error);
