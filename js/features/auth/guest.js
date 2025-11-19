@@ -72,6 +72,9 @@ export const guestAuthMethods = {
             // Clear authentication
             await idbRemove('physicsAuditAuth');
 
+            // Clear privacy notice seen flag so user sees it again on next login
+            await idbRemove('privacyNoticeSeen');
+
             // Clear user-specific data if it exists
             if (this.user?.id) {
                 if (this.authMethod === 'teams') {
@@ -88,6 +91,9 @@ export const guestAuthMethods = {
             this.authMethod = null;
             this.confidenceLevels = {};
             this.analyticsHistoryData = [];
+
+            // Close settings modal
+            this.showSettingsModal = false;
 
             console.log('👋 Logged out successfully');
         }
