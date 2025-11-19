@@ -55,48 +55,6 @@
     </div>
 
     <div class="flex items-center space-x-2">
-        <!-- Online/Offline Status Indicator -->
-        <div class="flex items-center space-x-2 px-3 py-1.5 bg-white/60 dark:bg-gray-700/60 backdrop-blur-sm rounded-lg"
-             x-data="{ showSyncTooltip: false }"
-             @mouseenter="showSyncTooltip = true"
-             @mouseleave="showSyncTooltip = false">
-
-            <!-- Online/Offline Dot -->
-            <div class="relative">
-                <div :class="isOnline ? 'bg-green-500' : 'bg-red-500'"
-                     class="w-2 h-2 rounded-full"></div>
-                <div :class="isOnline ? 'bg-green-500' : 'bg-red-500'"
-                     x-show="isOnline"
-                     class="w-2 h-2 rounded-full absolute top-0 left-0 animate-ping"></div>
-            </div>
-
-            <!-- Status Text -->
-            <span class="text-xs font-medium text-slate-700 dark:text-slate-300"
-                  x-text="isOnline ? 'Online' : 'Offline'"></span>
-
-            <!-- Sync Tooltip -->
-            <div x-show="showSyncTooltip"
-                 x-cloak
-                 class="absolute top-full right-0 mt-2 w-48 p-2 bg-gray-900 dark:bg-gray-800 text-white text-xs rounded-lg shadow-lg z-50">
-                <div class="space-y-1">
-                    <div class="flex justify-between">
-                        <span>Status:</span>
-                        <span class="font-semibold" x-text="isOnline ? 'Connected' : 'Offline'"></span>
-                    </div>
-                    <div x-show="lastSyncTime" class="flex justify-between">
-                        <span>Last sync:</span>
-                        <span class="font-semibold" x-text="getTimeSinceSync()"></span>
-                    </div>
-                    <div x-show="authMethod === 'teams' && isOnline" class="pt-1 border-t border-gray-700">
-                        <button @click="syncDataNow()"
-                                class="w-full px-2 py-1 bg-blue-600 hover:bg-blue-700 rounded text-white text-xs font-medium transition-colors">
-                            Sync Now
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <button @click="toggleSearch()" class="p-2 bg-white/60 dark:bg-gray-700/60 hover:bg-white/80 dark:hover:bg-gray-600/80 backdrop-blur-sm rounded-lg transition-colors" title="Search topics">
             <i :data-lucide="searchVisible ? 'x' : 'search'" class="w-5 h-5 text-slate-700 dark:text-slate-300"></i>
         </button>
