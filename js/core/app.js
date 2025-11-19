@@ -267,20 +267,21 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
 
             // --- INITIALIZATION ---
             async init() {
-                window.physicsAuditApp = this; // For debugging
+                try {
+                    window.physicsAuditApp = this; // For debugging
 
-                // Lazy load auth module only when needed
-                await this.loadAuthModule();
-                await this.checkExistingAuth();
+                    // Lazy load auth module only when needed
+                    await this.loadAuthModule();
+                    await this.checkExistingAuth();
 
-                // Load user preferences (includes dark mode, view mode, selected paper)
-                await this.loadPreferences();
+                    // Load user preferences (includes dark mode, view mode, selected paper)
+                    await this.loadPreferences();
 
-                // Load flashcard test results history
-                await this.loadTestResultsHistory();
+                    // Load flashcard test results history
+                    await this.loadTestResultsHistory();
 
-                // Load saved test sets
-                await this.loadTestSets();
+                    // Load saved test sets
+                    await this.loadTestSets();
 
                 this.sidebarVisible = true;
 
@@ -318,11 +319,31 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                     }
                 });
 
-                // Set up watchers
-                setupWatchers(this);
+                    // Set up watchers
+                    setupWatchers(this);
 
-                // ⚡ PERFORMANCE: Initialize search indexes
-                this._initializeSearchIndexes();
+                    // ⚡ PERFORMANCE: Initialize search indexes
+                    this._initializeSearchIndexes();
+
+                } catch (error) {
+                    console.error('❌ App initialization failed:', error);
+
+                    // Show error fallback
+                    const fallback = document.getElementById('error-fallback');
+                    const errorMessage = document.getElementById('error-message');
+                    if (fallback && errorMessage) {
+                        fallback.classList.remove('hidden');
+                        errorMessage.textContent = `Initialization Error: ${error.message}`;
+
+                        const errorStack = document.getElementById('error-stack');
+                        if (errorStack) {
+                            errorStack.textContent = error.stack || 'No stack trace available';
+                        }
+                    }
+
+                    // Re-throw to let global handler catch it too
+                    throw error;
+                }
             },
 
             // --- SEARCH INDEX MANAGEMENT ---

@@ -83,6 +83,34 @@
             Alpine
         ));
 
+        // ✅ ERROR BOUNDARY: Alpine.js error interception
+        // Wrap Alpine methods to catch errors in reactive expressions
+        const originalEvaluate = Alpine.evaluate;
+        Alpine.evaluate = function(el, expression, extras = {}) {
+            try {
+                return originalEvaluate.call(this, el, expression, extras);
+            } catch (error) {
+                console.error('❌ Alpine expression error:', {
+                    expression,
+                    element: el,
+                    error
+                });
+
+                // Show error fallback for critical errors
+                if (error.message.includes('is not a function') || error.message.includes('Cannot read')) {
+                    const fallback = document.getElementById('error-fallback');
+                    const errorMessage = document.getElementById('error-message');
+                    if (fallback && errorMessage) {
+                        fallback.classList.remove('hidden');
+                        errorMessage.textContent = `Alpine.js Error: ${error.message}`;
+                    }
+                }
+
+                // Return safe default to prevent cascade
+                return undefined;
+            }
+        };
+
         Alpine.start();
 
         const totalTime = performance.now() - startTime;
