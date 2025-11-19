@@ -5,7 +5,8 @@ window.appUpdateState = {
     updateAvailable: false,
     newWorker: null,
     currentVersion: null,
-    newVersion: null
+    newVersion: null,
+    skipWaitingCalled: false  // Track if we explicitly activated an update
 };
 
 /**
@@ -38,8 +39,14 @@ export function registerServiceWorker() {
                 });
 
                 // Handle controller changes (when update is activated)
+                // ✅ FIX: Only reload if we explicitly called skipWaiting (real update)
+                // Don't reload on automatic SW reinstall (e.g., after clearing cache)
                 navigator.serviceWorker.addEventListener('controllerchange', () => {
-                    window.location.reload();
+                    if (window.appUpdateState.skipWaitingCalled) {
+                        window.location.reload();
+                    }
+                    // Reset flag after handling
+                    window.appUpdateState.skipWaitingCalled = false;
                 });
 
                 // Get current version info
@@ -96,6 +103,8 @@ export async function checkForUpdates() {
 export function activateUpdate() {
     if (window.appUpdateState.newWorker) {
         console.log('⚡ Activating update...');
+        // Set flag so controllerchange knows to reload
+        window.appUpdateState.skipWaitingCalled = true;
         window.appUpdateState.newWorker.postMessage({ type: 'SKIP_WAITING' });
         // Controller change event will trigger reload
     } else {
