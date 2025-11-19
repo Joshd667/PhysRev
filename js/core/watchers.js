@@ -62,13 +62,43 @@ export function setupWatchers(app) {
 
     app.$nextTick(() => { if (window.lucide) lucide.createIcons(); });
 
-    // ⚡ PERFORMANCE: Cleanup memory when leaving analytics
+    // ✅ PERFORMANCE FIX: Robust Chart.js cleanup to prevent memory leaks
     app.$watch('showingAnalytics', (newValue, oldValue) => {
         if (oldValue === true && newValue === false) {
-            // Destroy all charts to free memory
-            if (typeof app.destroyAllCharts === 'function') {
-                app.destroyAllCharts();
+            // Destroy all charts to free memory with robust error handling
+            try {
+                if (typeof app.destroyAllCharts === 'function') {
+                    app.destroyAllCharts();
+                    console.log('✅ Charts destroyed successfully');
+                } else {
+                    // ✅ FALLBACK: Manual cleanup if method doesn't exist
+                    console.warn('⚠️ destroyAllCharts not found, attempting manual cleanup');
+
+                    if (app.chartInstances && app.chartInstances instanceof Map) {
+                        let destroyedCount = 0;
+                        app.chartInstances.forEach((chart, key) => {
+                            try {
+                                if (chart && typeof chart.destroy === 'function') {
+                                    chart.destroy();
+                                    destroyedCount++;
+                                }
+                            } catch (e) {
+                                console.error(`Failed to destroy chart ${key}:`, e);
+                            }
+                        });
+                        app.chartInstances.clear();
+                        console.log(`✅ Manual cleanup destroyed ${destroyedCount} charts`);
+                    }
+                }
+
+                // ✅ Verify cleanup succeeded
+                if (app.chartInstances && app.chartInstances.size > 0) {
+                    console.warn(`⚠️ ${app.chartInstances.size} charts still remain after cleanup!`);
+                }
+            } catch (error) {
+                console.error('❌ Chart cleanup failed:', error);
             }
+
             // Clear analytics data to free memory
             app.analyticsData = null;
         }
