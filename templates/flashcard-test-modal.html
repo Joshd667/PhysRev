@@ -237,7 +237,7 @@
             </div>
             <div class="flex items-center space-x-4">
                 <div class="text-sm font-medium text-slate-600 dark:text-slate-400">
-                    <span x-text="getReviewCards().length"></span> cards
+                    <span x-text="reviewCardsCached.length"></span> cards
                 </div>
                 <button @click="exitReview()" class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                     <i data-lucide="arrow-left" class="w-5 h-5 text-gray-500 dark:text-gray-400"></i>
@@ -247,7 +247,7 @@
 
         <!-- Review Cards List -->
         <div class="flex-1 overflow-y-auto p-6 space-y-4">
-            <template x-for="(card, index) in getReviewCards()" :key="index">
+            <template x-for="(card, index) in reviewCardsCached" :key="index">
                 <div class="grid grid-cols-2 gap-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <!-- Front Column -->
                     <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
@@ -261,7 +261,7 @@
             </template>
 
             <!-- Empty State -->
-            <div x-show="getReviewCards().length === 0" class="text-center py-12">
+            <div x-show="reviewCardsCached.length === 0" class="text-center py-12">
                 <i data-lucide="inbox" class="w-12 h-12 text-gray-400 mx-auto mb-3"></i>
                 <p class="text-gray-500 dark:text-gray-400">No cards to review</p>
             </div>

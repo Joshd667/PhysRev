@@ -101,6 +101,110 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 return this._cachedProgressTitle;
             },
 
+            // ⚡ PERFORMANCE: Cached getters for expensive template computations
+            get notesGroupedBySection() {
+                if (this._cachedNotesGroupedDirty) {
+                    this._cachedNotesGrouped = this.getNotesGroupedBySection();
+                    this._cachedNotesGroupedDirty = false;
+                }
+                return this._cachedNotesGrouped;
+            },
+
+            get flashcardsGroupedBySection() {
+                if (this._cachedFlashcardsGroupedDirty) {
+                    this._cachedFlashcardsGrouped = this.getFlashcardsGroupedBySection();
+                    this._cachedFlashcardsGroupedDirty = false;
+                }
+                return this._cachedFlashcardsGrouped;
+            },
+
+            get mindmapsGroupedBySection() {
+                if (this._cachedMindmapsGroupedDirty) {
+                    this._cachedMindmapsGrouped = this.getMindmapsGroupedBySection();
+                    this._cachedMindmapsGroupedDirty = false;
+                }
+                return this._cachedMindmapsGrouped;
+            },
+
+            get inheritedTags() {
+                if (this._cachedInheritedTagsDirty) {
+                    const tags = new Set();
+                    this.testSetBuilderCards.forEach(card => {
+                        const deck = this.flashcardDecks[card.deckId];
+                        if (deck && deck.tags) {
+                            deck.tags.forEach(tag => tags.add(tag));
+                        }
+                    });
+                    this._cachedInheritedTags = Array.from(tags).sort();
+                    this._cachedInheritedTagsDirty = false;
+                }
+                return this._cachedInheritedTags;
+            },
+
+            get filteredDecksForBuilder() {
+                if (this._cachedFilteredDecksForBuilderDirty) {
+                    this._cachedFilteredDecksForBuilder = this.getFilteredDecksForBuilder();
+                    this._cachedFilteredDecksForBuilderDirty = false;
+                }
+                return this._cachedFilteredDecksForBuilder;
+            },
+
+            get criticalTopicsPageCached() {
+                if (this._cachedCriticalTopicsPageDirty) {
+                    this._cachedCriticalTopicsPage = this.getCriticalTopicsPage();
+                    this._cachedCriticalTopicsPageDirty = false;
+                }
+                return this._cachedCriticalTopicsPage;
+            },
+
+            get strongTopicsPageCached() {
+                if (this._cachedStrongTopicsPageDirty) {
+                    this._cachedStrongTopicsPage = this.getStrongTopicsPage();
+                    this._cachedStrongTopicsPageDirty = false;
+                }
+                return this._cachedStrongTopicsPage;
+            },
+
+            get currentTagsCached() {
+                if (this._cachedCurrentTagsDirty) {
+                    this._cachedCurrentTags = this.getCurrentTags();
+                    this._cachedCurrentTagsDirty = false;
+                }
+                return this._cachedCurrentTags;
+            },
+
+            get reviewCardsCached() {
+                if (this._cachedReviewCardsDirty) {
+                    this._cachedReviewCards = this.getReviewCards();
+                    this._cachedReviewCardsDirty = false;
+                }
+                return this._cachedReviewCards;
+            },
+
+            get notesForCurrentSectionCached() {
+                if (this._cachedNotesForCurrentSectionDirty) {
+                    this._cachedNotesForCurrentSection = this.getNotesForCurrentSection();
+                    this._cachedNotesForCurrentSectionDirty = false;
+                }
+                return this._cachedNotesForCurrentSection;
+            },
+
+            get flashcardDecksForCurrentSectionCached() {
+                if (this._cachedFlashcardDecksForCurrentSectionDirty) {
+                    this._cachedFlashcardDecksForCurrentSection = this.getFlashcardDecksForCurrentSection();
+                    this._cachedFlashcardDecksForCurrentSectionDirty = false;
+                }
+                return this._cachedFlashcardDecksForCurrentSection;
+            },
+
+            get mindmapsForCurrentSectionCached() {
+                if (this._cachedMindmapsForCurrentSectionDirty) {
+                    this._cachedMindmapsForCurrentSection = this.getMindmapsForCurrentSection();
+                    this._cachedMindmapsForCurrentSectionDirty = false;
+                }
+                return this._cachedMindmapsForCurrentSection;
+            },
+
             // Compute progress title
             _computeProgressTitleCache() {
                 this._cachedProgressTitle = this.viewMode === 'spec' ? 'Overall Progress' : this.selectedPaper + ' Progress';

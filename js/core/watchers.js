@@ -112,4 +112,61 @@ export function setupWatchers(app) {
         console.log('📢 App update detected by Alpine.js');
         app.updateAvailable = true;
     });
+
+    // ⚡ PERFORMANCE: Cache invalidation watchers for expensive computations
+    // These watchers mark caches as dirty when their dependencies change
+
+    // Notes grouped by section dependencies
+    const notesGroupedDeps = ['userNotes', 'viewMode', 'selectedPaper', 'contentFilterGroup', 'contentFilterSection', 'currentGroups'];
+    notesGroupedDeps.forEach(prop => {
+        app.$watch(prop, () => { app._cachedNotesGroupedDirty = true; });
+    });
+
+    // Flashcards grouped by section dependencies
+    const flashcardsGroupedDeps = ['flashcardDecks', 'viewMode', 'selectedPaper', 'contentFilterGroup', 'contentFilterSection', 'currentGroups'];
+    flashcardsGroupedDeps.forEach(prop => {
+        app.$watch(prop, () => { app._cachedFlashcardsGroupedDirty = true; });
+    });
+
+    // Mindmaps grouped by section dependencies
+    const mindmapsGroupedDeps = ['mindmaps', 'viewMode', 'selectedPaper', 'contentFilterGroup', 'contentFilterSection', 'currentGroups'];
+    mindmapsGroupedDeps.forEach(prop => {
+        app.$watch(prop, () => { app._cachedMindmapsGroupedDirty = true; });
+    });
+
+    // Inherited tags dependencies
+    app.$watch('testSetBuilderCards', () => { app._cachedInheritedTagsDirty = true; });
+    app.$watch('flashcardDecks', () => { app._cachedInheritedTagsDirty = true; });
+
+    // Filtered decks for builder dependencies
+    app.$watch('flashcardDecks', () => { app._cachedFilteredDecksForBuilderDirty = true; });
+    app.$watch('advancedSearchTags', () => { app._cachedFilteredDecksForBuilderDirty = true; });
+    app.$watch('testSetBuilderSearch', () => { app._cachedFilteredDecksForBuilderDirty = true; });
+
+    // Critical/Strong topics page dependencies
+    app.$watch('criticalTopicsPage', () => { app._cachedCriticalTopicsPageDirty = true; });
+    app.$watch('analyticsData', () => { app._cachedCriticalTopicsPageDirty = true; });
+    app.$watch('strongTopicsPage', () => { app._cachedStrongTopicsPageDirty = true; });
+    app.$watch('analyticsData', () => { app._cachedStrongTopicsPageDirty = true; });
+
+    // Current tags dependencies
+    const currentTagsDeps = ['tagSelectorContext', 'noteEditorTags', 'flashcardEditorTags', 'mindmapEditorTags'];
+    currentTagsDeps.forEach(prop => {
+        app.$watch(prop, () => { app._cachedCurrentTagsDirty = true; });
+    });
+
+    // Review cards dependencies
+    app.$watch('testFlashcards', () => { app._cachedReviewCardsDirty = true; });
+    app.$watch('testReviewMode', () => { app._cachedReviewCardsDirty = true; });
+    app.$watch('testAnswers', () => { app._cachedReviewCardsDirty = true; });
+
+    // Revision section content dependencies
+    const revisionSectionDeps = ['currentRevisionSection', 'userNotes', 'flashcardDecks', 'mindmaps'];
+    revisionSectionDeps.forEach(prop => {
+        app.$watch(prop, () => {
+            app._cachedNotesForCurrentSectionDirty = true;
+            app._cachedFlashcardDecksForCurrentSectionDirty = true;
+            app._cachedMindmapsForCurrentSectionDirty = true;
+        });
+    });
 }

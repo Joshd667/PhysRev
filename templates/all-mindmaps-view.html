@@ -6,7 +6,7 @@
     </button>
 
     <!-- Empty State -->
-    <template x-if="getMindmapsGroupedBySection().length === 0">
+    <template x-if="mindmapsGroupedBySection.length === 0">
         <div class="text-center py-16">
             <i data-lucide="network" class="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4"></i>
             <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No mindmaps found</h3>
@@ -14,7 +14,7 @@
         </div>
     </template>
 
-    <div x-show="getMindmapsGroupedBySection().length > 0">
+    <div x-show="mindmapsGroupedBySection.length > 0">
         <!-- View Toggle -->
         <div class="flex items-center justify-end gap-2 mb-6">
             <!-- Sort Dropdown -->
@@ -55,7 +55,7 @@
 
         <!-- List View -->
     <div class="space-y-6 -mt-6" x-show="mindmapsViewMode === 'list'">
-        <template x-for="group in getMindmapsGroupedBySection()" :key="group.groupTitle">
+        <template x-for="group in mindmapsGroupedBySection" :key="group.groupTitle">
             <div x-data="{ groupExpanded: true }">
                 <!-- Group Header -->
                 <button @click="groupExpanded = !groupExpanded" class="w-full flex items-center justify-between mb-4 pb-3 border-b-4 border-cyan-600 dark:border-cyan-500 hover:opacity-80 transition-opacity">
@@ -157,7 +157,7 @@
 
     <!-- Card View -->
     <div x-show="mindmapsViewMode === 'card'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); })" x-effect="if (mindmapsViewMode === 'card' && window.lucide) { $nextTick(() => lucide.createIcons()); }">
-        <template x-for="group in getMindmapsGroupedBySection()" :key="group.groupTitle">
+        <template x-for="group in mindmapsGroupedBySection" :key="group.groupTitle">
             <template x-for="section in group.sections" :key="section.sectionName">
                 <template x-for="mindmap in section.mindmaps" :key="mindmap.id">
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-2 hover:shadow-lg transition-all flex flex-col h-full" :class="mindmap.pinned ? 'border-yellow-400 dark:border-yellow-500' : 'border-cyan-200 dark:border-cyan-700'">

@@ -196,6 +196,33 @@ export function createState() {
         // --- REVISION AREA INDICATOR SETTINGS ---
         revisionAreaIndicatorStyle: 'outline', // 'bar', 'outline', or 'none'
 
+        // --- PERFORMANCE: CACHED COMPUTED VALUES ---
+        // These cache expensive template computations to avoid recalculating on every render
+        _cachedNotesGrouped: [],
+        _cachedNotesGroupedDirty: true,
+        _cachedFlashcardsGrouped: [],
+        _cachedFlashcardsGroupedDirty: true,
+        _cachedMindmapsGrouped: [],
+        _cachedMindmapsGroupedDirty: true,
+        _cachedInheritedTags: [],
+        _cachedInheritedTagsDirty: true,
+        _cachedFilteredDecksForBuilder: [],
+        _cachedFilteredDecksForBuilderDirty: true,
+        _cachedCriticalTopicsPage: [],
+        _cachedCriticalTopicsPageDirty: true,
+        _cachedStrongTopicsPage: [],
+        _cachedStrongTopicsPageDirty: true,
+        _cachedCurrentTags: [],
+        _cachedCurrentTagsDirty: true,
+        _cachedReviewCards: [],
+        _cachedReviewCardsDirty: true,
+        _cachedNotesForCurrentSection: [],
+        _cachedNotesForCurrentSectionDirty: true,
+        _cachedFlashcardDecksForCurrentSection: [],
+        _cachedFlashcardDecksForCurrentSectionDirty: true,
+        _cachedMindmapsForCurrentSection: [],
+        _cachedMindmapsForCurrentSectionDirty: true,
+
         // --- CUSTOM MODAL DIALOG STATE ---
         showCustomModal: false,
         modalType: 'alert', // 'alert', 'confirm', 'prompt'

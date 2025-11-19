@@ -58,7 +58,7 @@
             
             <!-- View Toggle and Filters -->
             <div class="flex items-center gap-2">
-                <div x-show="flashcardViewMode === 'card' && getFlashcardsGroupedBySection().length > 0" class="relative" x-data="{ open: false }" x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); }); $watch('open', value => { if (value && window.lucide) { lucide.createIcons(); } })" @keydown.escape.window="open = false">
+                <div x-show="flashcardViewMode === 'card' && flashcardsGroupedBySection.length > 0" class="relative" x-data="{ open: false }" x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); }); $watch('open', value => { if (value && window.lucide) { lucide.createIcons(); } })" @keydown.escape.window="open = false">
                     <button @click="open = !open" class="p-2 bg-white/60 dark:bg-gray-700/60 backdrop-blur-sm rounded-md border border-gray-200 dark:border-gray-600 hover:bg-white/80 dark:hover:bg-gray-600 transition-colors text-gray-700 dark:text-gray-300" :class="open ? 'ring-2 ring-purple-400/60' : ''" title="Sort decks">
                         <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
                     </button>
@@ -98,7 +98,7 @@
         </div>
 
         <!-- Empty State -->
-        <template x-if="getFlashcardsGroupedBySection().length === 0">
+        <template x-if="flashcardsGroupedBySection.length === 0">
             <div class="text-center py-16">
                 <i data-lucide="layers" class="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4"></i>
                 <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No flashcard decks found</h3>
@@ -107,8 +107,8 @@
         </template>
 
         <!-- Flashcard Decks List Grouped by Group and Section -->
-        <div class="space-y-6 -mt-6" x-show="getFlashcardsGroupedBySection().length > 0 && flashcardViewMode === 'list'" x-effect="if (flashcardViewMode === 'list' && window.lucide) { $nextTick(() => lucide.createIcons()); }">
-        <template x-for="group in getFlashcardsGroupedBySection()" :key="group.groupTitle">
+        <div class="space-y-6 -mt-6" x-show="flashcardsGroupedBySection.length > 0 && flashcardViewMode === 'list'" x-effect="if (flashcardViewMode === 'list' && window.lucide) { $nextTick(() => lucide.createIcons()); }">
+        <template x-for="group in flashcardsGroupedBySection" :key="group.groupTitle">
             <div x-data="{ groupExpanded: true }" x-effect="if (groupExpanded && window.lucide) { $nextTick(() => lucide.createIcons()); }">
                 <!-- Group Header -->
                 <button @click="groupExpanded = !groupExpanded" class="w-full flex items-center justify-between mb-4 pb-3 border-b-4 border-purple-600 dark:border-purple-500 hover:opacity-80 transition-opacity">
@@ -224,8 +224,8 @@
         </div>
 
         <!-- Card View Mode -->
-        <div x-show="getFlashcardsGroupedBySection().length > 0 && flashcardViewMode === 'card'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); })" x-effect="if (flashcardViewMode === 'card' && window.lucide) { $nextTick(() => lucide.createIcons()); }">
-            <template x-for="group in getFlashcardsGroupedBySection()" :key="group.groupTitle">
+        <div x-show="flashcardsGroupedBySection.length > 0 && flashcardViewMode === 'card'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); })" x-effect="if (flashcardViewMode === 'card' && window.lucide) { $nextTick(() => lucide.createIcons()); }">
+            <template x-for="group in flashcardsGroupedBySection" :key="group.groupTitle">
                 <template x-for="section in group.sections" :key="section.sectionName">
                     <template x-for="deck in section.decks" :key="deck.id">
                         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-2 hover:shadow-lg transition-all flex flex-col h-full" :class="deck.pinned ? 'border-yellow-400 dark:border-yellow-500' : 'border-gray-200 dark:border-gray-700'">
@@ -522,7 +522,7 @@
 
                 <!-- Decks List -->
                 <div class="space-y-3 flex-1 overflow-y-auto">
-                    <template x-for="deck in getFilteredDecksForBuilder()" :key="deck.id">
+                    <template x-for="deck in filteredDecksForBuilder" :key="deck.id">
                         <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
                             <!-- Deck Header -->
                             <div class="p-3 bg-gray-50 dark:bg-gray-700/50 flex items-center justify-between">
@@ -563,7 +563,7 @@
                         </div>
                     </template>
 
-                    <div x-show="getFilteredDecksForBuilder().length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
+                    <div x-show="filteredDecksForBuilder.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
                         No decks found
                     </div>
                 </div>
@@ -606,31 +606,13 @@
         <div x-show="testSetBuilderCards.length > 0" class="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6">
             <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Inherited Tags from Selected Decks</h3>
             <div class="flex flex-wrap gap-2">
-                <template x-for="tagId in (() => {
-                    const tags = new Set();
-                    testSetBuilderCards.forEach(card => {
-                        const deck = flashcardDecks[card.deckId];
-                        if (deck && deck.tags) {
-                            deck.tags.forEach(tag => tags.add(tag));
-                        }
-                    });
-                    return Array.from(tags).sort();
-                })()" :key="tagId">
+                <template x-for="tagId in inheritedTags" :key="tagId">
                     <span class="inline-flex items-center px-3 py-1.5 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded text-sm">
                         <span class="font-mono font-bold mr-1.5" x-text="tagId"></span>
                         <span x-text="topicLookup[tagId] ? topicLookup[tagId].topicTitle : ''"></span>
                     </span>
                 </template>
-                <span x-show="(() => {
-                    const tags = new Set();
-                    testSetBuilderCards.forEach(card => {
-                        const deck = flashcardDecks[card.deckId];
-                        if (deck && deck.tags) {
-                            deck.tags.forEach(tag => tags.add(tag));
-                        }
-                    });
-                    return tags.size === 0;
-                })()" class="text-sm text-gray-500 dark:text-gray-400 italic">
+                <span x-show="inheritedTags.length === 0" class="text-sm text-gray-500 dark:text-gray-400 italic">
                     No tags inherited from selected decks
                 </span>
             </div>
