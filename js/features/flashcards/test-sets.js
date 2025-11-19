@@ -358,10 +358,10 @@ export const testSetMethods = {
     },
 
     /**
-     * Loads test sets from localStorage
+     * Loads test sets from IndexedDB
      */
-    loadTestSets() {
-        const data = this.loadDataType('testSets', { data: {} });
+    async loadTestSets() {
+        const data = await this.loadDataType('testSets', { data: {} });
         this.testSets = data.data || {};
     },
 
