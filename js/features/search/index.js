@@ -168,8 +168,15 @@ export const searchMethods = {
         // Apply sorting
         this._sortSearchResults(results, query);
 
-        // Freeze result objects to prevent deep reactivity (reduces RAM usage)
-        this.searchResults = results.map(result => Object.freeze(result));
+        // ⚡ MEMORY FIX: Store results in module-level cache (outside Alpine reactivity)
+        // Access via getter in app.js - prevents deep reactive wrapping
+        // Note: cachedSearchResults is defined in core/app.js
+        if (typeof window.physicsAuditApp !== 'undefined' && window.physicsAuditApp._setSearchResults) {
+            window.physicsAuditApp._setSearchResults(results);
+        } else {
+            // Fallback for edge cases
+            this.searchResults = results.map(result => Object.freeze(result));
+        }
     },
 
     _sortSearchResults(results, query) {

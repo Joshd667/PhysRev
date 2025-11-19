@@ -180,7 +180,8 @@ export function createState() {
         criticalTopicsPage: 0,
         strongTopicsPage: 0,
         recommendationsPage: 0,
-        chartInstances: new Map(),
+        // ⚡ MEMORY FIX: chartInstances moved outside reactive state (see app.js)
+        // Storing Map in reactive state prevents garbage collection of destroyed charts
 
         // --- DATA ---
         // NOTE: Large read-only data (specificationData, groups, topicLookup) are stored
