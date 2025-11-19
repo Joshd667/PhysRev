@@ -271,16 +271,16 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
 
                 // Lazy load auth module only when needed
                 await this.loadAuthModule();
-                this.checkExistingAuth();
+                await this.checkExistingAuth();
 
                 // Load user preferences (includes dark mode, view mode, selected paper)
-                this.loadPreferences();
+                await this.loadPreferences();
 
                 // Load flashcard test results history
-                this.loadTestResultsHistory();
+                await this.loadTestResultsHistory();
 
                 // Load saved test sets
-                this.loadTestSets();
+                await this.loadTestSets();
 
                 this.sidebarVisible = true;
 
