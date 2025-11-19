@@ -360,23 +360,42 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
              * @param {string} dirty - Untrusted HTML content
              * @returns {string} Sanitized HTML safe for rendering
              */
-            sanitizeHTML(dirty) {
+            sanitizeHTML(dirty, options = {}) {
                 if (!dirty) return '';
 
-                // Use DOMPurify if available
+                // ✅ SECURITY: Strengthened DOMPurify configuration
                 if (typeof DOMPurify !== 'undefined') {
-                    return DOMPurify.sanitize(dirty, {
-                        ALLOWED_TAGS: ['b', 'i', 'u', 'strong', 'em', 'p', 'br', 'ul', 'ol', 'li',
+                    const strictConfig = {
+                        ALLOWED_TAGS: ['b', 'i', 'u', 's', 'strong', 'em', 'p', 'br', 'ul', 'ol', 'li',
                                        'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
                                        'table', 'thead', 'tbody', 'tr', 'td', 'th',
-                                       'blockquote', 'code', 'pre', 'span', 'div', 'a',
-                                       'img', 'hr', 'mark'],
-                        ALLOWED_ATTR: ['href', 'class', 'style', 'src', 'alt', 'title', 'width', 'height'],
-                        ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+                                       'blockquote', 'code', 'pre', 'span', 'div',
+                                       'hr', 'mark'],
+                        // ✅ Explicit attribute whitelist - no 'href' or 'src' by default
+                        ALLOWED_ATTR: ['class', 'style', 'data-latex'], // For KaTeX equations
+                        // ✅ Forbid dangerous tags explicitly
+                        FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'link', 'style',
+                                      'form', 'input', 'button', 'textarea', 'select',
+                                      'frame', 'frameset', 'base', 'meta'],
+                        // ✅ Forbid event handlers and javascript: URLs
+                        FORBID_ATTR: ['onerror', 'onclick', 'onload', 'onmouseover', 'onfocus', 'onblur',
+                                      'oninput', 'onchange', 'onsubmit', 'onreset', 'onkeydown', 'onkeyup',
+                                      'onkeypress', 'onmousedown', 'onmouseup', 'onmousemove', 'onmouseenter',
+                                      'onmouseleave', 'onwheel', 'ondrag', 'ondrop', 'onscroll'],
                         ALLOW_DATA_ATTR: false,
                         ALLOW_UNKNOWN_PROTOCOLS: false,
-                        SAFE_FOR_TEMPLATES: true
-                    });
+                        SAFE_FOR_TEMPLATES: true,
+                        KEEP_CONTENT: true,
+                        RETURN_DOM_FRAGMENT: false,
+                        RETURN_DOM: false,
+                        FORCE_BODY: true,
+                        SANITIZE_DOM: true,
+                        IN_PLACE: false,
+                        // Allow caller to override for specific use cases
+                        ...options
+                    };
+
+                    return DOMPurify.sanitize(dirty, strictConfig);
                 }
 
                 // Fallback: text-only escape (no HTML)

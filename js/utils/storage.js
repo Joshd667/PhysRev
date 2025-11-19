@@ -1,9 +1,46 @@
 // js/utils/storage.js
 // localStorage utility functions with async operations and quota handling
 
+// ✅ PERFORMANCE: Web Worker for large JSON serialization (>100KB)
+let storageWorker = null;
+let workerMessageId = 0;
+const workerCallbacks = new Map();
+
+function initWorker() {
+    if (!storageWorker && typeof Worker !== 'undefined') {
+        try {
+            storageWorker = new Worker('/js/utils/storage-worker.js');
+            storageWorker.onmessage = (e) => {
+                const { id, success, serialized, error } = e.data;
+                const callback = workerCallbacks.get(id);
+                if (callback) {
+                    if (success) {
+                        callback.resolve(serialized);
+                    } else {
+                        callback.reject(new Error(error));
+                    }
+                    workerCallbacks.delete(id);
+                }
+            };
+            storageWorker.onerror = (e) => {
+                console.error('Storage Worker error:', e);
+                workerCallbacks.forEach(cb => cb.reject(new Error('Worker error')));
+                workerCallbacks.clear();
+                storageWorker = null;
+            };
+        } catch (e) {
+            console.warn('Web Worker not available, falling back to main thread');
+            storageWorker = null;
+        }
+    }
+    return storageWorker;
+}
+
 export const storageUtils = {
     /**
-     * Save data asynchronously using requestIdleCallback to avoid blocking main thread
+     * Save data asynchronously using Web Worker for large datasets or requestIdleCallback for small ones
+     * ✅ PERFORMANCE: Web Worker for >100KB prevents blocking main thread
+     * ✅ iOS FIX: Automatic cleanup on quota exceeded
      */
     async save(key, data) {
         try {
@@ -20,9 +57,37 @@ export const storageUtils = {
     },
 
     /**
-     * Serialize data asynchronously using requestIdleCallback
+     * Serialize data asynchronously using Web Worker (>100KB) or requestIdleCallback (<=100KB)
      */
-    _serializeAsync(data) {
+    async _serializeAsync(data) {
+        // Quick size estimate
+        const roughSize = JSON.stringify(data).length;
+        const sizeKB = roughSize / 1024;
+
+        // Use Web Worker for large datasets (>100KB)
+        if (sizeKB > 100 && initWorker()) {
+            return new Promise((resolve, reject) => {
+                const id = ++workerMessageId;
+                workerCallbacks.set(id, { resolve, reject });
+
+                storageWorker.postMessage({
+                    action: 'serialize',
+                    key: 'temp',
+                    data: data,
+                    id
+                });
+
+                // Timeout after 10 seconds
+                setTimeout(() => {
+                    if (workerCallbacks.has(id)) {
+                        workerCallbacks.delete(id);
+                        reject(new Error('Worker timeout'));
+                    }
+                }, 10000);
+            });
+        }
+
+        // Small datasets - use requestIdleCallback
         return new Promise((resolve, reject) => {
             if ('requestIdleCallback' in window) {
                 requestIdleCallback(() => {
@@ -48,20 +113,72 @@ export const storageUtils = {
     },
 
     /**
-     * Handle quota exceeded error with user notification
+     * Clean up old analytics data to free storage space (iOS fix)
      */
-    _handleQuotaExceeded(key, data, error) {
+    async cleanupOldAnalytics() {
+        try {
+            const analyticsKey = 'physics-analytics-history';
+            const analyticsData = localStorage.getItem(analyticsKey);
+            if (!analyticsData) return 0;
+
+            const analytics = JSON.parse(analyticsData);
+            if (!analytics || !Array.isArray(analytics.data)) return 0;
+
+            // Keep only last 30 days
+            const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+            const originalCount = analytics.data.length;
+
+            analytics.data = analytics.data.filter(entry => {
+                const timestamp = new Date(entry.timestamp || entry.date).getTime();
+                return timestamp > thirtyDaysAgo;
+            });
+
+            const cleaned = originalCount - analytics.data.length;
+            if (cleaned > 0) {
+                localStorage.setItem(analyticsKey, JSON.stringify(analytics));
+                console.log(`🧹 Cleaned up ${cleaned} old analytics entries`);
+            }
+
+            return cleaned;
+        } catch (e) {
+            console.warn('Error cleaning analytics:', e);
+            return 0;
+        }
+    },
+
+    /**
+     * Handle quota exceeded error with automatic cleanup and user notification
+     * ✅ iOS FIX: Automatic cleanup before prompting user
+     */
+    async _handleQuotaExceeded(key, data, error) {
         const usage = this.getStorageSize();
         const usageMB = (usage / 1024 / 1024).toFixed(2);
 
-        console.error(`Storage quota exceeded. Current usage: ${usageMB}MB`);
+        console.warn(`⚠️ Storage quota exceeded. Current usage: ${usageMB}MB`);
 
-        // Return structured error for app to handle
+        // 1. Attempt automatic cleanup of old analytics data
+        const cleaned = await this.cleanupOldAnalytics();
+
+        // 2. Try saving again after cleanup
+        if (cleaned > 0) {
+            try {
+                const serialized = await this._serializeAsync(data);
+                localStorage.setItem(key, serialized);
+                console.log(`✅ Save succeeded after cleanup (removed ${cleaned} entries)`);
+                return { success: true, cleaned };
+            } catch (retryError) {
+                // Still failed after cleanup
+                console.error('Save failed even after cleanup');
+            }
+        }
+
+        // 3. Return structured error for app to handle
         return {
             success: false,
             quotaExceeded: true,
             currentUsage: usage,
             currentUsageMB: usageMB,
+            cleaned,
             error: error.message
         };
     },
