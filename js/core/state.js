@@ -68,6 +68,11 @@ export function createState() {
         loginError: null,
         isLoading: false,
 
+        // --- OFFLINE/ONLINE SYNC STATE ---
+        isOnline: navigator.onLine,
+        lastSyncTime: null,
+        syncInProgress: false,
+
         // --- REVISION STATE ---
         currentRevisionSection: '',
         currentRevisionSectionTitle: '',
