@@ -430,18 +430,11 @@ export const enhancedDataManagement = {
             this.confidenceLevels = confidenceData.data || {};
 
             // ⚡ MEMORY FIX: Prune analytics history to prevent unbounded growth
-            // Keep only last 500 entries or 90 days (whichever is smaller)
+            // Keep only last 500 entries
             let historyData = analyticsData.data || [];
             if (historyData.length > 500) {
                 historyData = historyData.slice(0, 500);
             }
-            // Also prune by date - keep only last 90 days
-            const cutoffDate = Date.now() - (90 * 24 * 60 * 60 * 1000);
-            historyData = historyData.filter(entry => {
-                if (!entry.timestamp) return true; // Keep if no timestamp
-                const entryDate = new Date(entry.timestamp).getTime();
-                return entryDate > cutoffDate;
-            });
             this.analyticsHistoryData = historyData;
 
         } catch (error) {
