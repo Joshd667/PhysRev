@@ -36,7 +36,7 @@ export const noteManagementMethods = {
             if (editor) {
                 editor.innerHTML = '';
             }
-            if (window.lucide) lucide.createIcons();
+            if (window.refreshIconsDebounced) window.refreshIconsDebounced();
         });
     },
 
@@ -75,7 +75,7 @@ export const noteManagementMethods = {
                     });
                 }
             }
-            if (window.lucide) lucide.createIcons();
+            if (window.refreshIconsDebounced) window.refreshIconsDebounced();
         });
     },
 
@@ -152,7 +152,7 @@ export const noteManagementMethods = {
 
         // Refresh icons after save
         this.$nextTick(() => {
-            if (window.lucide) lucide.createIcons();
+            if (window.refreshIconsDebounced) window.refreshIconsDebounced();
         });
     },
 

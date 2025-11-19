@@ -5,6 +5,7 @@
 import {
     idbSet,
     idbGet,
+    idbGetBatch,
     idbRemove,
     idbClear,
     idbGetAllKeys,
@@ -267,6 +268,22 @@ export const storageUtils = {
         } catch (error) {
             console.error('Storage load error:', error);
             return null;
+        }
+    },
+
+    /**
+     * ⚡ PERFORMANCE: Load multiple keys in a single transaction
+     * @param {Array<string>} keys - Array of keys to load
+     * @returns {Promise<Object>} - Object mapping keys to their values
+     */
+    async loadBatch(keys) {
+        try {
+            const data = await idbGetBatch(keys);
+            return data;
+        } catch (error) {
+            console.error('Storage batch load error:', error);
+            // Return object with all keys set to null on error
+            return Object.fromEntries(keys.map(key => [key, null]));
         }
     },
 

@@ -33,9 +33,9 @@ export async function loadTemplateLazy(id, path) {
             container.innerHTML = html;
             lazyLoadedTemplates.add(id);
 
-            // Refresh icons after lazy load
-            if (window.lucide) {
-                lucide.createIcons();
+            // ⚡ Refresh icons after lazy load (debounced)
+            if (window.refreshIconsDebounced) {
+                window.refreshIconsDebounced();
             }
 
             console.log(`✅ Lazy-loaded template: ${path}`);
@@ -108,8 +108,8 @@ export async function loadTemplates() {
     const loaded = results.filter(r => r.success).length;
     console.log(`✅ Templates loaded (${loaded}/${templates.length})`);
 
-    // Re-initialize Lucide icons after templates are inserted
-    if (window.lucide) {
-        lucide.createIcons();
+    // ⚡ Re-initialize Lucide icons after templates are inserted (debounced)
+    if (window.refreshIconsDebounced) {
+        window.refreshIconsDebounced();
     }
 }

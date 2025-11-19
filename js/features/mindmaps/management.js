@@ -37,8 +37,8 @@ export const mindmapManagementMethods = {
         // Initialize canvas after modal opens
         this.$nextTick(() => {
             this.initMindmapCanvas();
-            if (window.lucide) {
-                lucide.createIcons();
+            if (window.refreshIconsDebounced) {
+                window.refreshIconsDebounced();
             }
         });
     },
@@ -179,8 +179,8 @@ export const mindmapManagementMethods = {
 
         // Refresh icons after save
         this.$nextTick(() => {
-            if (window.lucide) {
-                lucide.createIcons();
+            if (window.refreshIconsDebounced) {
+                window.refreshIconsDebounced();
             }
         });
     },
@@ -220,8 +220,8 @@ export const mindmapManagementMethods = {
 
         // Refresh icons
         this.$nextTick(() => {
-            if (window.lucide) {
-                lucide.createIcons();
+            if (window.refreshIconsDebounced) {
+                window.refreshIconsDebounced();
             }
         });
     },
