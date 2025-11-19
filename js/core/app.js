@@ -1,6 +1,3 @@
-// js/core/app.js
-// Main app factory that combines all features
-
 import { createState } from './state.js';
 import { setupWatchers } from './watchers.js';
 
@@ -29,7 +26,6 @@ import { buildTopicLookup } from '../utils/topic-lookup.js';
 import { modalMethods } from '../utils/modals.js';
 import { SearchIndex } from '../utils/search-index.js';
 
-// Auth methods loaded from features/auth
 let authMethodsLoaded = false;
 let authLoadingPromise = null;
 
@@ -40,12 +36,12 @@ let staticPaperModeGroups = null;
 let staticSpecModeGroups = null;
 let staticTopicLookup = null;
 
-// ⚡ PERFORMANCE: Search indexes (non-reactive, for O(1) search lookups)
+// ⚡ PERFORMANCE: Search indexes for O(1) lookups
 let auditCardsIndex = null;
 let notesIndex = null;
 let flashcardsIndex = null;
 let mindmapsIndex = null;
-let searchIndexesInitialized = false; // ⚡ Track if indexes are built
+let searchIndexesInitialized = false;
 
 // ⚡ MEMORY FIX: Chart instances stored outside Alpine reactive state
 // Storing Map in reactive state prevents garbage collection of destroyed charts
@@ -56,16 +52,12 @@ let chartInstancesMap = new Map();
 let cachedSearchResults = [];
 
 export function createApp(specificationData, paperModeGroups, specModeGroups, Alpine) {
-    // Store large data in module-level variables (non-reactive)
     staticSpecificationData = specificationData;
     staticPaperModeGroups = paperModeGroups;
     staticSpecModeGroups = specModeGroups;
     staticTopicLookup = buildTopicLookup(specificationData);
     return () => {
-        // Create base state (without large data objects)
         const state = createState();
-
-        // Extract getters from state to preserve them
         const { currentGroups, currentSection, availablePapers, bannerTitle, bannerIcon, ...stateProps } = state;
 
         return {
@@ -96,12 +88,10 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 return cachedSearchResults;
             },
 
-            // Internal setter for search feature
             _setSearchResults(results) {
                 cachedSearchResults = results;
             },
 
-            // Re-define computed properties to preserve reactivity
             get currentGroups() {
                 return this.viewMode === 'spec' ? staticSpecModeGroups["All Topics"] : staticPaperModeGroups[this.selectedPaper] || [];
             },
@@ -111,7 +101,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
             get availablePapers() {
                 return this.viewMode === 'paper' ? ['Paper 1', 'Paper 2', 'Paper 3'] : ['All Topics'];
             },
-            // Cached breadcrumb getters (reduces 25-35MB initial RAM spike)
             get bannerTitle() {
                 if (this._bannerCacheDirty) {
                     this._computeBannerCache();
@@ -125,7 +114,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 return this._cachedBannerIcon;
             },
 
-            // Cached progress title getter (prevents string concatenation in reactive context)
             get progressTitle() {
                 if (this._progressTitleCacheDirty) {
                     this._computeProgressTitleCache();
@@ -237,13 +225,11 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 return this._cachedMindmapsForCurrentSection;
             },
 
-            // Compute progress title
             _computeProgressTitleCache() {
                 this._cachedProgressTitle = this.viewMode === 'spec' ? 'Overall Progress' : this.selectedPaper + ' Progress';
                 this._progressTitleCacheDirty = false;
             },
 
-            // Compute both title and icon together (shared logic)
             _computeBannerCache() {
                 if (this.searchVisible) {
                     this._cachedBannerTitle = 'Search';
@@ -290,34 +276,24 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 this._bannerCacheDirty = false;
             },
 
-            // --- INITIALIZATION ---
             async init() {
                 try {
-                    window.physicsAuditApp = this; // For debugging
+                    window.physicsAuditApp = this;
 
-                    // Lazy load auth module only when needed
                     await this.loadAuthModule();
                     await this.checkExistingAuth();
-
-                    // Load user preferences (includes dark mode, view mode, selected paper)
                     await this.loadPreferences();
-
-                    // Load flashcard test results history
                     await this.loadTestResultsHistory();
-
-                    // Load saved test sets
                     await this.loadTestSets();
 
-                this.sidebarVisible = true;
+                    this.sidebarVisible = true;
 
-                // Store reference for cleanup
-                this._resizeHandler = () => {
+                    this._resizeHandler = () => {
                     if (window.innerWidth >= 768) this.sidebarVisible = true;
-                };
-                window.addEventListener('resize', this._resizeHandler);
+                    };
+                    window.addEventListener('resize', this._resizeHandler);
 
-                // ✅ OFFLINE UX: Set up online/offline event listeners
-                this._onlineHandler = () => {
+                    this._onlineHandler = () => {
                     this.isOnline = true;
                     console.log('🌐 Back online');
                 };
@@ -325,11 +301,10 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                     this.isOnline = false;
                     console.log('📴 Gone offline');
                 };
-                window.addEventListener('online', this._onlineHandler);
-                window.addEventListener('offline', this._offlineHandler);
+                    window.addEventListener('online', this._onlineHandler);
+                    window.addEventListener('offline', this._offlineHandler);
 
-                // Set up cleanup on component destruction
-                this.$watch('$el', (value, oldValue) => {
+                    this.$watch('$el', (value, oldValue) => {
                     if (!value && oldValue) {
                         if (this._resizeHandler) {
                             window.removeEventListener('resize', this._resizeHandler);
@@ -342,9 +317,8 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                             this._offlineHandler = null;
                         }
                     }
-                });
+                    });
 
-                    // Set up watchers
                     setupWatchers(this);
 
                     // ⚡ PERFORMANCE OPTIMIZATION: Search indexes deferred to first search
@@ -354,7 +328,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 } catch (error) {
                     console.error('❌ App initialization failed:', error);
 
-                    // Show error fallback
                     const fallback = document.getElementById('error-fallback');
                     const errorMessage = document.getElementById('error-message');
                     if (fallback && errorMessage) {
@@ -367,19 +340,16 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                         }
                     }
 
-                    // Re-throw to let global handler catch it too
                     throw error;
                 }
             },
 
-            // --- SEARCH INDEX MANAGEMENT ---
             /**
-             * ⚡ LAZY INITIALIZATION: Build search indexes on first search
-             * Saves ~80-120ms on app startup
+             * ⚡ PERFORMANCE: Lazy search index initialization saves ~80-120ms on startup
              */
             _ensureSearchIndexes() {
                 if (searchIndexesInitialized) {
-                    return; // Already initialized
+                    return;
                 }
 
                 console.log('⚡ Building search indexes (first search)...');
@@ -393,19 +363,16 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
             },
 
             _initializeSearchIndexes() {
-                // Initialize all indexes
                 auditCardsIndex = new SearchIndex();
                 notesIndex = new SearchIndex();
                 flashcardsIndex = new SearchIndex();
                 mindmapsIndex = new SearchIndex();
 
-                // ✅ PERFORMANCE FIX: Pre-compute search text during index build
-                // Build audit cards index with cached search text
+                // ⚡ PERFORMANCE: Pre-compute search text during index build
                 const auditCards = [];
                 Object.entries(this.specificationData).forEach(([sectionKey, section]) => {
                     if (!section.topics) return;
                     section.topics.forEach(topic => {
-                        // ✅ Pre-compute search text ONCE (not on every search)
                         const searchText = `${topic.id || ''} ${topic.title || ''} ${topic.prompt || ''} ${(topic.learningObjectives || []).join(' ')} ${(topic.examples || []).join(' ')}`.toLowerCase();
 
                         auditCards.push({
@@ -413,25 +380,22 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                             sectionKey,
                             sectionTitle: section.title,
                             paper: section.paper,
-                            _searchText: searchText // ✅ Cached for O(1) access
+                            _searchText: searchText
                         });
                     });
                 });
                 auditCardsIndex.buildIndex(auditCards, topic => topic._searchText);
 
-                // Build notes index
                 notesIndex.buildIndex(Object.values(this.userNotes), note =>
                     `${note.title || ''} ${note.content || ''} ${(note.tags || []).join(' ')}`
                 );
 
-                // Build flashcards index
                 flashcardsIndex.buildIndex(Object.values(this.flashcardDecks), deck => {
                     const deckText = `${deck.name || ''} ${(deck.tags || []).join(' ')}`;
                     const cardsText = (deck.cards || []).map(card => `${card.front || ''} ${card.back || ''}`).join(' ');
                     return `${deckText} ${cardsText}`;
                 });
 
-                // Build mindmaps index
                 mindmapsIndex.buildIndex(Object.values(this.mindmaps), mindmap => {
                     const shapesText = (mindmap.shapes || []).map(shape => shape.text || '').join(' ');
                     return `${mindmap.title || ''} ${shapesText} ${(mindmap.tags || []).join(' ')}`;
@@ -439,8 +403,8 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
             },
 
             _rebuildSearchIndexes() {
-                searchIndexesInitialized = false; // Mark as not initialized
-                this._ensureSearchIndexes(); // Rebuild immediately
+                searchIndexesInitialized = false;
+                this._ensureSearchIndexes();
             },
 
             _updateNoteInIndex(note) {
@@ -506,7 +470,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 mindmapsIndex.removeItem(mindmapId);
             },
 
-            // Getters for search indexes (used by search methods)
             _getAuditCardsIndex() {
                 return auditCardsIndex || { search: () => new Set(), getItems: () => [], items: new Map() };
             },
@@ -523,24 +486,19 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 return mindmapsIndex || { search: () => new Set(), getItems: () => [], items: new Map() };
             },
 
-            // --- LAZY LOADING AUTH MODULE ---
             async loadAuthModule() {
-                // If already loaded, return immediately
                 if (authMethodsLoaded) {
                     return;
                 }
 
-                // If currently loading, wait for existing promise
                 if (authLoadingPromise) {
                     return authLoadingPromise;
                 }
 
-                // Start loading
                 authLoadingPromise = (async () => {
                     const authModule = await import('../features/auth/index.js');
                     const authMethods = await authModule.loadAuthMethods();
 
-                    // Dynamically add auth methods to this instance
                     Object.assign(this, authMethods);
                     authMethodsLoaded = true;
                 })();
@@ -549,7 +507,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 authLoadingPromise = null;
             },
 
-            // --- DATA MANAGEMENT OVERRIDE METHODS ---
             saveData() {
                 enhancedDataManagement.saveData.call(this);
             },
@@ -559,7 +516,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
             },
 
             async syncToMoodleBackend(data) {
-                // Placeholder for backend sync
                 try {
                     console.log('Syncing data to backend for student:', this.user.moodleId);
                 } catch (error) {
@@ -583,7 +539,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 enhancedDataManagement.importDataBackup.call(this, event);
             },
 
-            // --- NEW SEPARATED STORAGE METHODS ---
             saveNotes() {
                 enhancedDataManagement.saveNotes.call(this);
             },
@@ -604,7 +559,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 enhancedDataManagement.saveAnalyticsHistory.call(this);
             },
 
-            // --- STORAGE HELPER METHODS ---
             getStoragePrefix() {
                 return enhancedDataManagement.getStoragePrefix.call(this);
             },
@@ -617,7 +571,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 return enhancedDataManagement.loadDataType.call(this, type, defaultValue);
             },
 
-            // Add async helper methods to Alpine component context
             async _serializeAsync(data) {
                 return enhancedDataManagement._serializeAsync.call(this, data);
             },
@@ -642,7 +595,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 return enhancedDataManagement.validateBackupData.call(this, data);
             },
 
-            // --- MODULARIZED METHODS ---
             ...searchMethods,
             ...navigationMethods,
             ...statisticsMethods,
@@ -652,7 +604,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
             ...revisionAreaColorMethods,
             ...modalMethods,
 
-            // Feature methods
             ...analyticCalculationMethods,
             ...analyticChartMethods,
             ...analyticInsightMethods,
@@ -673,7 +624,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
             renderContentWithMath(htmlContent) {
                 if (!htmlContent) return '';
 
-                // SECURITY: Sanitize first to prevent XSS
                 const sanitized = this.sanitizeHTML(htmlContent);
 
                 const div = document.createElement('div');
@@ -699,7 +649,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
             sanitizeHTML(dirty, options = {}) {
                 if (!dirty) return '';
 
-                // ✅ SECURITY: Strengthened DOMPurify configuration
                 if (typeof DOMPurify !== 'undefined') {
                     const strictConfig = {
                         ALLOWED_TAGS: ['b', 'i', 'u', 's', 'strong', 'em', 'p', 'br', 'ul', 'ol', 'li',
@@ -707,18 +656,15 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                                        'table', 'thead', 'tbody', 'tr', 'td', 'th',
                                        'blockquote', 'code', 'pre', 'span', 'div',
                                        'hr', 'mark'],
-                        // ✅ SECURITY FIX: Removed 'style' attribute to prevent CSS injection
-                        ALLOWED_ATTR: ['class', 'data-latex'], // For KaTeX equations
-                        // ✅ Forbid dangerous tags explicitly
+                        ALLOWED_ATTR: ['class', 'data-latex'],
                         FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'link', 'style',
                                       'form', 'input', 'button', 'textarea', 'select',
                                       'frame', 'frameset', 'base', 'meta', 'svg'],
-                        // ✅ Forbid event handlers and javascript: URLs
                         FORBID_ATTR: ['onerror', 'onclick', 'onload', 'onmouseover', 'onfocus', 'onblur',
                                       'oninput', 'onchange', 'onsubmit', 'onreset', 'onkeydown', 'onkeyup',
                                       'onkeypress', 'onmousedown', 'onmouseup', 'onmousemove', 'onmouseenter',
                                       'onmouseleave', 'onwheel', 'ondrag', 'ondrop', 'onscroll',
-                                      'style', 'src', 'href', 'xlink:href'], // ✅ Block URLs and styles
+                                      'style', 'src', 'href', 'xlink:href'],
                         ALLOW_DATA_ATTR: false,
                         ALLOW_UNKNOWN_PROTOCOLS: false,
                         SAFE_FOR_TEMPLATES: true,
@@ -728,22 +674,17 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                         FORCE_BODY: true,
                         SANITIZE_DOM: true,
                         IN_PLACE: false,
-                        // Allow caller to override for specific use cases
                         ...options
                     };
 
                     return DOMPurify.sanitize(dirty, strictConfig);
                 }
 
-                // Fallback: text-only escape (no HTML)
                 const div = document.createElement('div');
                 div.textContent = dirty;
                 return div.innerHTML;
             },
 
-            /**
-             * Debounce utility for performance optimization
-             */
             debounce(func, wait) {
                 let timeout;
                 return function executedFunction(...args) {
@@ -756,9 +697,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 };
             },
 
-            /**
-             * Throttle utility for scroll/resize events
-             */
             throttle(func, limit) {
                 let inThrottle;
                 return function(...args) {
@@ -770,9 +708,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 };
             },
 
-            /**
-             * ✅ OFFLINE UX: Get human-readable time since last sync
-             */
             getTimeSinceSync() {
                 if (!this.lastSyncTime) return 'Never';
 
@@ -789,9 +724,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 return `${days}d ago`;
             },
 
-            /**
-             * ✅ OFFLINE UX: Manual sync trigger
-             */
             async syncDataNow() {
                 if (!this.isOnline) {
                     console.warn('⚠️ Cannot sync while offline');

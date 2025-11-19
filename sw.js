@@ -1,20 +1,12 @@
-// sw.js - Fixed Service Worker for Physics Audit Tool with Analytics Support
-// Place this file in your project root (same folder as index.html)
-
-// ✅ ROBUST VERSIONING: Automatic timestamp-based versioning
-// Build systems can replace BUILD_TIMESTAMP with actual build time
-const BUILD_TIMESTAMP = '20250119-003'; // Format: YYYYMMDD-NNN (auto-generated)
+const BUILD_TIMESTAMP = '20250119-003';
 const CACHE_NAME = `physics-audit-v${BUILD_TIMESTAMP}`;
 const APP_VERSION = BUILD_TIMESTAMP;
 
-// 🎯 Core resources that should be cached
 const CRITICAL_RESOURCES = [
-    // Main page
     './',
     './index.html',
     './favicon.ico',
 
-    // Core app files - THESE SHOULD BE CACHE-BUSTED ON UPDATES
     './css/style.css',
     './js/app-loader.js',
     './js/template-loader.js',
@@ -22,12 +14,10 @@ const CRITICAL_RESOURCES = [
     './js/data/unified-csv-loader.js',
     './resources/combined-data.json',
 
-    // Core architecture (NEW - Refactored)
     './js/core/app.js',
     './js/core/state.js',
     './js/core/watchers.js',
 
-    // Feature modules (NEW - Refactored)
     './js/features/analytics/calculations.js',
     './js/features/analytics/charts.js',
     './js/features/analytics/insights.js',
@@ -42,7 +32,6 @@ const CRITICAL_RESOURCES = [
     './js/features/auth/teams.js',
     './js/features/auth/data-management.js',
 
-    // Utils
     './js/utils/csv-parser.js',
     './js/utils/csv-converter.js',
     './js/utils/resource-schema.js',
@@ -53,8 +42,6 @@ const CRITICAL_RESOURCES = [
     './js/utils/statistics.js',
     './js/utils/topic-lookup.js',
 
-
-    // HTML Templates - NEW!
     './templates/search-results.html',
     './templates/analytics-dashboard.html',
     './templates/revision-view.html',
@@ -62,12 +49,9 @@ const CRITICAL_RESOURCES = [
     './templates/section-cards.html',
     './templates/topic-detail.html',
 
-    // HTML Components
     './templates/sidebar.html',
     './templates/top-bar.html',
 
-    // ✅ ROBUST VERSIONING: Pinned external CDN resources matching index.html
-    // IMPORTANT: These must match the versions loaded in index.html exactly!
     'https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/module.esm.js',
     'https://unpkg.com/lucide@0.546.0/dist/umd/lucide.min.js',
     'https://cdn.jsdelivr.net/npm/chart.js',
@@ -77,15 +61,12 @@ const CRITICAL_RESOURCES = [
     'https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js'
 ];
 
-// 🚀 Install event - aggressive cache refresh
-// ✅ FIX: Silent installation to prevent console spam - only log errors
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                // Fetch all resources (respects HTTP cache)
                 const cachePromises = CRITICAL_RESOURCES.map(url =>
-                    fetch(url) // Use default HTTP caching
+                    fetch(url)
                         .then(response => {
                             if (response.ok) {
                                 return cache.put(url, response.clone());
@@ -96,7 +77,6 @@ self.addEventListener('install', event => {
                             return { url, success: true };
                         })
                         .catch(error => {
-                            // Only log failures
                             console.warn(`⚠️ SW: Failed to cache ${url}:`, error.message);
                             return { url, success: false, error: error.message };
                         })
@@ -106,11 +86,9 @@ self.addEventListener('install', event => {
             })
             .then(results => {
                 const failed = results.filter(r => !r.success).length;
-                // Only log if there were failures
                 if (failed > 0) {
                     console.warn(`⚠️ SW: Failed to cache ${failed}/${CRITICAL_RESOURCES.length} resources`);
                 }
-                // Silent success - no console spam
             })
             .catch(error => {
                 console.error('❌ SW: Cache installation failed:', error);
@@ -118,26 +96,20 @@ self.addEventListener('install', event => {
     );
 });
 
-// 🚀 Activate event - clean up old caches and take control immediately
-// ✅ FIX: Silent activation to prevent console spam
 self.addEventListener('activate', event => {
     event.waitUntil(
         Promise.all([
-            // Delete all old caches
             caches.keys().then(cacheNames => {
                 return Promise.all(
                     cacheNames
                         .filter(cacheName => cacheName !== CACHE_NAME)
                         .map(oldCacheName => {
-                            // Silent deletion - no logging
                             return caches.delete(oldCacheName);
                         })
                 );
             }),
-            // Take control of all clients immediately
             self.clients.claim()
         ]).then(() => {
-            // Notify all clients about update (silently)
             return self.clients.matchAll();
         }).then(clients => {
             clients.forEach(client => {
@@ -151,23 +123,19 @@ self.addEventListener('activate', event => {
     );
 });
 
-// ⚡ Fetch event - Network-first for JS files, cache-first for others
 self.addEventListener('fetch', event => {
     const request = event.request;
     const url = new URL(request.url);
-    
-    // Only handle GET requests
+
     if (request.method !== 'GET') {
         return;
     }
-    
-    // Handle same-origin requests and specific external resources
+
     if (url.origin === location.origin || isAllowedExternalResource(url)) {
         event.respondWith(handleRequest(request));
     }
 });
 
-// 🎯 Smart request handler with network-first for JS files
 async function handleRequest(request) {
     const url = new URL(request.url);
     const isJavaScript = url.pathname.endsWith('.js') || url.pathname.includes('/js/');
@@ -175,7 +143,6 @@ async function handleRequest(request) {
     const isTemplate = url.pathname.includes('/templates/') || url.pathname.includes('/components/');
 
     try {
-        // Cache-first strategy for templates (they're part of the app structure)
         if (isTemplate) {
             const cachedResponse = await caches.match(request);
             if (cachedResponse) {
@@ -196,16 +163,12 @@ async function handleRequest(request) {
             return networkResponse;
         }
 
-        // Cache-first with background update for JavaScript and HTML files
-        // ✅ FIX: Detect updates and notify user
         if (isJavaScript || isHTML) {
             const cachedResponse = await caches.match(request);
 
             if (cachedResponse) {
-                // Background update: fetch fresh version and notify if changed
                 fetch(request).then(async networkResponse => {
                     if (networkResponse && networkResponse.ok) {
-                        // ✅ FIX: Compare versions to detect changes
                         const cachedClone = cachedResponse.clone();
                         const networkClone = networkResponse.clone();
 
@@ -213,12 +176,10 @@ async function handleRequest(request) {
                             const cachedText = await cachedClone.text();
                             const networkText = await networkClone.text();
 
-                            // ✅ FIX: Only update cache and notify if content actually changed
                             if (cachedText !== networkText) {
                                 const cache = await caches.open(CACHE_NAME);
                                 await cache.put(request, networkResponse.clone());
 
-                                // ✅ FIX: Notify ALL open tabs that update is available
                                 const clients = await self.clients.matchAll({ type: 'window' });
                                 clients.forEach(client => {
                                     client.postMessage({
@@ -232,19 +193,15 @@ async function handleRequest(request) {
                                 console.log(`🔄 Update detected for ${url.pathname}`);
                             }
                         } catch (comparisonError) {
-                            // Fallback: just update cache without comparison
                             const cache = await caches.open(CACHE_NAME);
                             await cache.put(request, networkResponse);
                         }
                     }
-                }).catch(() => {
-                    // Silently fail background updates (offline scenario)
-                });
+                }).catch(() => {});
 
                 return cachedResponse;
             }
 
-            // No cache available, fetch from network
             try {
                 const networkResponse = await fetch(request);
 
@@ -264,7 +221,6 @@ async function handleRequest(request) {
             }
         }
 
-        // Cache-first strategy for CSS, images, and other static assets
         else {
             const cachedResponse = await caches.match(request);
             if (cachedResponse) {
@@ -294,7 +250,6 @@ async function handleRequest(request) {
             return cachedResponse;
         }
 
-        // For HTML requests, serve the main page as fallback
         if (request.destination === 'document') {
             const fallback = await caches.match('./index.html');
             if (fallback) {
@@ -306,7 +261,6 @@ async function handleRequest(request) {
     }
 }
 
-// 🔍 Helper function for allowed external resources
 function isAllowedExternalResource(url) {
     const allowedDomains = [
         'unpkg.com',
@@ -316,10 +270,8 @@ function isAllowedExternalResource(url) {
     return allowedDomains.some(domain => url.hostname.includes(domain));
 }
 
-// 📱 Handle messages from main thread
 self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
-        // Silent skip waiting
         self.skipWaiting();
     }
 
@@ -333,12 +285,9 @@ self.addEventListener('message', event => {
     }
 
     if (event.data && event.data.type === 'CLEAR_CACHE') {
-        // User-initiated action - log this one
         console.log('🗑️ Manual cache clear requested');
         caches.delete(CACHE_NAME).then(() => {
             event.ports[0].postMessage({ type: 'CACHE_CLEARED' });
         });
     }
 });
-
-// ✅ Service Worker loaded - silent operation (only errors logged)

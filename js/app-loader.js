@@ -1,8 +1,5 @@
-// js/app-loader.js - ULTRA-FAST VERSION with parallel loading
-
 (async function() {
     try {
-        // Clean up force refresh parameter from URL if present
         const url = new URL(window.location.href);
         if (url.searchParams.has('_refresh')) {
             url.searchParams.delete('_refresh');
@@ -11,59 +8,47 @@
 
         const startTime = performance.now();
 
-        // Start ALL async operations in parallel
         const initPromises = [
-            // 0. Initialize IndexedDB and migrate from localStorage
             import('./utils/storage.js').then(({ storageUtils }) => {
                 return storageUtils.init();
             }),
 
-            // 1. Load HTML templates
             import('./template-loader.js').then(({ loadTemplates }) => {
                 return loadTemplates();
             }),
 
-            // 2. Load Alpine.js in parallel (pinned version for stability)
             import('https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/module.esm.js').then(module => {
                 window.Alpine = module.default;
                 return module.default;
             }),
 
-            // 3. Placeholder for group configurations (loaded with data below)
             Promise.resolve(null),
 
-            // 4. Load physics audit tool (refactored)
             import('./core/app.js').then(module => module.createApp),
 
-            // 5. Load data (JSON first, CSV fallback) - includes revision mappings
             loadDataWithFallback()
         ];
 
-        // Wait for all parallel operations (graceful degradation on failures)
         const results = await Promise.allSettled(initPromises);
 
         const loadTime = performance.now() - startTime;
 
-        // Check for failures
         const failures = results.filter(r => r.status === 'rejected');
         if (failures.length > 0) {
             console.warn(`⚠️ ${failures.length} resource(s) failed to load:`, failures.map(f => f.reason));
             console.error('Full failure details:', failures);
         }
 
-        // Extract successful results
         const [idbInit, templatesLoaded, Alpine, _unused, createApp, dataResult] = results.map(r =>
             r.status === 'fulfilled' ? r.value : null
         );
 
-        // Log IndexedDB initialization status
         if (idbInit && idbInit.success) {
             console.log('✅ IndexedDB initialized and migration complete');
         } else {
             console.warn('⚠️ IndexedDB initialization had issues');
         }
 
-        // Verify critical resources loaded
         if (!Alpine || !createApp || !dataResult) {
             const failedResources = [];
             if (!Alpine) failedResources.push('Alpine.js');
@@ -75,7 +60,6 @@
             throw new Error(`Critical resources failed to load: ${failedResources.join(', ')}`);
         }
 
-        // Create and start the app (groups now come from dataResult)
         Alpine.data('physicsAuditTool', createApp(
             dataResult.specificationData,
             dataResult.paperModeGroups,
@@ -83,8 +67,6 @@
             Alpine
         ));
 
-        // ✅ ERROR BOUNDARY: Alpine.js error interception
-        // Wrap Alpine methods to catch errors in reactive expressions
         const originalEvaluate = Alpine.evaluate;
         Alpine.evaluate = function(el, expression, extras = {}) {
             try {
@@ -96,7 +78,6 @@
                     error
                 });
 
-                // Show error fallback for critical errors
                 if (error.message.includes('is not a function') || error.message.includes('Cannot read')) {
                     const fallback = document.getElementById('error-fallback');
                     const errorMessage = document.getElementById('error-message');
@@ -106,7 +87,6 @@
                     }
                 }
 
-                // Return safe default to prevent cascade
                 return undefined;
             }
         };
@@ -122,7 +102,6 @@
     }
 })();
 
-// Optimized data loading with smart fallback
 async function loadDataWithFallback() {
     try {
         console.log('⚡ Attempting JSON loading...');
@@ -138,10 +117,8 @@ async function loadDataWithFallback() {
         
         const data = await response.json();
 
-        // Set up instant resource lookup
         window.getResourcesForSection = await createOptimizedResourceGetter(data.resourceData);
 
-        // Initialize revision mappings from JSON (if available)
         if (data.revisionMappings) {
             window.revisionMapping = data.revisionMappings.revisionMapping || {};
             window.topicToSectionMapping = data.revisionMappings.topicToSectionMapping || {};
@@ -153,16 +130,13 @@ async function loadDataWithFallback() {
             window.revisionSectionTitles = {};
         }
 
-        // Load groups from JSON (v2.0+) or fallback to CSV
         let paperModeGroups = {};
         let specModeGroups = {};
 
         if (data.paperModeGroups && data.specModeGroups) {
-            // Groups included in JSON (v2.0+)
             paperModeGroups = data.paperModeGroups;
             specModeGroups = data.specModeGroups;
         } else {
-            // Fallback: Load groups from CSV (old JSON files)
             console.warn('⚠️ JSON file missing groups - loading from CSV (regenerate JSON for optimal performance)');
             const { loadGroups } = await import('./data/unified-csv-loader.js');
             const groups = await loadGroups();
@@ -185,7 +159,6 @@ async function loadDataWithFallback() {
             const { loadAllData, getResourcesForSection } = await import('./data/unified-csv-loader.js');
             const result = await loadAllData();
 
-            // ✅ Set up the global function for CSV path (this was missing!)
             window.getResourcesForSection = getResourcesForSection;
 
             return {
@@ -197,15 +170,11 @@ async function loadDataWithFallback() {
         }
 }
 
-// OPTIMIZED resource getter with pre-computed indexes
-// Note: Duplicate checking is removed - done in converter tools for performance
 async function createOptimizedResourceGetter(resourceData) {
     const startTime = performance.now();
 
-    // Import shared resource schema
     const { getResourceCreator, createRevisionSection } = await import('./utils/resource-schema.js');
 
-    // Pre-build ALL indexes at once for maximum speed
     const indexes = {
         videos: new Map(),
         notes: new Map(),
@@ -214,7 +183,6 @@ async function createOptimizedResourceGetter(resourceData) {
         sections: new Map()
     };
 
-    // Batch process all resource types using shared schema
     const resourceTypes = [
         { key: 'videos', data: resourceData.videos },
         { key: 'notes', data: resourceData.notes },
@@ -235,13 +203,11 @@ async function createOptimizedResourceGetter(resourceData) {
                 indexes[key].set(sectionId, []);
             }
 
-            // Use shared resource schema (no duplicate checking - done in converter)
             const optimizedItem = resourceCreator(item);
             indexes[key].get(sectionId).push(optimizedItem);
         });
     });
 
-    // Process revision sections using shared schema
     if (resourceData.revisionsections) {
         resourceData.revisionsections.forEach(section => {
             const sectionId = section.section_id?.toString().trim();
@@ -251,7 +217,6 @@ async function createOptimizedResourceGetter(resourceData) {
         });
     }
 
-    // Return ultra-fast lookup function using Maps
     return function getResourcesForSection(sectionId) {
         const sectionIdStr = sectionId?.toString().trim() || '';
 
