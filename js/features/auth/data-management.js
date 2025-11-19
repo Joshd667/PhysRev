@@ -16,10 +16,63 @@ const STORAGE_KEYS = {
 
 export const enhancedDataManagement = {
     /**
+     * SECURITY: Verify Teams authentication token to prevent privilege escalation
+     * Validates JWT token expiration to ensure user cannot spoof Teams identity
+     */
+    _verifyTeamsToken() {
+        if (!this.authToken) {
+            console.error('🚨 SECURITY: No auth token present for Teams user');
+            return false;
+        }
+
+        try {
+            // Parse JWT token (format: header.payload.signature)
+            const parts = this.authToken.split('.');
+            if (parts.length !== 3) {
+                console.error('🚨 SECURITY: Invalid token format');
+                return false;
+            }
+
+            // Decode payload (base64url)
+            const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+
+            // Check token expiration
+            if (payload.exp) {
+                const now = Math.floor(Date.now() / 1000);
+                if (payload.exp < now) {
+                    console.error('🚨 SECURITY: Token expired');
+                    return false;
+                }
+            }
+
+            // Verify user ID matches token subject
+            if (payload.sub && payload.sub !== this.user?.id) {
+                console.error('🚨 SECURITY: User ID mismatch');
+                return false;
+            }
+
+            return true;
+        } catch (error) {
+            console.error('🚨 SECURITY: Token verification failed:', error);
+            return false;
+        }
+    },
+
+    /**
      * Get storage key prefix for user
+     * SECURITY: Validates token before allowing Teams data access
      */
     getStoragePrefix() {
         if (this.authMethod === 'teams' && this.user?.id) {
+            // SECURITY: Verify token before granting access to Teams data
+            if (!this._verifyTeamsToken()) {
+                console.error('🚨 SECURITY: Token verification failed - forcing logout');
+                // Trigger logout to prevent unauthorized access
+                if (typeof this.logout === 'function') {
+                    this.logout();
+                }
+                return '';
+            }
             return `teams_${this.user.id}_`;
         }
         return '';

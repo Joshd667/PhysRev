@@ -1,7 +1,38 @@
 // js/features/analytics/calculations.js - Analytics calculation methods
 
 export const analyticCalculationMethods = {
+    /**
+     * PERFORMANCE: Build topic-to-section map for O(1) lookups
+     * This prevents O(n²) nested loops in analytics calculations
+     */
+    _buildTopicSectionMap() {
+        // Cache the map to avoid rebuilding on every analytics calculation
+        if (this._topicSectionMap) {
+            return this._topicSectionMap;
+        }
+
+        const map = new Map();
+        Object.entries(this.specificationData).forEach(([sectionKey, section]) => {
+            if (section.topics && Array.isArray(section.topics)) {
+                section.topics.forEach(topic => {
+                    map.set(topic.id, {
+                        section,
+                        sectionKey,
+                        sectionTitle: section.title,
+                        paper: section.paper
+                    });
+                });
+            }
+        });
+
+        this._topicSectionMap = map;
+        return map;
+    },
+
     calculateAnalytics() {
+        // PERFORMANCE: Build topic-section map once for O(1) lookups
+        const sectionMap = this._buildTopicSectionMap();
+
         // Get all topics from specification data
         const allTopics = Object.values(this.specificationData).flatMap(section => section.topics);
         const assessedTopics = allTopics.filter(topic => this.confidenceLevels[topic.id] && this.confidenceLevels[topic.id] > 0);
@@ -13,14 +44,14 @@ export const analyticCalculationMethods = {
             (assessedLevels.reduce((sum, level) => sum + level, 0) / assessedLevels.length) : 0;
         const lowConfidenceCount = assessedTopics.filter(topic => this.confidenceLevels[topic.id] <= 2).length;
 
-        // Paper readiness comparison
+        // PERFORMANCE: Paper readiness comparison using O(1) map lookups
         const paper1Topics = allTopics.filter(topic => {
-            const section = Object.values(this.specificationData).find(s => s.topics.some(t => t.id === topic.id));
-            return section && section.paper === 'Paper 1';
+            const topicInfo = sectionMap.get(topic.id);
+            return topicInfo && topicInfo.paper === 'Paper 1';
         });
         const paper2Topics = allTopics.filter(topic => {
-            const section = Object.values(this.specificationData).find(s => s.topics.some(t => t.id === topic.id));
-            return section && section.paper === 'Paper 2';
+            const topicInfo = sectionMap.get(topic.id);
+            return topicInfo && topicInfo.paper === 'Paper 2';
         });
 
         const paper1Assessed = paper1Topics.filter(topic => this.confidenceLevels[topic.id] && this.confidenceLevels[topic.id] > 0);
@@ -34,18 +65,16 @@ export const analyticCalculationMethods = {
         const paper2AvgConfidence = paper2Assessed.length > 0 ?
             (paper2Assessed.reduce((sum, topic) => sum + this.confidenceLevels[topic.id], 0) / paper2Assessed.length) : 0;
 
-        // Calculate critical and strong topics
+        // PERFORMANCE: Calculate critical and strong topics using O(1) map lookups
         const criticalTopics = allTopics
             .filter(topic => this.confidenceLevels[topic.id] && this.confidenceLevels[topic.id] <= 2)
             .map(topic => {
-                const section = Object.values(this.specificationData).find(s =>
-                    s.topics.some(t => t.id === topic.id)
-                );
+                const topicInfo = sectionMap.get(topic.id);
                 return {
                     ...topic,
                     confidence: this.confidenceLevels[topic.id],
-                    section: section,
-                    sectionTitle: section?.title || 'Unknown Section'
+                    section: topicInfo?.section,
+                    sectionTitle: topicInfo?.sectionTitle || 'Unknown Section'
                 };
             })
             .sort((a, b) => a.confidence - b.confidence);
@@ -53,14 +82,12 @@ export const analyticCalculationMethods = {
         const strongTopics = allTopics
             .filter(topic => this.confidenceLevels[topic.id] && this.confidenceLevels[topic.id] >= 4)
             .map(topic => {
-                const section = Object.values(this.specificationData).find(s =>
-                    s.topics.some(t => t.id === topic.id)
-                );
+                const topicInfo = sectionMap.get(topic.id);
                 return {
                     ...topic,
                     confidence: this.confidenceLevels[topic.id],
-                    section: section,
-                    sectionTitle: section?.title || 'Unknown Section'
+                    section: topicInfo?.section,
+                    sectionTitle: topicInfo?.sectionTitle || 'Unknown Section'
                 };
             })
             .sort((a, b) => b.confidence - a.confidence);
