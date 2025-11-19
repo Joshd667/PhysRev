@@ -307,8 +307,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
 
             // --- SEARCH INDEX MANAGEMENT ---
             _initializeSearchIndexes() {
-                const startTime = performance.now();
-
                 // Initialize all indexes
                 auditCardsIndex = new SearchIndex();
                 notesIndex = new SearchIndex();
@@ -349,9 +347,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                     const shapesText = (mindmap.shapes || []).map(shape => shape.text || '').join(' ');
                     return `${mindmap.title || ''} ${shapesText} ${(mindmap.tags || []).join(' ')}`;
                 });
-
-                const totalTime = performance.now() - startTime;
-                console.log(`🔍 Search indexes built in ${totalTime.toFixed(0)}ms`);
             },
 
             _rebuildSearchIndexes() {
