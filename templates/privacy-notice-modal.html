@@ -10,7 +10,6 @@
              this.$watch('showPrivacyNoticeModal', value => {
                  if (value) {
                      this.isTeamsLogin = window.isTeamsPrivacyMode || false;
-                     console.log('Privacy modal opened, Teams mode:', this.isTeamsLogin);
                  }
              });
          }

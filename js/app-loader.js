@@ -35,7 +35,6 @@
 
         const failures = results.filter(r => r.status === 'rejected');
         if (failures.length > 0) {
-            console.warn(`⚠️ ${failures.length} resource(s) failed to load:`, failures.map(f => f.reason));
             console.error('Full failure details:', failures);
         }
 
@@ -43,11 +42,6 @@
             r.status === 'fulfilled' ? r.value : null
         );
 
-        if (idbInit && idbInit.success) {
-            console.log('✅ IndexedDB initialized and migration complete');
-        } else {
-            console.warn('⚠️ IndexedDB initialization had issues');
-        }
 
         if (!Alpine || !createApp || !dataResult) {
             const failedResources = [];
@@ -93,9 +87,6 @@
 
         Alpine.start();
 
-        const totalTime = performance.now() - startTime;
-        console.log(`🎉 App ready in ${totalTime.toFixed(0)}ms`);
-
     } catch (error) {
         console.error('❌ Failed to initialize Physics Audit Tool:', error);
         showErrorScreen(error);
@@ -104,7 +95,6 @@
 
 async function loadDataWithFallback() {
     try {
-        console.log('⚡ Attempting JSON loading...');
         const startTime = performance.now();
         
         const response = await fetch('./resources/combined-data.json', {
@@ -124,7 +114,6 @@ async function loadDataWithFallback() {
             window.topicToSectionMapping = data.revisionMappings.topicToSectionMapping || {};
             window.revisionSectionTitles = data.revisionSectionTitles || {};
         } else {
-            console.warn('⚠️ JSON file missing revision mappings - regenerate using csv-converter-unified.html');
             window.revisionMapping = {};
             window.topicToSectionMapping = {};
             window.revisionSectionTitles = {};
@@ -137,7 +126,6 @@ async function loadDataWithFallback() {
             paperModeGroups = data.paperModeGroups;
             specModeGroups = data.specModeGroups;
         } else {
-            console.warn('⚠️ JSON file missing groups - loading from CSV (regenerate JSON for optimal performance)');
             const { loadGroups } = await import('./data/unified-csv-loader.js');
             const groups = await loadGroups();
             paperModeGroups = groups.paperModeGroups;
@@ -150,11 +138,8 @@ async function loadDataWithFallback() {
             paperModeGroups: paperModeGroups,
             specModeGroups: specModeGroups
         };
-        
-        } catch (jsonError) {
-            console.log('📝 JSON not found, using CSV fallback...');
-            console.log('💡 Run csv-converter.html to create combined-data.json for 10x faster loading');
 
+        } catch (jsonError) {
             // Import and use existing CSV loader
             const { loadAllData, getResourcesForSection } = await import('./data/unified-csv-loader.js');
             const result = await loadAllData();

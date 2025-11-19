@@ -77,7 +77,6 @@ self.addEventListener('install', event => {
                             return { url, success: true };
                         })
                         .catch(error => {
-                            console.warn(`⚠️ SW: Failed to cache ${url}:`, error.message);
                             return { url, success: false, error: error.message };
                         })
                 );
@@ -86,9 +85,6 @@ self.addEventListener('install', event => {
             })
             .then(results => {
                 const failed = results.filter(r => !r.success).length;
-                if (failed > 0) {
-                    console.warn(`⚠️ SW: Failed to cache ${failed}/${CRITICAL_RESOURCES.length} resources`);
-                }
             })
             .catch(error => {
                 console.error('❌ SW: Cache installation failed:', error);
@@ -156,7 +152,6 @@ async function handleRequest(request) {
                     const cache = await caches.open(CACHE_NAME);
                     await cache.put(request, networkResponse.clone());
                 } catch (cacheError) {
-                    console.warn(`Failed to cache template ${url.pathname}:`, cacheError);
                 }
             }
 
@@ -189,8 +184,6 @@ async function handleRequest(request) {
                                         action: 'reload_recommended'
                                     });
                                 });
-
-                                console.log(`🔄 Update detected for ${url.pathname}`);
                             }
                         } catch (comparisonError) {
                             const cache = await caches.open(CACHE_NAME);
@@ -210,7 +203,6 @@ async function handleRequest(request) {
                         const cache = await caches.open(CACHE_NAME);
                         await cache.put(request, networkResponse.clone());
                     } catch (cacheError) {
-                        console.warn(`Failed to cache ${url.pathname}:`, cacheError);
                     }
                 }
 
@@ -234,7 +226,6 @@ async function handleRequest(request) {
                     const cache = await caches.open(CACHE_NAME);
                     await cache.put(request, networkResponse.clone());
                 } catch (cacheError) {
-                    console.warn(`Failed to cache ${url.pathname}:`, cacheError);
                 }
             }
 
@@ -285,7 +276,6 @@ self.addEventListener('message', event => {
     }
 
     if (event.data && event.data.type === 'CLEAR_CACHE') {
-        console.log('🗑️ Manual cache clear requested');
         caches.delete(CACHE_NAME).then(() => {
             event.ports[0].postMessage({ type: 'CACHE_CLEARED' });
         });

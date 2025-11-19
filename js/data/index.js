@@ -10,8 +10,6 @@ export let specModeGroups = {};
 
 // Initialize data loading from CSV files
 export async function initializeData() {
-    console.log('Initializing physics specification data from CSV files...');
-
     try {
         // Load all data (subjects, resources, and groups) from CSV files
         const allData = await loadAllData();
@@ -20,11 +18,6 @@ export async function initializeData() {
         specificationData = allData.specificationData;
         paperModeGroups = allData.paperModeGroups;
         specModeGroups = allData.specModeGroups;
-
-        console.log('✅ CSV data loaded successfully');
-        console.log('Available sections:', Object.keys(specificationData));
-        console.log('Paper mode groups:', Object.keys(paperModeGroups));
-        console.log('Spec mode groups:', Object.keys(specModeGroups));
 
         return true;
     } catch (error) {

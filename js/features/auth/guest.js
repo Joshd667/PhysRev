@@ -94,8 +94,6 @@ export const guestAuthMethods = {
 
             // Close settings modal
             this.showSettingsModal = false;
-
-            console.log('👋 Logged out successfully');
         }
     }
 };
