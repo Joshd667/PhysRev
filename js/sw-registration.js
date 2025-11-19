@@ -59,6 +59,24 @@ export function registerServiceWorker() {
                     registration.active.postMessage({ type: 'GET_VERSION' }, [messageChannel.port2]);
                 }
 
+                // ✅ FIX: Listen for update notifications from Service Worker
+                navigator.serviceWorker.addEventListener('message', (event) => {
+                    if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
+                        console.log(`🔄 Update detected: ${event.data.url}`);
+
+                        // Update global state
+                        window.appUpdateState.updateAvailable = true;
+
+                        // Dispatch event to notify Alpine.js app
+                        window.dispatchEvent(new CustomEvent('app-update-available', {
+                            detail: {
+                                url: event.data.url,
+                                timestamp: event.data.timestamp
+                            }
+                        }));
+                    }
+                });
+
             } catch (error) {
                 console.error('❌ Service Worker registration failed:', error);
             }
