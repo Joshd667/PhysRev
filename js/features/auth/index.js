@@ -39,5 +39,25 @@ export async function loadAuthMethods() {
         return teamsAuthMethods.loginWithTeams.call(this);
     };
 
+    // Initiate Teams login - checks privacy notice first
+    authMethods.initiateTeamsLogin = async function() {
+        try {
+            const { idbGet } = await import('../../utils/indexeddb.js');
+            const hasSeenNotice = await idbGet('privacyNoticeSeen');
+
+            if (!hasSeenNotice) {
+                // Show privacy modal in Teams mode (will trigger loginWithTeams when user continues)
+                this.openPrivacyNotice(true);
+            } else {
+                // User has already seen privacy notice, proceed directly to login
+                await this.loginWithTeams();
+            }
+        } catch (error) {
+            console.warn('Failed to check privacy notice status:', error);
+            // If check fails, proceed with login anyway
+            await this.loginWithTeams();
+        }
+    };
+
     return authMethods;
 }
