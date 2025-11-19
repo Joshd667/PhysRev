@@ -1,8 +1,8 @@
 // sw.js - Fixed Service Worker for Physics Audit Tool with Analytics Support
 // Place this file in your project root (same folder as index.html)
 
-const CACHE_NAME = 'physics-audit-v2.42'; // 🔥 INCREMENT THIS WHEN YOU UPDATE THE APP
-const APP_VERSION = '2.42';
+const CACHE_NAME = 'physics-audit-v2.43'; // 🔥 INCREMENT THIS WHEN YOU UPDATE THE APP
+const APP_VERSION = '2.43';
 
 // 🎯 Core resources that should be cached
 const CRITICAL_RESOURCES = [
@@ -188,21 +188,48 @@ async function handleRequest(request) {
         }
 
         // Cache-first with background update for JavaScript and HTML files
-        // This reduces console spam and improves performance
+        // ✅ FIX: Detect updates and notify user
         if (isJavaScript || isHTML) {
             const cachedResponse = await caches.match(request);
 
             if (cachedResponse) {
-                // Background update: fetch fresh version silently and update cache
-                // This happens AFTER returning the cached response (non-blocking)
-                fetch(request).then(networkResponse => {
+                // Background update: fetch fresh version and notify if changed
+                fetch(request).then(async networkResponse => {
                     if (networkResponse && networkResponse.ok) {
-                        caches.open(CACHE_NAME).then(cache => {
-                            cache.put(request, networkResponse);
-                        });
+                        // ✅ FIX: Compare versions to detect changes
+                        const cachedClone = cachedResponse.clone();
+                        const networkClone = networkResponse.clone();
+
+                        try {
+                            const cachedText = await cachedClone.text();
+                            const networkText = await networkClone.text();
+
+                            // ✅ FIX: Only update cache and notify if content actually changed
+                            if (cachedText !== networkText) {
+                                const cache = await caches.open(CACHE_NAME);
+                                await cache.put(request, networkResponse.clone());
+
+                                // ✅ FIX: Notify ALL open tabs that update is available
+                                const clients = await self.clients.matchAll({ type: 'window' });
+                                clients.forEach(client => {
+                                    client.postMessage({
+                                        type: 'UPDATE_AVAILABLE',
+                                        url: url.pathname,
+                                        timestamp: Date.now(),
+                                        action: 'reload_recommended'
+                                    });
+                                });
+
+                                console.log(`🔄 Update detected for ${url.pathname}`);
+                            }
+                        } catch (comparisonError) {
+                            // Fallback: just update cache without comparison
+                            const cache = await caches.open(CACHE_NAME);
+                            await cache.put(request, networkResponse);
+                        }
                     }
                 }).catch(() => {
-                    // Silently fail background updates
+                    // Silently fail background updates (offline scenario)
                 });
 
                 return cachedResponse;

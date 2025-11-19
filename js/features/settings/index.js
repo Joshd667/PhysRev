@@ -147,6 +147,14 @@ export const settingsMethods = {
     },
 
     /**
+     * ✅ FIX: Apply update from notification banner
+     * Alias for installUpdateNow() for use with update banner
+     */
+    applyUpdate() {
+        this.installUpdateNow();
+    },
+
+    /**
      * Backup data and then install update
      */
     async backupAndUpdate() {
