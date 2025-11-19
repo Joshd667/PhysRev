@@ -67,14 +67,14 @@
                                 <p class="text-sm text-green-700 dark:text-green-300 mt-1">Historical snapshots of your learning progress</p>
                             </div>
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                30 Days
+                                Until Deleted*
                             </span>
                         </div>
                         <div class="space-y-2">
                             <p class="text-slate-700 dark:text-slate-300"><strong>What:</strong> Progress snapshots, confidence distribution over time, trend data</p>
-                            <p class="text-slate-700 dark:text-slate-300"><strong>Retention Period:</strong> 30 days from date of creation</p>
-                            <p class="text-slate-700 dark:text-slate-300"><strong>Deletion Method:</strong> Automatic (runs when app loads)</p>
-                            <p class="text-slate-700 dark:text-slate-300"><strong>Reason:</strong> Recent analytics provide valuable insights while minimising long-term data storage</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Retention Period:</strong> Indefinite, until browser storage is full</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Deletion Method:</strong> Automatic cleanup when storage quota is exceeded (deletes entries older than 30 days to free space)</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Reason:</strong> Analytics provide valuable learning insights; old entries are only deleted when necessary to manage storage</p>
                         </div>
                     </div>
 
@@ -173,18 +173,22 @@
 
             <!-- Deletion Schedule -->
             <section>
-                <h2 class="text-2xl font-bold mb-4">Automatic Deletion Schedule</h2>
+                <h2 class="text-2xl font-bold mb-4">Storage Management and Cleanup</h2>
                 <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
-                    <h3 class="font-semibold text-lg mb-3 text-blue-800 dark:text-blue-200">How Automatic Cleanup Works</h3>
+                    <h3 class="font-semibold text-lg mb-3 text-blue-800 dark:text-blue-200">How Storage Cleanup Works</h3>
                     <p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
-                        The application performs automatic cleanup when you open or reload it:
+                        The application manages storage automatically when needed:
                     </p>
                     <ol class="list-decimal list-inside space-y-2 text-slate-700 dark:text-slate-300">
-                        <li>The app checks the creation date of all analytics history entries</li>
-                        <li>Any entries older than 30 days are automatically deleted</li>
-                        <li>This process runs silently in the background without affecting your experience</li>
+                        <li>Analytics history is retained indefinitely under normal conditions</li>
+                        <li>If browser storage quota is exceeded, the app automatically cleans up old data</li>
+                        <li>When cleanup runs, analytics entries older than 30 days are deleted to free space</li>
+                        <li>This process runs automatically when needed without affecting your experience</li>
                         <li>Current confidence ratings and study materials are never automatically deleted</li>
                     </ol>
+                    <p class="text-slate-700 dark:text-slate-300 leading-relaxed mt-4 text-sm italic">
+                        <strong>Note:</strong> Browser storage limits vary by device and browser (typically 50MB-100MB for IndexedDB). The 30-day limit acts as a safety mechanism to prevent data loss when storage is full.
+                    </p>
                 </div>
             </section>
 

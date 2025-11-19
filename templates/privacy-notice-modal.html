@@ -1,14 +1,11 @@
-<!-- First-Time Privacy Notice Modal -->
+<!-- First-Time Privacy Notice Modal (BLOCKING - Must Read All Documents) -->
 <div x-show="showPrivacyNoticeModal"
-     x-transition:enter="transition ease-out duration-200"
-     x-transition:enter-start="opacity-0"
-     x-transition:enter-end="opacity-100"
-     x-transition:leave="transition ease-in duration-150"
-     x-transition:leave-start="opacity-100"
-     x-transition:leave-end="opacity-0"
-     @click="closePrivacyNotice()"
-     class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
-     style="display: none;">
+     class="fixed inset-0 bg-black/70 backdrop-blur-sm z-[60] flex items-center justify-center p-4"
+     style="display: none;"
+     x-data="{
+         documentsRead: { privacy: false, terms: false, retention: false, accessibility: false }
+     }"
+     @click.stop>
 
     <!-- Modal Window -->
     <div @click.stop
@@ -16,37 +13,51 @@
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
-         x-transition:leave="transition ease-in duration-150"
-         x-transition:leave-start="opacity-100 scale-100"
-         x-transition:leave-end="opacity-0 scale-95"
-         class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[85vh] flex flex-col overflow-hidden">
+         class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
 
         <!-- Header -->
-        <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex items-center space-x-3">
-                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                    <i data-lucide="shield-check" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+        <div class="p-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+            <div class="flex items-start space-x-4">
+                <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                    <i data-lucide="atom" class="w-7 h-7 text-white"></i>
                 </div>
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200">Welcome to Physics Knowledge Audit Tool</h2>
-                    <p class="text-sm text-slate-600 dark:text-slate-400">Your privacy matters to us</p>
+                <div class="flex-1">
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-1">Welcome to Physics Knowledge Audit Tool</h2>
+                    <p class="text-sm text-slate-600 dark:text-slate-400">A-Level Physics revision and progress tracking made simple</p>
                 </div>
             </div>
         </div>
 
         <!-- Content -->
-        <div class="flex-1 overflow-y-auto p-6 minimal-scrollbar space-y-5">
+        <div class="flex-1 overflow-y-auto p-6 minimal-scrollbar space-y-6">
 
             <!-- Introduction -->
-            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-5 border border-blue-200 dark:border-blue-800">
+            <div>
                 <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
-                    This is a <strong>privacy-first educational tool</strong> designed to help you track your physics learning progress. We want you to understand how your data is handled.
+                    This tool helps you self-assess your confidence across physics topics, create study materials (notes, flashcards, mindmaps), track your progress with analytics, and access curated revision resources—all while keeping your data private and secure.
                 </p>
             </div>
 
-            <!-- Key Points -->
+            <!-- Before You Continue Notice -->
+            <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-5 border-2 border-blue-200 dark:border-blue-800">
+                <div class="flex items-start space-x-3 mb-3">
+                    <i data-lucide="info" class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0"></i>
+                    <div>
+                        <h3 class="font-bold text-lg text-blue-800 dark:text-blue-200">Before You Continue</h3>
+                        <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                            To use this app, please review our privacy practices and terms of use. We need you to understand how your educational data is processed and what your rights are under UK GDPR.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How Your Data is Processed -->
             <div class="space-y-3">
                 <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">How Your Data is Processed</h3>
+
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed text-sm mb-3">
+                    This is a <strong>privacy-first educational tool</strong> designed to help you track your physics learning progress. We want you to understand how your data is handled.
+                </p>
 
                 <div class="flex items-start space-x-3">
                     <div class="flex-shrink-0 mt-0.5">
@@ -79,8 +90,8 @@
                         </svg>
                     </div>
                     <div>
-                        <strong class="text-slate-800 dark:text-slate-200">30-Day Analytics Retention</strong>
-                        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Historical analytics data is automatically deleted after 30 days to minimise data storage.</p>
+                        <strong class="text-slate-800 dark:text-slate-200">Smart Storage Management</strong>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Analytics history is kept indefinitely until storage is full. If needed, entries older than 30 days are automatically removed to free space.</p>
                     </div>
                 </div>
 
@@ -97,58 +108,149 @@
                 </div>
             </div>
 
-            <!-- Legal Basis -->
-            <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
-                <h3 class="font-bold text-slate-800 dark:text-slate-200 mb-2">Legal Basis (UK GDPR)</h3>
-                <p class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-                    We process your data under <strong>Legitimate Interest (Article 6(1)(f))</strong> for providing educational tools to support your learning. You are not required to give explicit consent as your data remains on your device.
-                </p>
-            </div>
-
-            <!-- Your Rights -->
-            <div class="space-y-2">
-                <h3 class="font-bold text-slate-800 dark:text-slate-200">Your Rights</h3>
-                <div class="text-sm text-slate-700 dark:text-slate-300 space-y-1">
-                    <p>✓ <strong>Right to Access:</strong> Export your data anytime (Settings → Export CSV/Backup Data)</p>
-                    <p>✓ <strong>Right to Erasure:</strong> Delete all data (Settings → Clear All Data or Logout)</p>
-                    <p>✓ <strong>Right to Data Portability:</strong> Export in JSON format for use elsewhere</p>
+            <!-- Required Reading Section -->
+            <div class="border-t border-gray-200 dark:border-gray-600 pt-5">
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-4 border border-yellow-200 dark:border-yellow-800 mb-4">
+                    <div class="flex items-start space-x-3">
+                        <i data-lucide="alert-circle" class="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0"></i>
+                        <div>
+                            <p class="text-sm font-semibold text-yellow-800 dark:text-yellow-200">Required: Review All Documents</p>
+                            <p class="text-xs text-yellow-700 dark:text-yellow-300 mt-1">Please click each link below to open and review our legal documents. You must review all four documents before continuing.</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Learn More -->
-            <div class="border-t border-gray-200 dark:border-gray-600 pt-4">
-                <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">
-                    For full details, please read our legal documents:
-                </p>
-                <div class="flex flex-wrap gap-2">
-                    <a href="./legal/privacy-notice.html" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors text-sm font-medium">
-                        <i data-lucide="shield" class="w-3.5 h-3.5 mr-1.5"></i>
-                        Privacy Notice
+                <div class="space-y-2">
+                    <!-- Privacy Notice -->
+                    <a href="./legal/privacy-notice.html"
+                       target="_blank"
+                       @click="documentsRead.privacy = true"
+                       class="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-700 hover:bg-blue-50 dark:hover:bg-gray-600 rounded-lg transition-colors border border-gray-200 dark:border-gray-600 group">
+                        <div class="flex items-center space-x-3 flex-1">
+                            <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="shield" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i>
+                            </div>
+                            <div class="text-left flex-1">
+                                <div class="font-semibold text-sm text-slate-800 dark:text-slate-200">Privacy Notice</div>
+                                <div class="text-xs text-slate-600 dark:text-slate-400">UK GDPR compliance and data rights</div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div x-show="documentsRead.privacy" class="flex items-center space-x-1 text-green-600 dark:text-green-400">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="text-xs font-medium">Read</span>
+                                </div>
+                                <i data-lucide="external-link" class="w-4 h-4 text-gray-400 group-hover:text-blue-600"></i>
+                            </div>
+                        </div>
                     </a>
-                    <a href="./legal/terms-of-service.html" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg hover:bg-green-200 dark:hover:bg-green-800 transition-colors text-sm font-medium">
-                        <i data-lucide="file-text" class="w-3.5 h-3.5 mr-1.5"></i>
-                        Terms of Service
+
+                    <!-- Terms of Service -->
+                    <a href="./legal/terms-of-service.html"
+                       target="_blank"
+                       @click="documentsRead.terms = true"
+                       class="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-700 hover:bg-green-50 dark:hover:bg-gray-600 rounded-lg transition-colors border border-gray-200 dark:border-gray-600 group">
+                        <div class="flex items-center space-x-3 flex-1">
+                            <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="file-text" class="w-4 h-4 text-green-600 dark:text-green-400"></i>
+                            </div>
+                            <div class="text-left flex-1">
+                                <div class="font-semibold text-sm text-slate-800 dark:text-slate-200">Terms of Service</div>
+                                <div class="text-xs text-slate-600 dark:text-slate-400">Usage rules and guidelines</div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div x-show="documentsRead.terms" class="flex items-center space-x-1 text-green-600 dark:text-green-400">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="text-xs font-medium">Read</span>
+                                </div>
+                                <i data-lucide="external-link" class="w-4 h-4 text-gray-400 group-hover:text-green-600"></i>
+                            </div>
+                        </div>
                     </a>
-                    <a href="./legal/data-retention-policy.html" target="_blank" class="inline-flex items-center px-3 py-1.5 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors text-sm font-medium">
-                        <i data-lucide="clock" class="w-3.5 h-3.5 mr-1.5"></i>
-                        Data Retention
+
+                    <!-- Data Retention Policy -->
+                    <a href="./legal/data-retention-policy.html"
+                       target="_blank"
+                       @click="documentsRead.retention = true"
+                       class="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-700 hover:bg-purple-50 dark:hover:bg-gray-600 rounded-lg transition-colors border border-gray-200 dark:border-gray-600 group">
+                        <div class="flex items-center space-x-3 flex-1">
+                            <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="clock" class="w-4 h-4 text-purple-600 dark:text-purple-400"></i>
+                            </div>
+                            <div class="text-left flex-1">
+                                <div class="font-semibold text-sm text-slate-800 dark:text-slate-200">Data Retention Policy</div>
+                                <div class="text-xs text-slate-600 dark:text-slate-400">How long we keep your data</div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div x-show="documentsRead.retention" class="flex items-center space-x-1 text-green-600 dark:text-green-400">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="text-xs font-medium">Read</span>
+                                </div>
+                                <i data-lucide="external-link" class="w-4 h-4 text-gray-400 group-hover:text-purple-600"></i>
+                            </div>
+                        </div>
+                    </a>
+
+                    <!-- Accessibility Statement -->
+                    <a href="./legal/accessibility-statement.html"
+                       target="_blank"
+                       @click="documentsRead.accessibility = true"
+                       class="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-700 hover:bg-orange-50 dark:hover:bg-gray-600 rounded-lg transition-colors border border-gray-200 dark:border-gray-600 group">
+                        <div class="flex items-center space-x-3 flex-1">
+                            <div class="w-8 h-8 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <i data-lucide="accessibility" class="w-4 h-4 text-orange-600 dark:text-orange-400"></i>
+                            </div>
+                            <div class="text-left flex-1">
+                                <div class="font-semibold text-sm text-slate-800 dark:text-slate-200">Accessibility Statement</div>
+                                <div class="text-xs text-slate-600 dark:text-slate-400">WCAG 2.1 AA compliance</div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div x-show="documentsRead.accessibility" class="flex items-center space-x-1 text-green-600 dark:text-green-400">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span class="text-xs font-medium">Read</span>
+                                </div>
+                                <i data-lucide="external-link" class="w-4 h-4 text-gray-400 group-hover:text-orange-600"></i>
+                            </div>
+                        </div>
                     </a>
                 </div>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-3 italic">
-                    You can access these documents anytime via Settings → Privacy & Legal
+
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-3 italic text-center">
+                    Documents open in a new tab. You can access these anytime via Settings → Privacy & Legal
                 </p>
             </div>
 
         </div>
 
         <!-- Footer -->
-        <div class="border-t border-gray-200 dark:border-gray-700 p-6 bg-gray-50 dark:bg-gray-900/50">
+        <div class="border-t border-gray-200 dark:border-gray-700 p-5 bg-gray-50 dark:bg-gray-900/50">
             <div class="flex items-center justify-between">
                 <p class="text-xs text-slate-600 dark:text-slate-400">
-                    By continuing to use this app, you acknowledge this information notice.
+                    By continuing, you acknowledge that you have reviewed these documents.
                 </p>
-                <button @click="closePrivacyNotice()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-medium">
-                    Got it, thanks!
+                <button
+                    @click="closePrivacyNotice()"
+                    :disabled="!(documentsRead.privacy && documentsRead.terms && documentsRead.retention && documentsRead.accessibility)"
+                    :class="(documentsRead.privacy && documentsRead.terms && documentsRead.retention && documentsRead.accessibility)
+                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 cursor-pointer'
+                        : 'bg-gray-300 dark:bg-gray-700 cursor-not-allowed opacity-50'"
+                    class="px-8 py-3 text-white rounded-lg transition-all font-semibold shadow-lg flex items-center space-x-2">
+                    <span x-show="!(documentsRead.privacy && documentsRead.terms && documentsRead.retention && documentsRead.accessibility)" class="text-sm">
+                        Read all documents to continue
+                    </span>
+                    <span x-show="documentsRead.privacy && documentsRead.terms && documentsRead.retention && documentsRead.accessibility" class="flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Continue to App</span>
+                    </span>
                 </button>
             </div>
         </div>
