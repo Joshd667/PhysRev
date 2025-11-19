@@ -27,6 +27,7 @@ import { dateUtils } from '../utils/date.js';
 import { revisionAreaColorMethods } from '../utils/revision-colors.js';
 import { buildTopicLookup } from '../utils/topic-lookup.js';
 import { modalMethods } from '../utils/modals.js';
+import { SearchIndex } from '../utils/search-index.js';
 
 // Auth methods loaded from features/auth
 let authMethodsLoaded = false;
@@ -38,6 +39,12 @@ let staticSpecificationData = null;
 let staticPaperModeGroups = null;
 let staticSpecModeGroups = null;
 let staticTopicLookup = null;
+
+// ⚡ PERFORMANCE: Search indexes (non-reactive, for O(1) search lookups)
+let auditCardsIndex = null;
+let notesIndex = null;
+let flashcardsIndex = null;
+let mindmapsIndex = null;
 
 export function createApp(specificationData, paperModeGroups, specModeGroups, Alpine) {
     // Store large data in module-level variables (non-reactive)
@@ -293,6 +300,142 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
 
                 // Set up watchers
                 setupWatchers(this);
+
+                // ⚡ PERFORMANCE: Initialize search indexes
+                this._initializeSearchIndexes();
+            },
+
+            // --- SEARCH INDEX MANAGEMENT ---
+            _initializeSearchIndexes() {
+                const startTime = performance.now();
+
+                // Initialize all indexes
+                auditCardsIndex = new SearchIndex();
+                notesIndex = new SearchIndex();
+                flashcardsIndex = new SearchIndex();
+                mindmapsIndex = new SearchIndex();
+
+                // Build audit cards index
+                const auditCards = [];
+                Object.entries(this.specificationData).forEach(([sectionKey, section]) => {
+                    if (!section.topics) return;
+                    section.topics.forEach(topic => {
+                        auditCards.push({
+                            ...topic,
+                            sectionKey,
+                            sectionTitle: section.title,
+                            paper: section.paper
+                        });
+                    });
+                });
+                auditCardsIndex.buildIndex(auditCards, topic =>
+                    `${topic.id || ''} ${topic.title || ''} ${topic.prompt || ''} ${(topic.learningObjectives || []).join(' ')} ${(topic.examples || []).join(' ')}`
+                );
+
+                // Build notes index
+                notesIndex.buildIndex(Object.values(this.userNotes), note =>
+                    `${note.title || ''} ${note.content || ''} ${(note.tags || []).join(' ')}`
+                );
+
+                // Build flashcards index
+                flashcardsIndex.buildIndex(Object.values(this.flashcardDecks), deck => {
+                    const deckText = `${deck.name || ''} ${(deck.tags || []).join(' ')}`;
+                    const cardsText = (deck.cards || []).map(card => `${card.front || ''} ${card.back || ''}`).join(' ');
+                    return `${deckText} ${cardsText}`;
+                });
+
+                // Build mindmaps index
+                mindmapsIndex.buildIndex(Object.values(this.mindmaps), mindmap => {
+                    const shapesText = (mindmap.shapes || []).map(shape => shape.text || '').join(' ');
+                    return `${mindmap.title || ''} ${shapesText} ${(mindmap.tags || []).join(' ')}`;
+                });
+
+                const totalTime = performance.now() - startTime;
+                console.log(`🔍 Search indexes built in ${totalTime.toFixed(0)}ms`);
+            },
+
+            _rebuildSearchIndexes() {
+                this._initializeSearchIndexes();
+            },
+
+            _updateNoteInIndex(note) {
+                if (!notesIndex || !note.id) return;
+                notesIndex.updateItem(note, n =>
+                    `${n.title || ''} ${n.content || ''} ${(n.tags || []).join(' ')}`
+                );
+            },
+
+            _addNoteToIndex(note) {
+                if (!notesIndex || !note.id) return;
+                notesIndex.addItem(note, n =>
+                    `${n.title || ''} ${n.content || ''} ${(n.tags || []).join(' ')}`
+                );
+            },
+
+            _removeNoteFromIndex(noteId) {
+                if (!notesIndex) return;
+                notesIndex.removeItem(noteId);
+            },
+
+            _updateFlashcardDeckInIndex(deck) {
+                if (!flashcardsIndex || !deck.id) return;
+                flashcardsIndex.updateItem(deck, d => {
+                    const deckText = `${d.name || ''} ${(d.tags || []).join(' ')}`;
+                    const cardsText = (d.cards || []).map(card => `${card.front || ''} ${card.back || ''}`).join(' ');
+                    return `${deckText} ${cardsText}`;
+                });
+            },
+
+            _addFlashcardDeckToIndex(deck) {
+                if (!flashcardsIndex || !deck.id) return;
+                flashcardsIndex.addItem(deck, d => {
+                    const deckText = `${d.name || ''} ${(d.tags || []).join(' ')}`;
+                    const cardsText = (d.cards || []).map(card => `${card.front || ''} ${card.back || ''}`).join(' ');
+                    return `${deckText} ${cardsText}`;
+                });
+            },
+
+            _removeFlashcardDeckFromIndex(deckId) {
+                if (!flashcardsIndex) return;
+                flashcardsIndex.removeItem(deckId);
+            },
+
+            _updateMindmapInIndex(mindmap) {
+                if (!mindmapsIndex || !mindmap.id) return;
+                mindmapsIndex.updateItem(mindmap, m => {
+                    const shapesText = (m.shapes || []).map(shape => shape.text || '').join(' ');
+                    return `${m.title || ''} ${shapesText} ${(m.tags || []).join(' ')}`;
+                });
+            },
+
+            _addMindmapToIndex(mindmap) {
+                if (!mindmapsIndex || !mindmap.id) return;
+                mindmapsIndex.addItem(mindmap, m => {
+                    const shapesText = (m.shapes || []).map(shape => shape.text || '').join(' ');
+                    return `${m.title || ''} ${shapesText} ${(m.tags || []).join(' ')}`;
+                });
+            },
+
+            _removeMindmapFromIndex(mindmapId) {
+                if (!mindmapsIndex) return;
+                mindmapsIndex.removeItem(mindmapId);
+            },
+
+            // Getters for search indexes (used by search methods)
+            _getAuditCardsIndex() {
+                return auditCardsIndex || { search: () => new Set(), getItems: () => [], items: new Map() };
+            },
+
+            _getNotesIndex() {
+                return notesIndex || { search: () => new Set(), getItems: () => [], items: new Map() };
+            },
+
+            _getFlashcardsIndex() {
+                return flashcardsIndex || { search: () => new Set(), getItems: () => [], items: new Map() };
+            },
+
+            _getMindmapsIndex() {
+                return mindmapsIndex || { search: () => new Set(), getItems: () => [], items: new Map() };
             },
 
             // --- LAZY LOADING AUTH MODULE ---

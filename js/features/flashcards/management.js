@@ -141,7 +141,7 @@ export const flashcardManagementMethods = {
             // Create new deck
             const deckId = `deck_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-            this.flashcardDecks[deckId] = {
+            const newDeck = {
                 id: deckId,
                 sectionId: this.flashcardEditorSectionId,
                 name: this.flashcardEditorDeckName.trim(),
@@ -151,6 +151,11 @@ export const flashcardManagementMethods = {
                 createdAt: timestamp,
                 updatedAt: timestamp
             };
+
+            this.flashcardDecks[deckId] = newDeck;
+
+            // ⚡ PERFORMANCE: Update search index
+            this._addFlashcardDeckToIndex(newDeck);
         } else {
             // Update existing deck
             if (this.flashcardDecks[this.flashcardEditorDeckId]) {
@@ -158,6 +163,9 @@ export const flashcardManagementMethods = {
                 this.flashcardDecks[this.flashcardEditorDeckId].cards = this.flashcardEditorCards;
                 this.flashcardDecks[this.flashcardEditorDeckId].tags = this.flashcardEditorTags;
                 this.flashcardDecks[this.flashcardEditorDeckId].updatedAt = timestamp;
+
+                // ⚡ PERFORMANCE: Update search index
+                this._updateFlashcardDeckInIndex(this.flashcardDecks[this.flashcardEditorDeckId]);
             }
         }
 
@@ -189,6 +197,10 @@ export const flashcardManagementMethods = {
 
         if (confirmed) {
             delete this.flashcardDecks[deckId];
+
+            // ⚡ PERFORMANCE: Update search index
+            this._removeFlashcardDeckFromIndex(deckId);
+
             this.saveFlashcardDecks();
         }
     },
