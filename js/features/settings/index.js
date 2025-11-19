@@ -221,5 +221,56 @@ export const settingsMethods = {
             console.error('❌ Force refresh failed:', error);
             alert('Force refresh failed: ' + error.message);
         }
+    },
+
+    /**
+     * Opens the privacy notice modal
+     */
+    openPrivacyNotice() {
+        this.showPrivacyNoticeModal = true;
+
+        // Refresh icons after modal opens
+        this.$nextTick(() => {
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        });
+    },
+
+    /**
+     * Closes the privacy notice modal and marks it as seen
+     */
+    async closePrivacyNotice() {
+        this.showPrivacyNoticeModal = false;
+
+        // Mark as seen in IndexedDB
+        try {
+            const { idbSet } = await import('../../utils/indexeddb.js');
+            await idbSet('privacyNoticeSeen', true);
+            console.log('✅ Privacy notice marked as seen');
+        } catch (error) {
+            console.warn('Failed to save privacy notice status:', error);
+        }
+    },
+
+    /**
+     * Checks if user has seen the privacy notice, and shows it if not
+     * Should be called after authentication
+     */
+    async checkAndShowPrivacyNotice() {
+        try {
+            const { idbGet } = await import('../../utils/indexeddb.js');
+            const hasSeenNotice = await idbGet('privacyNoticeSeen');
+
+            // Only show if user hasn't seen it before
+            if (!hasSeenNotice) {
+                // Delay slightly to ensure templates are loaded and icons are ready
+                setTimeout(() => {
+                    this.openPrivacyNotice();
+                }, 500);
+            }
+        } catch (error) {
+            console.warn('Failed to check privacy notice status:', error);
+        }
     }
 };

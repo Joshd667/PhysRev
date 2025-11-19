@@ -28,6 +28,7 @@ export function createState() {
         showingMainMenu: true,
         showingRevision: false,
         showSettingsModal: false,
+        showPrivacyNoticeModal: false,
 
         // --- BREADCRUMB CACHE (reduces initial RAM spike) ---
         _cachedBannerTitle: null,

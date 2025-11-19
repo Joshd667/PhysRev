@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Notice - Physics Knowledge Audit Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-slate-800 dark:text-slate-200">
+    <div class="max-w-4xl mx-auto p-6 md:p-12">
+        <!-- Header -->
+        <div class="mb-8">
+            <button onclick="window.history.back()" class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline mb-4">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Back to App
+            </button>
+            <h1 class="text-4xl font-bold mb-2">Privacy Notice</h1>
+            <p class="text-slate-600 dark:text-slate-400">Last updated: 19 November 2025</p>
+        </div>
+
+        <!-- Content -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 space-y-8">
+
+            <!-- Introduction -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Introduction</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                    This Privacy Notice explains how the Physics Knowledge Audit Tool ("we", "our", "the App") collects, uses, and protects your personal information. We are committed to protecting your privacy and complying with the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018.
+                </p>
+            </section>
+
+            <!-- Data Controller -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Data Controller</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                    The Physics Knowledge Audit Tool is a client-side Progressive Web Application. Your data is stored locally on your device and is not transmitted to any external servers (except when using Microsoft Teams integration, see below).
+                </p>
+            </section>
+
+            <!-- What Data We Collect -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">What Data We Collect</h2>
+                <div class="space-y-4">
+                    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+                        <h3 class="font-semibold text-lg mb-2">Learning Progress Data</h3>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700 dark:text-slate-300">
+                            <li>Confidence ratings (1-5 scale) for physics topics</li>
+                            <li>Timestamps of when ratings were made</li>
+                            <li>Progress analytics and learning metrics</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+                        <h3 class="font-semibold text-lg mb-2">Study Materials</h3>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700 dark:text-slate-300">
+                            <li>Custom notes, flashcards, and mindmaps you create</li>
+                            <li>Topic tags you assign to your materials</li>
+                            <li>Test results and performance history</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+                        <h3 class="font-semibold text-lg mb-2">Application Preferences</h3>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700 dark:text-slate-300">
+                            <li>View mode preferences (specification/paper view)</li>
+                            <li>Theme selection (light/dark mode)</li>
+                            <li>Default view settings for notes, flashcards, and mindmaps</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+                        <h3 class="font-semibold text-lg mb-2">Account Information (Teams Users Only)</h3>
+                        <ul class="list-disc list-inside space-y-1 text-slate-700 dark:text-slate-300">
+                            <li>Name and email address (from Microsoft Teams account)</li>
+                            <li>Profile picture (if provided by Microsoft Teams)</li>
+                            <li>Microsoft Teams user ID</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data We Don't Collect -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">What We Don't Collect</h2>
+                <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-5 border border-green-200 dark:border-green-800">
+                    <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
+                        <li><strong>No Cookies:</strong> We do not use cookies or tracking technologies</li>
+                        <li><strong>No Analytics Tracking:</strong> We do not use Google Analytics, Segment, or any third-party analytics services</li>
+                        <li><strong>No Advertising:</strong> We do not collect data for advertising purposes</li>
+                        <li><strong>No Location Data:</strong> We do not track your physical location</li>
+                        <li><strong>No Device Information:</strong> We do not collect device identifiers or system information</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- How We Store Your Data -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">How We Store Your Data</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                    <strong>Guest Mode:</strong> All data is stored in IndexedDB on your device. Your data never leaves your device and is not accessible to us or any third parties.
+                </p>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                    <strong>Microsoft Teams Mode:</strong> If you choose to use Teams integration, your data is stored using Microsoft's services. Please refer to <a href="https://privacy.microsoft.com/en-gb/privacystatement" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener">Microsoft's Privacy Statement</a> for information on how Microsoft handles your data.
+                </p>
+            </section>
+
+            <!-- Legal Basis for Processing -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Legal Basis for Processing</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                    We process your personal data under the following lawful bases:
+                </p>
+                <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300 mt-4">
+                    <li><strong>Legitimate Interest (Article 6(1)(f) UK GDPR):</strong> Processing is necessary for the provision of educational tools to support your learning</li>
+                    <li><strong>Consent (Article 6(1)(a) UK GDPR):</strong> When you choose to use Microsoft Teams integration, you consent to data processing by Microsoft</li>
+                </ul>
+            </section>
+
+            <!-- Data Retention -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Data Retention</h2>
+                <div class="space-y-3">
+                    <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                        <strong>Analytics History:</strong> Automatically deleted after 30 days to minimise data storage
+                    </p>
+                    <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                        <strong>Study Materials:</strong> Retained indefinitely until you choose to delete them
+                    </p>
+                    <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                        <strong>Preferences:</strong> Retained until you clear them via the Settings menu or browser storage
+                    </p>
+                    <p class="text-blue-700 dark:text-blue-300 leading-relaxed italic">
+                        See our <a href="./data-retention-policy.html" class="underline">Data Retention Policy</a> for full details.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Your Rights -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Your Rights Under UK GDPR</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                    You have the following rights regarding your personal data:
+                </p>
+                <div class="space-y-3">
+                    <div class="flex items-start space-x-3">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200">Right of Access (Article 15):</strong>
+                            <p class="text-slate-700 dark:text-slate-300">Export your data as JSON or CSV via Settings → Data Management</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200">Right to Rectification (Article 16):</strong>
+                            <p class="text-slate-700 dark:text-slate-300">Edit your confidence ratings, notes, and materials at any time</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200">Right to Erasure (Article 17):</strong>
+                            <p class="text-slate-700 dark:text-slate-300">Delete all data via Settings → Data Management → Clear All Data, or by logging out</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200">Right to Data Portability (Article 20):</strong>
+                            <p class="text-slate-700 dark:text-slate-300">Export your data in machine-readable formats (JSON, CSV)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Sharing -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Data Sharing and Third Parties</h2>
+                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-5 border border-blue-200 dark:border-blue-800">
+                    <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                        <strong>We do not share your data with any third parties.</strong> In Guest Mode, your data remains entirely on your device. When using Microsoft Teams integration, your data is processed by Microsoft in accordance with their Data Processing Agreement.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Security -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Security Measures</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                    We implement the following security measures to protect your data:
+                </p>
+                <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
+                    <li>Content Security Policy (CSP) to prevent XSS attacks</li>
+                    <li>DOMPurify sanitization for user-generated content</li>
+                    <li>HTTPS-only content delivery</li>
+                    <li>No server-side data storage (Guest Mode)</li>
+                    <li>Local IndexedDB encryption via browser security features</li>
+                </ul>
+            </section>
+
+            <!-- Children's Privacy -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Children's Privacy</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                    This application is designed for A-Level students (typically aged 16-18). Users under 13 years of age should obtain parental consent before using this application, in accordance with Article 8 of UK GDPR. We do not knowingly collect personal data from children under 13 without parental consent.
+                </p>
+            </section>
+
+            <!-- Changes to Privacy Notice -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Changes to This Privacy Notice</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                    We may update this Privacy Notice from time to time. Any changes will be posted on this page with an updated "Last updated" date. We encourage you to review this Privacy Notice periodically.
+                </p>
+            </section>
+
+            <!-- Contact -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Contact Us</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                    If you have any questions about this Privacy Notice or wish to exercise your data protection rights, please contact us through your educational institution or the app administrator.
+                </p>
+            </section>
+
+            <!-- ICO Information -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Complaints to the ICO</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-3">
+                    You have the right to lodge a complaint with the Information Commissioner's Office (ICO) if you believe your data protection rights have been breached.
+                </p>
+                <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-5 border border-gray-200 dark:border-gray-600">
+                    <p class="text-slate-700 dark:text-slate-300"><strong>Information Commissioner's Office</strong></p>
+                    <p class="text-slate-700 dark:text-slate-300">Wycliffe House, Water Lane, Wilmslow, Cheshire, SK9 5AF</p>
+                    <p class="text-slate-700 dark:text-slate-300">Tel: 0303 123 1113</p>
+                    <p class="text-slate-700 dark:text-slate-300">Website: <a href="https://ico.org.uk" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener">ico.org.uk</a></p>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
+            <p>© 2025 Physics Knowledge Audit Tool | For Educational Purposes</p>
+            <div class="mt-2 space-x-4">
+                <a href="./terms-of-service.html" class="hover:underline">Terms of Service</a>
+                <a href="./data-retention-policy.html" class="hover:underline">Data Retention Policy</a>
+                <a href="./accessibility-statement.html" class="hover:underline">Accessibility</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

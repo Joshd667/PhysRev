@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Retention Policy - Physics Knowledge Audit Tool</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-slate-800 dark:text-slate-200">
+    <div class="max-w-4xl mx-auto p-6 md:p-12">
+        <!-- Header -->
+        <div class="mb-8">
+            <button onclick="window.history.back()" class="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline mb-4">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Back to App
+            </button>
+            <h1 class="text-4xl font-bold mb-2">Data Retention Policy</h1>
+            <p class="text-slate-600 dark:text-slate-400">Last updated: 19 November 2025</p>
+        </div>
+
+        <!-- Content -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 space-y-8">
+
+            <!-- Introduction -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Introduction</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                    This Data Retention Policy explains how long we keep different types of data in the Physics Knowledge Audit Tool and why. This policy applies to both Guest Mode (local storage) and Microsoft Teams integration users.
+                </p>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed mt-3">
+                    This policy is designed to comply with UK GDPR principles of data minimisation and storage limitation (Article 5(1)(c) and (e)).
+                </p>
+            </section>
+
+            <!-- Retention Principles -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Data Retention Principles</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                    We retain personal data only for as long as necessary to:
+                </p>
+                <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
+                    <li>Support your ongoing learning and revision activities</li>
+                    <li>Provide you with meaningful analytics and progress tracking</li>
+                    <li>Maintain the functionality of the application</li>
+                    <li>Comply with legal obligations</li>
+                </ul>
+            </section>
+
+            <!-- Data Categories -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Data Categories and Retention Periods</h2>
+
+                <!-- Analytics History -->
+                <div class="space-y-4">
+                    <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-6 border border-green-200 dark:border-green-800">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-bold text-lg text-green-800 dark:text-green-200">Analytics History</h3>
+                                <p class="text-sm text-green-700 dark:text-green-300 mt-1">Historical snapshots of your learning progress</p>
+                            </div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
+                                30 Days
+                            </span>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-slate-700 dark:text-slate-300"><strong>What:</strong> Progress snapshots, confidence distribution over time, trend data</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Retention Period:</strong> 30 days from date of creation</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Deletion Method:</strong> Automatic (runs when app loads)</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Reason:</strong> Recent analytics provide valuable insights while minimising long-term data storage</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-bold text-lg text-blue-800 dark:text-blue-200">Current Confidence Ratings</h3>
+                                <p class="text-sm text-blue-700 dark:text-blue-300 mt-1">Your latest confidence assessment for each topic</p>
+                            </div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
+                                Until Deleted
+                            </span>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-slate-700 dark:text-slate-300"><strong>What:</strong> Current (most recent) confidence ratings for each physics topic</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Retention Period:</strong> Indefinite (until you update, clear data, or logout)</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Deletion Method:</strong> Manual via Settings → Clear All Data or Logout</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Reason:</strong> Essential for the core functionality of tracking your current knowledge level</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-6 border border-purple-200 dark:border-purple-800">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-bold text-lg text-purple-800 dark:text-purple-200">Study Materials</h3>
+                                <p class="text-sm text-purple-700 dark:text-purple-300 mt-1">Notes, flashcards, mindmaps, and test results</p>
+                            </div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200">
+                                Until Deleted
+                            </span>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-slate-700 dark:text-slate-300"><strong>What:</strong> All user-created study content including notes, flashcard decks, mindmaps, test sets, and test performance history</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Retention Period:</strong> Indefinite (until you manually delete individual items, clear all data, or logout)</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Deletion Method:</strong> Individual deletion via the app interface, or bulk deletion via Settings → Clear All Data</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Reason:</strong> Your study materials are valuable long-term learning resources that you may need throughout your A-Level course</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-yellow-50 dark:bg-yellow-900/20 rounded-lg p-6 border border-yellow-200 dark:border-yellow-800">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-bold text-lg text-yellow-800 dark:text-yellow-200">Application Preferences</h3>
+                                <p class="text-sm text-yellow-700 dark:text-yellow-300 mt-1">Theme, view modes, and display settings</p>
+                            </div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200">
+                                Until Cleared
+                            </span>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-slate-700 dark:text-slate-300"><strong>What:</strong> Theme selection (dark/light mode), default view modes, paper preferences, revision area indicator style</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Retention Period:</strong> Indefinite (until you clear browser data or logout)</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Deletion Method:</strong> Clearing browser storage or Settings → Logout</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Reason:</strong> Preferences improve your user experience and should persist across sessions</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-orange-50 dark:bg-orange-900/20 rounded-lg p-6 border border-orange-200 dark:border-orange-800">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-bold text-lg text-orange-800 dark:text-orange-200">Account Information (Teams Only)</h3>
+                                <p class="text-sm text-orange-700 dark:text-orange-300 mt-1">Name, email, profile picture from Microsoft Teams</p>
+                            </div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200">
+                                Session Duration
+                            </span>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-slate-700 dark:text-slate-300"><strong>What:</strong> Microsoft Teams user ID, name, email address, profile picture</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Retention Period:</strong> Duration of your Teams session (cleared on logout)</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Deletion Method:</strong> Automatic on logout, or via Settings → Logout</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Reason:</strong> Required for Teams authentication; stored by Microsoft per their retention policies</p>
+                            <p class="text-slate-700 dark:text-slate-300 text-sm italic">Note: Data stored via Microsoft Teams is subject to Microsoft's retention policies.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-6 border border-gray-200 dark:border-gray-600">
+                        <div class="flex items-start justify-between mb-3">
+                            <div>
+                                <h3 class="font-bold text-lg text-slate-800 dark:text-slate-200">Exported Backup Files</h3>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">JSON/CSV exports you create manually</p>
+                            </div>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                                User Controlled
+                            </span>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-slate-700 dark:text-slate-300"><strong>What:</strong> Backup files (JSON/CSV) that you manually download via Settings → Data Management</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Retention Period:</strong> Entirely user-controlled (stored on your device/cloud storage)</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Deletion Method:</strong> You manage these files independently on your device</p>
+                            <p class="text-slate-700 dark:text-slate-300"><strong>Reason:</strong> Backups provide data portability and recovery options; you control when to delete them</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Deletion Schedule -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Automatic Deletion Schedule</h2>
+                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
+                    <h3 class="font-semibold text-lg mb-3 text-blue-800 dark:text-blue-200">How Automatic Cleanup Works</h3>
+                    <p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                        The application performs automatic cleanup when you open or reload it:
+                    </p>
+                    <ol class="list-decimal list-inside space-y-2 text-slate-700 dark:text-slate-300">
+                        <li>The app checks the creation date of all analytics history entries</li>
+                        <li>Any entries older than 30 days are automatically deleted</li>
+                        <li>This process runs silently in the background without affecting your experience</li>
+                        <li>Current confidence ratings and study materials are never automatically deleted</li>
+                    </ol>
+                </div>
+            </section>
+
+            <!-- Manual Deletion -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Manual Data Deletion</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                    You have full control over your data and can delete it at any time:
+                </p>
+
+                <div class="space-y-3">
+                    <div class="flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200">Individual Study Materials</strong>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Delete individual notes, flashcard decks, or mindmaps via the app interface (trash icon on each item)</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <svg class="w-5 h-5 text-orange-600 dark:text-orange-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200">Clear All Data</strong>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Settings → Data Management → Clear All Data (deletes confidence ratings, analytics, and all study materials)</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <svg class="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200">Logout</strong>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Settings → Account → Logout (deletes all local data including preferences)</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+                        <svg class="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <strong class="text-slate-800 dark:text-slate-200">Browser Data Clearing</strong>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">Clearing your browser cache/storage will delete all app data (IndexedDB and preferences)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Data Portability -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Data Portability Before Deletion</h2>
+                <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-6 border border-green-200 dark:border-green-800">
+                    <p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                        <strong>Before deleting data, we recommend exporting a backup:</strong>
+                    </p>
+                    <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
+                        <li><strong>Full Backup (JSON):</strong> Settings → Data Management → Backup Data</li>
+                        <li><strong>Spreadsheet Format (CSV):</strong> Settings → Data Management → Export CSV</li>
+                        <li><strong>Individual Materials:</strong> Export notes as HTML, mindmaps as SVG via the app interface</li>
+                    </ul>
+                    <p class="text-slate-700 dark:text-slate-300 leading-relaxed mt-4">
+                        These exports give you full control over your data and allow you to reimport it later if needed (JSON backups only).
+                    </p>
+                </div>
+            </section>
+
+            <!-- Microsoft Teams -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Microsoft Teams Data Retention</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed mb-4">
+                    If you use Microsoft Teams integration:
+                </p>
+                <ul class="list-disc list-inside space-y-2 text-slate-700 dark:text-slate-300">
+                    <li>Your study data is stored in Microsoft's cloud infrastructure</li>
+                    <li>Microsoft's retention policies apply to this data</li>
+                    <li>Consult <a href="https://learn.microsoft.com/en-gb/microsoft-365/compliance/retention-policies-teams" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener">Microsoft's Teams retention documentation</a> for details</li>
+                    <li>Contact your organisation's IT administrator for specific retention settings in your Teams environment</li>
+                </ul>
+            </section>
+
+            <!-- Review Schedule -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Policy Review Schedule</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                    This Data Retention Policy is reviewed annually to ensure compliance with UK GDPR and data protection best practices. Any changes will be reflected in the "Last updated" date at the top of this page.
+                </p>
+            </section>
+
+            <!-- Contact -->
+            <section>
+                <h2 class="text-2xl font-bold mb-4">Questions About Data Retention</h2>
+                <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                    If you have questions about how long we retain your data or how to delete it, please contact us through your educational institution or the app administrator.
+                </p>
+            </section>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-8 text-center text-sm text-slate-600 dark:text-slate-400">
+            <p>© 2025 Physics Knowledge Audit Tool | For Educational Purposes</p>
+            <div class="mt-2 space-x-4">
+                <a href="./privacy-notice.html" class="hover:underline">Privacy Notice</a>
+                <a href="./terms-of-service.html" class="hover:underline">Terms of Service</a>
+                <a href="./accessibility-statement.html" class="hover:underline">Accessibility</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
