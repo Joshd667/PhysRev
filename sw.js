@@ -1,8 +1,8 @@
 // sw.js - Fixed Service Worker for Physics Audit Tool with Analytics Support
 // Place this file in your project root (same folder as index.html)
 
-const CACHE_NAME = 'physics-audit-v2.40'; // 🔥 INCREMENT THIS WHEN YOU UPDATE THE APP
-const APP_VERSION = '2.40';
+const CACHE_NAME = 'physics-audit-v2.41'; // 🔥 INCREMENT THIS WHEN YOU UPDATE THE APP
+const APP_VERSION = '2.41';
 
 // 🎯 Core resources that should be cached
 const CRITICAL_RESOURCES = [
@@ -15,7 +15,6 @@ const CRITICAL_RESOURCES = [
     './css/style.css',
     './js/app-loader.js',
     './js/template-loader.js',
-    './js/data/revision-mappings.js',
     './js/data/index.js',
     './js/data/unified-csv-loader.js',
     './resources/combined-data.json',
@@ -53,7 +52,6 @@ const CRITICAL_RESOURCES = [
 
 
     // HTML Templates - NEW!
-    './templates/login-screen.html',
     './templates/search-results.html',
     './templates/analytics-dashboard.html',
     './templates/revision-view.html',
