@@ -135,21 +135,51 @@ window.clearSWCache = function() {
 /**
  * ✅ FIX: Comprehensive storage cleanup function
  * Clears ALL storage types: IndexedDB, Service Worker cache, localStorage
- * Usage: Call `clearAllAppStorage()` from browser console to troubleshoot cache/memory issues
+ * Keeps Service Worker registered (will reinstall on next load)
+ * Usage: Call `clearAllAppStorage()` from browser console
  */
 window.clearAllAppStorage = async function() {
-    console.log('🧹 Starting comprehensive storage cleanup...');
+    console.log('🧹 Starting storage cleanup (keeping Service Worker registered)...');
 
     try {
-        // Import storage utils
         const { storageUtils } = await import('./utils/storage.js');
-
-        // Clear all storage using the new utility function
-        const result = await storageUtils.clearAllStorage();
+        const result = await storageUtils.clearAllStorage(false);
 
         if (result.success) {
             console.log('✅ All storage cleared successfully!');
             console.log('🔄 Reloading page in 2 seconds...');
+            setTimeout(() => window.location.reload(), 2000);
+        } else {
+            console.warn('⚠️ Some storage types failed to clear:', result.results);
+            console.log('🔄 Reloading page anyway in 2 seconds...');
+            setTimeout(() => window.location.reload(), 2000);
+        }
+
+        return result;
+    } catch (error) {
+        console.error('❌ Failed to clear storage:', error);
+        console.log('💡 Try using browser DevTools: Application → Clear storage');
+        return { success: false, error: error.message };
+    }
+};
+
+/**
+ * ✅ FIX: FRESH storage cleanup - unregisters Service Worker too
+ * Clears ALL storage AND unregisters Service Worker for completely fresh reload
+ * Use this to eliminate ALL cache-related console messages on reload
+ * Usage: Call `clearAllAppStorageFresh()` from browser console
+ */
+window.clearAllAppStorageFresh = async function() {
+    console.log('🧹 Starting FRESH storage cleanup (unregistering Service Worker)...');
+    console.log('⚠️ Next reload will have NO Service Worker until it reinstalls');
+
+    try {
+        const { storageUtils } = await import('./utils/storage.js');
+        const result = await storageUtils.clearAllStorage(true);
+
+        if (result.success) {
+            console.log('✅ All storage cleared and Service Worker unregistered!');
+            console.log('🔄 Reloading page in 2 seconds for fresh start...');
             setTimeout(() => window.location.reload(), 2000);
         } else {
             console.warn('⚠️ Some storage types failed to clear:', result.results);

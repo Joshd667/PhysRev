@@ -1,8 +1,8 @@
 // sw.js - Fixed Service Worker for Physics Audit Tool with Analytics Support
 // Place this file in your project root (same folder as index.html)
 
-const CACHE_NAME = 'physics-audit-v2.38'; // 🔥 INCREMENT THIS WHEN YOU UPDATE THE APP
-const APP_VERSION = '2.38';
+const CACHE_NAME = 'physics-audit-v2.39'; // 🔥 INCREMENT THIS WHEN YOU UPDATE THE APP
+const APP_VERSION = '2.39';
 
 // 🎯 Core resources that should be cached
 const CRITICAL_RESOURCES = [
@@ -80,6 +80,7 @@ self.addEventListener('install', event => {
                 console.log('📦 Caching all resources...');
                 
                 // Fetch all resources (respects HTTP cache)
+                // ✅ FIX: Removed per-file logging to reduce console spam during installation
                 const cachePromises = CRITICAL_RESOURCES.map(url =>
                     fetch(url) // Use default HTTP caching
                         .then(response => {
@@ -89,7 +90,6 @@ self.addEventListener('install', event => {
                             throw new Error(`HTTP ${response.status}`);
                         })
                         .then(() => {
-                            console.log(`✅ Cached: ${url}`);
                             return { url, success: true };
                         })
                         .catch(error => {

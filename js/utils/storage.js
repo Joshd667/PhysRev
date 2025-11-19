@@ -302,10 +302,11 @@ export const storageUtils = {
      * Clear all storage including IndexedDB, Service Worker cache, and localStorage
      * ✅ FIX: Comprehensive cleanup for troubleshooting cache/memory issues
      */
-    async clearAllStorage() {
+    async clearAllStorage(unregisterServiceWorker = false) {
         const results = {
             indexedDB: false,
             serviceWorkerCache: false,
+            serviceWorkerUnregistered: false,
             localStorage: false
         };
 
@@ -319,39 +320,33 @@ export const storageUtils = {
         }
 
         try {
-            // 2. Clear Service Worker cache
-            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                const registration = await navigator.serviceWorker.ready;
+            // 2. Clear Service Worker cache and optionally unregister
+            if ('serviceWorker' in navigator) {
+                // Clear all caches directly (faster and more reliable)
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                    results.serviceWorkerCache = true;
+                    console.log(`✅ Cleared ${cacheNames.length} Service Worker cache(s)`);
+                }
 
-                // Send message to service worker to clear cache
-                const messageChannel = new MessageChannel();
-                const cacheCleared = new Promise((resolve) => {
-                    messageChannel.port1.onmessage = (event) => {
-                        if (event.data.type === 'CACHE_CLEARED') {
-                            resolve(true);
-                        }
-                    };
-                    setTimeout(() => resolve(false), 2000); // Timeout after 2s
-                });
-
-                navigator.serviceWorker.controller.postMessage(
-                    { type: 'CLEAR_CACHE' },
-                    [messageChannel.port2]
-                );
-
-                results.serviceWorkerCache = await cacheCleared;
-
-                if (results.serviceWorkerCache) {
-                    console.log('✅ Service Worker cache cleared');
-                } else {
-                    console.warn('⚠️ Service Worker cache clear timeout');
+                // Unregister Service Worker if requested (for truly fresh reload)
+                if (unregisterServiceWorker) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(registrations.map(reg => reg.unregister()));
+                    results.serviceWorkerUnregistered = registrations.length > 0;
+                    if (results.serviceWorkerUnregistered) {
+                        console.log(`✅ Unregistered ${registrations.length} Service Worker(s)`);
+                        console.log('🔄 Page will reload with NO Service Worker (fresh install)');
+                    }
                 }
             } else {
-                console.log('ℹ️ No Service Worker active');
+                console.log('ℹ️ No Service Worker support');
                 results.serviceWorkerCache = true; // Not an error
+                results.serviceWorkerUnregistered = true;
             }
         } catch (e) {
-            console.error('Failed to clear Service Worker cache:', e);
+            console.error('Failed to clear Service Worker:', e);
         }
 
         try {
