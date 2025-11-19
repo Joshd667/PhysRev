@@ -77,16 +77,22 @@ export class SearchIndex {
             fuzzy = false     // Future: fuzzy matching
         } = options;
 
+        // For short queries (1-2 chars), do direct prefix matching without tokenization
+        const rawQuery = query.toLowerCase().trim();
+        if (rawQuery.length > 0 && rawQuery.length <= 2) {
+            return this._searchWord(rawQuery);
+        }
+
         const words = this.tokenize(query);
         if (words.length === 0) return new Set();
 
-        // Get results for first word
-        let results = this.index.get(words[0]) || new Set();
+        // Get results for first word (with prefix matching)
+        let results = this._searchWord(words[0]);
 
         if (matchAll) {
             // AND search - intersection
             for (let i = 1; i < words.length; i++) {
-                const wordResults = this.index.get(words[i]) || new Set();
+                const wordResults = this._searchWord(words[i]);
                 results = new Set([...results].filter(id => wordResults.has(id)));
 
                 // Early exit if no results
@@ -95,8 +101,27 @@ export class SearchIndex {
         } else {
             // OR search - union
             for (let i = 1; i < words.length; i++) {
-                const wordResults = this.index.get(words[i]) || new Set();
+                const wordResults = this._searchWord(words[i]);
                 wordResults.forEach(id => results.add(id));
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Search for a single word with prefix matching
+     * @param {string} word - Word to search for
+     * @returns {Set<string>} Set of matching item IDs
+     * @private
+     */
+    _searchWord(word) {
+        const results = new Set();
+
+        // Iterate through index and find all words that start with the query word
+        for (const [indexWord, itemIds] of this.index.entries()) {
+            if (indexWord.startsWith(word)) {
+                itemIds.forEach(id => results.add(id));
             }
         }
 
