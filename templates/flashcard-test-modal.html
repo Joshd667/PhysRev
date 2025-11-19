@@ -96,7 +96,8 @@
             </button>
 
             <div class="flex items-center space-x-2">
-                <template x-for="(card, index) in testFlashcards" :key="index">
+                <!-- ✅ FIX: Use stable key (deckId + front text) instead of array index -->
+                <template x-for="(card, index) in testFlashcards" :key="`${card.deckId || 'deck'}-${index}-${(card.front || '').substring(0, 20)}`">
                     <div @click.stop="goToTestCard(index)"
                          :class="{
                              'bg-purple-600 border-purple-600': index === currentTestCardIndex,
@@ -247,7 +248,8 @@
 
         <!-- Review Cards List -->
         <div class="flex-1 overflow-y-auto p-6 space-y-4">
-            <template x-for="(card, index) in reviewCardsCached" :key="index">
+            <!-- ✅ FIX: Use stable key based on card content instead of array index -->
+            <template x-for="(card, index) in reviewCardsCached" :key="`review-${card.deckId || index}-${(card.front || '').substring(0, 30)}`">
                 <div class="grid grid-cols-2 gap-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                     <!-- Front Column -->
                     <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800">

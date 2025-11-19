@@ -274,8 +274,9 @@ export const searchMethods = {
                 }
             }
 
-            // Build search text for snippet generation
-            const searchText = `${topic.id || ''} ${topic.title || ''} ${topic.prompt || ''} ${(topic.learningObjectives || []).join(' ')} ${(topic.examples || []).join(' ')}`.toLowerCase();
+            // ✅ PERFORMANCE FIX: Use pre-computed search text (cached during index build)
+            // Instead of rebuilding: `${topic.id}...`.toLowerCase() on every search
+            const searchText = topic._searchText;
 
             results.push({
                 type: 'audit',

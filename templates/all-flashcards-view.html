@@ -186,7 +186,8 @@
                                                 <template x-if="!deck.cards || deck.cards.length === 0">
                                                     <p class="text-sm text-gray-500 dark:text-gray-400 italic">No cards in this deck</p>
                                                 </template>
-                                                <template x-for="(card, index) in deck.cards" :key="index">
+                                                <!-- ✅ FIX: Use stable key (deckId + card content) instead of array index -->
+                                                <template x-for="(card, index) in deck.cards" :key="`${deck.id}-card-${index}-${(card.front || '').substring(0, 30)}`">
                                                     <div class="grid grid-cols-2 gap-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                                                         <!-- Front Column -->
                                                         <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800">

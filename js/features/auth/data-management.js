@@ -3,7 +3,7 @@
 // Now using IndexedDB for better capacity and performance
 
 import { storageUtils } from '../../utils/storage.js';
-import { idbGet, idbSet, idbRemove } from '../../utils/indexeddb.js';
+import { idbGet, idbSet, idbRemove, idbSetBatch } from '../../utils/indexeddb.js';
 
 // Storage keys for separated data
 const STORAGE_KEYS = {
@@ -214,20 +214,59 @@ export const enhancedDataManagement = {
     },
 
     /**
-     * Saves all data (deprecated - kept for compatibility)
-     * Now calls individual save methods
+     * ✅ PERFORMANCE FIX: Save all data atomically in a single transaction
+     * This prevents main thread blocking from 5 separate transactions
+     */
+    async saveDataAtomic() {
+        try {
+            const prefix = this.getStoragePrefix();
+            const timestamp = new Date().toISOString();
+
+            // Prepare all save operations as a batch
+            const batchItems = [
+                {
+                    key: prefix + STORAGE_KEYS.notes,
+                    value: { data: this.userNotes || {}, lastUpdated: timestamp }
+                },
+                {
+                    key: prefix + STORAGE_KEYS.flashcards,
+                    value: { data: this.flashcardDecks || {}, lastUpdated: timestamp }
+                },
+                {
+                    key: prefix + STORAGE_KEYS.mindmaps,
+                    value: { data: this.mindmaps || {}, lastUpdated: timestamp }
+                },
+                {
+                    key: prefix + STORAGE_KEYS.confidence,
+                    value: { data: this.confidenceLevels || {}, lastUpdated: timestamp }
+                },
+                {
+                    key: prefix + STORAGE_KEYS.analytics,
+                    value: { data: this.analyticsHistoryData || [], lastUpdated: timestamp }
+                }
+            ];
+
+            // ✅ Execute all saves in a single IndexedDB transaction
+            await idbSetBatch(batchItems);
+
+            // For Teams users, trigger cloud sync after local save succeeds
+            if (this.authMethod === 'teams' && this.teamsToken && this.saveDataToTeams) {
+                this.saveDataToTeams();
+            }
+
+            return { success: true };
+        } catch (error) {
+            console.error('❌ Atomic save failed:', error);
+            return { success: false, error: error.message };
+        }
+    },
+
+    /**
+     * Saves all data (now uses atomic batched transaction)
      */
     saveData() {
-        this.saveNotes();
-        this.saveFlashcardDecks();
-        this.saveMindmaps();
-        this.saveConfidenceLevels();
-        this.saveAnalyticsHistory();
-
-        // For Teams users, trigger cloud sync
-        if (this.authMethod === 'teams' && this.teamsToken && this.saveDataToTeams) {
-            this.saveDataToTeams();
-        }
+        // Use atomic save for better performance
+        this.saveDataAtomic();
     },
 
     /**

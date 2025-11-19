@@ -313,22 +313,25 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 flashcardsIndex = new SearchIndex();
                 mindmapsIndex = new SearchIndex();
 
-                // Build audit cards index
+                // ✅ PERFORMANCE FIX: Pre-compute search text during index build
+                // Build audit cards index with cached search text
                 const auditCards = [];
                 Object.entries(this.specificationData).forEach(([sectionKey, section]) => {
                     if (!section.topics) return;
                     section.topics.forEach(topic => {
+                        // ✅ Pre-compute search text ONCE (not on every search)
+                        const searchText = `${topic.id || ''} ${topic.title || ''} ${topic.prompt || ''} ${(topic.learningObjectives || []).join(' ')} ${(topic.examples || []).join(' ')}`.toLowerCase();
+
                         auditCards.push({
                             ...topic,
                             sectionKey,
                             sectionTitle: section.title,
-                            paper: section.paper
+                            paper: section.paper,
+                            _searchText: searchText // ✅ Cached for O(1) access
                         });
                     });
                 });
-                auditCardsIndex.buildIndex(auditCards, topic =>
-                    `${topic.id || ''} ${topic.title || ''} ${topic.prompt || ''} ${(topic.learningObjectives || []).join(' ')} ${(topic.examples || []).join(' ')}`
-                );
+                auditCardsIndex.buildIndex(auditCards, topic => topic._searchText);
 
                 // Build notes index
                 notesIndex.buildIndex(Object.values(this.userNotes), note =>
@@ -613,17 +616,18 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                                        'table', 'thead', 'tbody', 'tr', 'td', 'th',
                                        'blockquote', 'code', 'pre', 'span', 'div',
                                        'hr', 'mark'],
-                        // ✅ Explicit attribute whitelist - no 'href' or 'src' by default
-                        ALLOWED_ATTR: ['class', 'style', 'data-latex'], // For KaTeX equations
+                        // ✅ SECURITY FIX: Removed 'style' attribute to prevent CSS injection
+                        ALLOWED_ATTR: ['class', 'data-latex'], // For KaTeX equations
                         // ✅ Forbid dangerous tags explicitly
                         FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'link', 'style',
                                       'form', 'input', 'button', 'textarea', 'select',
-                                      'frame', 'frameset', 'base', 'meta'],
+                                      'frame', 'frameset', 'base', 'meta', 'svg'],
                         // ✅ Forbid event handlers and javascript: URLs
                         FORBID_ATTR: ['onerror', 'onclick', 'onload', 'onmouseover', 'onfocus', 'onblur',
                                       'oninput', 'onchange', 'onsubmit', 'onreset', 'onkeydown', 'onkeyup',
                                       'onkeypress', 'onmousedown', 'onmouseup', 'onmousemove', 'onmouseenter',
-                                      'onmouseleave', 'onwheel', 'ondrag', 'ondrop', 'onscroll'],
+                                      'onmouseleave', 'onwheel', 'ondrag', 'ondrop', 'onscroll',
+                                      'style', 'src', 'href', 'xlink:href'], // ✅ Block URLs and styles
                         ALLOW_DATA_ATTR: false,
                         ALLOW_UNKNOWN_PROTOCOLS: false,
                         SAFE_FOR_TEMPLATES: true,

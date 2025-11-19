@@ -123,6 +123,51 @@ export async function idbSet(key, value) {
 }
 
 /**
+ * ✅ PERFORMANCE FIX: Set multiple values in a single IndexedDB transaction
+ * This prevents main thread blocking from multiple separate transactions
+ * @param {Array<{key: string, value: any}>} items - Array of key-value pairs to store
+ * @returns {Promise<boolean>} - True if all items saved successfully
+ */
+export async function idbSetBatch(items) {
+    if (!items || items.length === 0) {
+        return true;
+    }
+
+    return performTransaction('readwrite', (store, transaction) => {
+        return new Promise((resolve, reject) => {
+            const timestamp = Date.now();
+            const requests = [];
+
+            // Queue all puts in the same transaction
+            for (const item of items) {
+                const data = {
+                    key: item.key,
+                    value: item.value,
+                    timestamp
+                };
+
+                const request = store.put(data);
+                requests.push(new Promise((res, rej) => {
+                    request.onsuccess = () => res(true);
+                    request.onerror = () => rej(request.error);
+                }));
+            }
+
+            // Wait for all puts to complete
+            Promise.all(requests)
+                .then(() => resolve(true))
+                .catch(reject);
+
+            // Also listen to transaction complete
+            transaction.oncomplete = () => {
+                if (requests.length === 0) resolve(true);
+            };
+            transaction.onerror = () => reject(transaction.error);
+        });
+    });
+}
+
+/**
  * Get a value from IndexedDB
  */
 export async function idbGet(key) {
