@@ -47,6 +47,14 @@ let flashcardsIndex = null;
 let mindmapsIndex = null;
 let searchIndexesInitialized = false; // ⚡ Track if indexes are built
 
+// ⚡ MEMORY FIX: Chart instances stored outside Alpine reactive state
+// Storing Map in reactive state prevents garbage collection of destroyed charts
+let chartInstancesMap = new Map();
+
+// ⚡ MEMORY FIX: Search results stored outside Alpine reactive state
+// Prevents deep reactivity wrapping of large result arrays (saves 2-10MB per search)
+let cachedSearchResults = [];
+
 export function createApp(specificationData, paperModeGroups, specModeGroups, Alpine) {
     // Store large data in module-level variables (non-reactive)
     staticSpecificationData = specificationData;
@@ -75,6 +83,22 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
             },
             get topicLookup() {
                 return staticTopicLookup;
+            },
+
+            // ⚡ MEMORY FIX: Chart instances getter (non-reactive)
+            get chartInstances() {
+                return chartInstancesMap;
+            },
+
+            // ⚡ MEMORY FIX: Search results getter/setter (non-reactive)
+            // Returns cached results without Alpine's reactive wrapping
+            get searchResults() {
+                return cachedSearchResults;
+            },
+
+            // Internal setter for search feature
+            _setSearchResults(results) {
+                cachedSearchResults = results;
             },
 
             // Re-define computed properties to preserve reactivity
