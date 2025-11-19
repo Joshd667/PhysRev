@@ -467,6 +467,10 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 enhancedDataManagement.saveData.call(this);
             },
 
+            async saveDataAtomic() {
+                return await enhancedDataManagement.saveDataAtomic.call(this);
+            },
+
             async syncToMoodleBackend(data) {
                 // Placeholder for backend sync
                 try {
