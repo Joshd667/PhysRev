@@ -57,14 +57,24 @@ export const storageUtils = {
     async save(key, data) {
         try {
             // Serialize to plain object to avoid DataCloneError with Alpine.js proxies
-            const serializedData = JSON.parse(JSON.stringify(data));
+            let serializedData;
+            try {
+                const jsonString = JSON.stringify(data);
+                serializedData = JSON.parse(jsonString);
+            } catch (serializeError) {
+                console.error(`Failed to serialize data for key "${key}":`, serializeError);
+                console.log('Problematic data:', data);
+                throw serializeError;
+            }
+
             await idbSet(key, serializedData);
             return { success: true };
         } catch (error) {
             if (error.name === 'QuotaExceededError') {
                 return this._handleQuotaExceeded(key, data, error);
             }
-            console.error('Storage save error:', error);
+            console.error(`Storage save error for key "${key}":`, error);
+            console.log('Data that failed:', data);
             return { success: false, error: error.message };
         }
     },
