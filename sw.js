@@ -1,8 +1,8 @@
 // sw.js - Fixed Service Worker for Physics Audit Tool with Analytics Support
 // Place this file in your project root (same folder as index.html)
 
-const CACHE_NAME = 'physics-audit-v2.39'; // 🔥 INCREMENT THIS WHEN YOU UPDATE THE APP
-const APP_VERSION = '2.39';
+const CACHE_NAME = 'physics-audit-v2.40'; // 🔥 INCREMENT THIS WHEN YOU UPDATE THE APP
+const APP_VERSION = '2.40';
 
 // 🎯 Core resources that should be cached
 const CRITICAL_RESOURCES = [
@@ -71,16 +71,12 @@ const CRITICAL_RESOURCES = [
 ];
 
 // 🚀 Install event - aggressive cache refresh
+// ✅ FIX: Silent installation to prevent console spam - only log errors
 self.addEventListener('install', event => {
-    console.log(`🔧 Service Worker ${APP_VERSION} installing...`);
-    
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
-                console.log('📦 Caching all resources...');
-                
                 // Fetch all resources (respects HTTP cache)
-                // ✅ FIX: Removed per-file logging to reduce console spam during installation
                 const cachePromises = CRITICAL_RESOURCES.map(url =>
                     fetch(url) // Use default HTTP caching
                         .then(response => {
@@ -93,36 +89,31 @@ self.addEventListener('install', event => {
                             return { url, success: true };
                         })
                         .catch(error => {
-                            console.warn(`⚠️ Failed to cache ${url}:`, error.message);
+                            // Only log failures
+                            console.warn(`⚠️ SW: Failed to cache ${url}:`, error.message);
                             return { url, success: false, error: error.message };
                         })
                 );
-                
+
                 return Promise.all(cachePromises);
             })
             .then(results => {
-                const successful = results.filter(r => r.success).length;
                 const failed = results.filter(r => !r.success).length;
-
-                console.log(`✅ Cached ${successful}/${CRITICAL_RESOURCES.length} resources`);
+                // Only log if there were failures
                 if (failed > 0) {
-                    console.log(`⚠️ Failed to cache ${failed} resources`);
+                    console.warn(`⚠️ SW: Failed to cache ${failed}/${CRITICAL_RESOURCES.length} resources`);
                 }
-
-                // Wait for manual activation (via SKIP_WAITING message)
-                // Don't auto-activate - let user control updates
-                console.log('⏸️ Service Worker installed, waiting for manual activation');
+                // Silent success - no console spam
             })
             .catch(error => {
-                console.error('❌ Cache installation failed:', error);
+                console.error('❌ SW: Cache installation failed:', error);
             })
     );
 });
 
 // 🚀 Activate event - clean up old caches and take control immediately
+// ✅ FIX: Silent activation to prevent console spam
 self.addEventListener('activate', event => {
-    console.log(`🚀 Service Worker ${APP_VERSION} activating...`);
-    
     event.waitUntil(
         Promise.all([
             // Delete all old caches
@@ -131,7 +122,7 @@ self.addEventListener('activate', event => {
                     cacheNames
                         .filter(cacheName => cacheName !== CACHE_NAME)
                         .map(oldCacheName => {
-                            console.log(`🗑️ Deleting old cache: ${oldCacheName}`);
+                            // Silent deletion - no logging
                             return caches.delete(oldCacheName);
                         })
                 );
@@ -139,14 +130,12 @@ self.addEventListener('activate', event => {
             // Take control of all clients immediately
             self.clients.claim()
         ]).then(() => {
-            console.log('✅ Service Worker activated, old caches cleared, control claimed');
-            
-            // Notify all clients to reload
+            // Notify all clients about update (silently)
             return self.clients.matchAll();
         }).then(clients => {
             clients.forEach(client => {
-                client.postMessage({ 
-                    type: 'SW_UPDATED', 
+                client.postMessage({
+                    type: 'SW_UPDATED',
                     version: APP_VERSION,
                     action: 'reload_recommended'
                 });
@@ -265,22 +254,20 @@ async function handleRequest(request) {
     } catch (error) {
         console.error(`❌ Fetch failed for ${url.pathname}:`, error);
         
-        // Final fallback
+        // Final fallback - serve from cache silently
         const cachedResponse = await caches.match(request);
         if (cachedResponse) {
-            console.log('🔄 Serving cached fallback');
             return cachedResponse;
         }
-        
+
         // For HTML requests, serve the main page as fallback
         if (request.destination === 'document') {
             const fallback = await caches.match('./index.html');
             if (fallback) {
-                console.log('🔄 Serving offline fallback');
                 return fallback;
             }
         }
-        
+
         throw error;
     }
 }
@@ -291,17 +278,17 @@ function isAllowedExternalResource(url) {
         'unpkg.com',
         'cdn.jsdelivr.net'
     ];
-    
+
     return allowedDomains.some(domain => url.hostname.includes(domain));
 }
 
 // 📱 Handle messages from main thread
 self.addEventListener('message', event => {
     if (event.data && event.data.type === 'SKIP_WAITING') {
-        console.log('⚡ Force-activating new service worker');
+        // Silent skip waiting
         self.skipWaiting();
     }
-    
+
     if (event.data && event.data.type === 'GET_VERSION') {
         event.ports[0].postMessage({
             version: APP_VERSION,
@@ -310,8 +297,9 @@ self.addEventListener('message', event => {
             strategy: 'cache-first-with-background-update'
         });
     }
-    
+
     if (event.data && event.data.type === 'CLEAR_CACHE') {
+        // User-initiated action - log this one
         console.log('🗑️ Manual cache clear requested');
         caches.delete(CACHE_NAME).then(() => {
             event.ports[0].postMessage({ type: 'CACHE_CLEARED' });
@@ -319,4 +307,4 @@ self.addEventListener('message', event => {
     }
 });
 
-console.log(`🔧 Service Worker ${APP_VERSION} loaded with cache-first + background update strategy`);
+// ✅ Service Worker loaded - silent operation (only errors logged)
