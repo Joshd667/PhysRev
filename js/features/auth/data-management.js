@@ -222,27 +222,38 @@ export const enhancedDataManagement = {
             const prefix = this.getStoragePrefix();
             const timestamp = new Date().toISOString();
 
+            // ✅ Serialize Alpine.js proxy objects to plain objects for IndexedDB
+            // IndexedDB's structured clone algorithm can't handle Proxy objects
+            const serializeData = (data) => {
+                try {
+                    return JSON.parse(JSON.stringify(data));
+                } catch (e) {
+                    console.warn('Failed to serialize data, using empty object:', e);
+                    return Array.isArray(data) ? [] : {};
+                }
+            };
+
             // Prepare all save operations as a batch
             const batchItems = [
                 {
                     key: prefix + STORAGE_KEYS.notes,
-                    value: { data: this.userNotes || {}, lastUpdated: timestamp }
+                    value: { data: serializeData(this.userNotes || {}), lastUpdated: timestamp }
                 },
                 {
                     key: prefix + STORAGE_KEYS.flashcards,
-                    value: { data: this.flashcardDecks || {}, lastUpdated: timestamp }
+                    value: { data: serializeData(this.flashcardDecks || {}), lastUpdated: timestamp }
                 },
                 {
                     key: prefix + STORAGE_KEYS.mindmaps,
-                    value: { data: this.mindmaps || {}, lastUpdated: timestamp }
+                    value: { data: serializeData(this.mindmaps || {}), lastUpdated: timestamp }
                 },
                 {
                     key: prefix + STORAGE_KEYS.confidence,
-                    value: { data: this.confidenceLevels || {}, lastUpdated: timestamp }
+                    value: { data: serializeData(this.confidenceLevels || {}), lastUpdated: timestamp }
                 },
                 {
                     key: prefix + STORAGE_KEYS.analytics,
-                    value: { data: this.analyticsHistoryData || [], lastUpdated: timestamp }
+                    value: { data: serializeData(this.analyticsHistoryData || []), lastUpdated: timestamp }
                 }
             ];
 
