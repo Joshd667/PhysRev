@@ -366,7 +366,10 @@ export const flashcardTestMethods = {
     async saveTestResultsHistory() {
         try {
             const { idbSet } = await import('../../utils/indexeddb.js');
-            await idbSet('flashcard-test-results', this.testResultsHistory);
+
+            // ✅ Serialize Alpine.js proxy array to plain array for IndexedDB
+            const serialized = JSON.parse(JSON.stringify(this.testResultsHistory || []));
+            await idbSet('flashcard-test-results', serialized);
         } catch (error) {
             console.error('Failed to save test results:', error);
             await this.showAlert('Failed to save test results. Your browser storage might be full.', 'Save Failed');
