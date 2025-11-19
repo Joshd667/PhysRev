@@ -393,12 +393,24 @@ export const enhancedDataManagement = {
             // First, check if migration is needed
             const migrated = await this.migrateOldData();
 
-            // Load from separated storage (all async now)
-            const notesData = await this.loadDataType('notes', { data: {} });
-            const flashcardsData = await this.loadDataType('flashcards', { data: {} });
-            const mindmapsData = await this.loadDataType('mindmaps', { data: {} });
-            const confidenceData = await this.loadDataType('confidence', { data: {} });
-            const analyticsData = await this.loadDataType('analytics', { data: [] });
+            // ⚡ PERFORMANCE: Load all data types in a single IndexedDB transaction
+            const prefix = this.getStoragePrefix();
+            const keys = [
+                prefix + STORAGE_KEYS.notes,
+                prefix + STORAGE_KEYS.flashcards,
+                prefix + STORAGE_KEYS.mindmaps,
+                prefix + STORAGE_KEYS.confidence,
+                prefix + STORAGE_KEYS.analytics
+            ];
+
+            const batchData = await storageUtils.loadBatch(keys);
+
+            // Extract data from batch result with default values
+            const notesData = batchData[keys[0]] !== null ? batchData[keys[0]] : { data: {} };
+            const flashcardsData = batchData[keys[1]] !== null ? batchData[keys[1]] : { data: {} };
+            const mindmapsData = batchData[keys[2]] !== null ? batchData[keys[2]] : { data: {} };
+            const confidenceData = batchData[keys[3]] !== null ? batchData[keys[3]] : { data: {} };
+            const analyticsData = batchData[keys[4]] !== null ? batchData[keys[4]] : { data: [] };
 
             this.userNotes = notesData.data || {};
             this.flashcardDecks = flashcardsData.data || {};

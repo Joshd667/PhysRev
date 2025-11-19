@@ -72,11 +72,15 @@ export const settingsMethods = {
 
     /**
      * Loads preferences from IndexedDB
+     * ⚡ OPTIMIZED: Uses batched reads for better performance
      */
     async loadPreferences() {
         try {
-            const { idbGet } = await import('../../utils/indexeddb.js');
-            const preferences = await idbGet('physicsAuditPreferences');
+            // ⚡ Batch read preferences and old darkMode key together
+            const { idbGetBatch } = await import('../../utils/indexeddb.js');
+            const data = await idbGetBatch(['physicsAuditPreferences', 'darkMode']);
+
+            const preferences = data.physicsAuditPreferences;
             if (preferences) {
                 // Only restore if values are valid
                 if (preferences.viewMode === 'spec' || preferences.viewMode === 'paper') {
@@ -96,8 +100,8 @@ export const settingsMethods = {
                     this.revisionAreaIndicatorStyle = preferences.revisionAreaIndicatorStyle;
                 }
             } else {
-                // Migration: Check for old darkMode key
-                const oldDarkMode = await idbGet('darkMode');
+                // Migration: Check for old darkMode key (already loaded in batch)
+                const oldDarkMode = data.darkMode;
                 if (oldDarkMode !== null) {
                     this.darkMode = oldDarkMode === 'true' || oldDarkMode === true;
                     this.applyDarkMode();
