@@ -271,7 +271,7 @@ export const enhancedDataManagement = {
     /**
      * Migrate old combined storage to new separated storage
      */
-    migrateOldData() {
+    async migrateOldData() {
         try {
             let oldData = null;
             let oldKey = null;

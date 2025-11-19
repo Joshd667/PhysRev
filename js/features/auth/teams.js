@@ -341,5 +341,6 @@ export const teamsAuthMethods = {
             this.autoSaveTimer = null;
             console.log('⏹️ Auto-save stopped');
         }
-    },
+    }
+};
 
