@@ -64,7 +64,14 @@
 
         // Verify critical resources loaded
         if (!Alpine || !createApp || !dataResult) {
-            throw new Error('Critical resources failed to load');
+            const failedResources = [];
+            if (!Alpine) failedResources.push('Alpine.js');
+            if (!createApp) failedResources.push('App creator');
+            if (!dataResult) failedResources.push('Data');
+
+            console.error('❌ Failed resources:', failedResources);
+            console.error('All results:', results);
+            throw new Error(`Critical resources failed to load: ${failedResources.join(', ')}`);
         }
 
         // Create and start the app (groups now come from dataResult)
