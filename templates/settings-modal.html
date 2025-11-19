@@ -80,6 +80,14 @@
                         <i data-lucide="shield-check" class="w-5 h-5"></i>
                         <span class="font-medium">Privacy & Legal</span>
                     </button>
+
+                    <!-- Install Tab -->
+                    <button @click="activeSettingsTab = 'install'"
+                            :class="activeSettingsTab === 'install' ? 'bg-blue-600 text-white' : 'text-slate-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+                            class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors">
+                        <i data-lucide="smartphone" class="w-5 h-5"></i>
+                        <span class="font-medium">Install</span>
+                    </button>
                 </nav>
 
                 <!-- About Tab - Pinned to Bottom -->
@@ -123,7 +131,7 @@
                             </div>
 
                             <!-- Logout Button -->
-                            <button @click="logout(); closeSettings();" class="w-full flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors font-medium">
+                            <button @click="logout()" class="w-full flex items-center justify-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors font-medium">
                                 <i data-lucide="log-out" class="w-5 h-5"></i>
                                 <span>Logout</span>
                             </button>
@@ -407,50 +415,6 @@
                             </div>
                         </div>
 
-                        <!-- PWA Installation Section -->
-                        <div class="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800 space-y-4">
-                            <div class="flex items-center space-x-3 mb-3">
-                                <i data-lucide="smartphone" class="w-5 h-5 text-blue-600 dark:text-blue-400"></i>
-                                <h4 class="text-lg font-bold text-slate-800 dark:text-slate-200">Install as App</h4>
-                            </div>
-
-                            <!-- Android/Chrome Install Button -->
-                            <template x-if="window.deferredInstallPrompt">
-                                <button @click="installPWA()" class="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg transition-colors font-medium shadow-lg">
-                                    <i data-lucide="download" class="w-5 h-5"></i>
-                                    <span>Install App (Android/Chrome)</span>
-                                </button>
-                            </template>
-
-                            <!-- iOS Install Instructions -->
-                            <div class="bg-white/50 dark:bg-gray-800/50 rounded-lg p-4 space-y-2">
-                                <div class="flex items-center space-x-2 text-slate-700 dark:text-slate-300 font-semibold text-sm">
-                                    <i data-lucide="smartphone" class="w-4 h-4"></i>
-                                    <span>iOS/Safari Installation:</span>
-                                </div>
-                                <ol class="text-xs text-slate-600 dark:text-slate-400 space-y-1 pl-6">
-                                    <li class="flex items-center space-x-2">
-                                        <span class="font-mono bg-blue-100 dark:bg-blue-900/40 px-1.5 py-0.5 rounded text-blue-700 dark:text-blue-300">1.</span>
-                                        <span>Tap the Share button <svg class="w-3 h-3 inline" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16v2H6v-2H4v4h16v-4zM17 11l-5-6-5 6h3v6h4v-6z"/></svg> at the bottom</span>
-                                    </li>
-                                    <li class="flex items-center space-x-2">
-                                        <span class="font-mono bg-blue-100 dark:bg-blue-900/40 px-1.5 py-0.5 rounded text-blue-700 dark:text-blue-300">2.</span>
-                                        <span>Select "Add to Home Screen"</span>
-                                    </li>
-                                    <li class="flex items-center space-x-2">
-                                        <span class="font-mono bg-blue-100 dark:bg-blue-900/40 px-1.5 py-0.5 rounded text-blue-700 dark:text-blue-300">3.</span>
-                                        <span>Tap "Add" to confirm</span>
-                                    </li>
-                                </ol>
-                            </div>
-
-                            <div class="text-xs text-slate-600 dark:text-slate-400 text-center pt-2">
-                                <p class="flex items-center justify-center space-x-1">
-                                    <i data-lucide="info" class="w-3 h-3"></i>
-                                    <span>Installing lets you use the app offline with a native app experience</span>
-                                </p>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -526,15 +490,96 @@
                                         <i data-lucide="check-circle" class="w-5 h-5 text-green-600 dark:text-green-400"></i>
                                     </div>
                                     <div class="flex-1 text-sm text-slate-700 dark:text-slate-300">
-                                        <p class="font-semibold mb-2 text-green-800 dark:text-green-200">Privacy-First Design</p>
+                                        <p class="font-semibold mb-2 text-green-800 dark:text-green-200" x-text="authMethod === 'teams' ? 'Data Storage & Privacy' : 'Privacy-First Design'"></p>
                                         <ul class="list-disc list-inside space-y-1">
                                             <li>No cookies or tracking</li>
-                                            <li>All data stored locally on your device</li>
-                                            <li>Smart storage management (old analytics cleaned when needed)</li>
+                                            <li x-show="authMethod !== 'teams'">All data stored locally on your device</li>
+                                            <li x-show="authMethod === 'teams'">Data stored with us and backed up to your Teams user area</li>
+                                            <li x-show="authMethod !== 'teams'">Smart storage management (old analytics cleaned when needed)</li>
                                             <li>Full data export and deletion available</li>
                                         </ul>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Install Tab Content -->
+                <div x-show="activeSettingsTab === 'install'" class="space-y-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800 dark:text-slate-200 mb-4">Install App</h3>
+
+                        <!-- PWA Installation Section -->
+                        <div class="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800 space-y-4">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <i data-lucide="smartphone" class="w-5 h-5 text-blue-600 dark:text-blue-400"></i>
+                                <h4 class="text-lg font-bold text-slate-800 dark:text-slate-200">Install as Progressive Web App</h4>
+                            </div>
+
+                            <p class="text-sm text-slate-600 dark:text-slate-400">
+                                Install this app on your device for a native app experience. You'll be able to access it offline, get faster loading times, and use it just like a regular app.
+                            </p>
+
+                            <!-- Android/Chrome Install Button -->
+                            <template x-if="window.deferredInstallPrompt">
+                                <button @click="installPWA()" class="w-full flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-lg transition-colors font-medium shadow-lg">
+                                    <i data-lucide="download" class="w-5 h-5"></i>
+                                    <span>Install App (Android/Chrome)</span>
+                                </button>
+                            </template>
+
+                            <!-- iOS Install Instructions -->
+                            <div class="bg-white/50 dark:bg-gray-800/50 rounded-lg p-4 space-y-3">
+                                <div class="flex items-center space-x-2 text-slate-700 dark:text-slate-300 font-semibold text-sm">
+                                    <i data-lucide="smartphone" class="w-4 h-4"></i>
+                                    <span>iOS/Safari Installation:</span>
+                                </div>
+                                <ol class="text-xs text-slate-600 dark:text-slate-400 space-y-2 pl-6">
+                                    <li class="flex items-center space-x-2">
+                                        <span class="font-mono bg-blue-100 dark:bg-blue-900/40 px-1.5 py-0.5 rounded text-blue-700 dark:text-blue-300">1.</span>
+                                        <span>Tap the Share button <svg class="w-3 h-3 inline" fill="currentColor" viewBox="0 0 24 24"><path d="M18 16v2H6v-2H4v4h16v-4zM17 11l-5-6-5 6h3v6h4v-6z"/></svg> at the bottom</span>
+                                    </li>
+                                    <li class="flex items-center space-x-2">
+                                        <span class="font-mono bg-blue-100 dark:bg-blue-900/40 px-1.5 py-0.5 rounded text-blue-700 dark:text-blue-300">2.</span>
+                                        <span>Select "Add to Home Screen"</span>
+                                    </li>
+                                    <li class="flex items-center space-x-2">
+                                        <span class="font-mono bg-blue-100 dark:bg-blue-900/40 px-1.5 py-0.5 rounded text-blue-700 dark:text-blue-300">3.</span>
+                                        <span>Tap "Add" to confirm</span>
+                                    </li>
+                                </ol>
+                            </div>
+
+                            <!-- Benefits -->
+                            <div class="bg-white/50 dark:bg-gray-800/50 rounded-lg p-4">
+                                <div class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Benefits of Installing:</div>
+                                <ul class="text-xs text-slate-600 dark:text-slate-400 space-y-1.5">
+                                    <li class="flex items-center space-x-2">
+                                        <svg class="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span>Works offline - access your data without internet</span>
+                                    </li>
+                                    <li class="flex items-center space-x-2">
+                                        <svg class="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span>Faster loading - instant startup from home screen</span>
+                                    </li>
+                                    <li class="flex items-center space-x-2">
+                                        <svg class="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span>Native feel - fullscreen experience without browser UI</span>
+                                    </li>
+                                    <li class="flex items-center space-x-2">
+                                        <svg class="w-4 h-4 text-green-600 dark:text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <span>App icon - quick access from your home screen</span>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>

@@ -265,10 +265,8 @@ export const settingsMethods = {
 
             // Only show if user hasn't seen it before
             if (!hasSeenNotice) {
-                // Delay slightly to ensure templates are loaded and icons are ready
-                setTimeout(() => {
-                    this.openPrivacyNotice(isTeamsMode);
-                }, 500);
+                // Show immediately (templates should be loaded via template-loader)
+                this.openPrivacyNotice(isTeamsMode);
             }
         } catch (error) {
             console.warn('Failed to check privacy notice status:', error);
