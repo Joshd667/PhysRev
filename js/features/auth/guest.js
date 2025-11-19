@@ -4,13 +4,13 @@
 import { idbGet, idbSet, idbRemove } from '../../utils/indexeddb.js';
 
 export const guestAuthMethods = {
-    loginAsGuest() {
+    async loginAsGuest() {
         this.user = {
             id: 'guest',
             name: 'Guest User',
         };
         this.authMethod = 'local';
-        this.completeLogin();
+        await this.completeLogin();
     },
 
     async completeLogin() {
