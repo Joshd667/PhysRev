@@ -4,8 +4,13 @@
 export const flashcardManagementMethods = {
     /**
      * Opens the flashcard editor modal for creating a new deck
+     * ⚡ OPTIMIZED: Lazy-loads template on first use (32 KB)
      */
-    openFlashcardEditor(sectionId = null, topicId = null) {
+    async openFlashcardEditor(sectionId = null, topicId = null) {
+        // ⚡ Lazy-load flashcard editor template (32 KB) on first use
+        const { loadTemplateLazy } = await import('../../template-loader.js');
+        await loadTemplateLazy('flashcard-editor-modal-container', './templates/flashcard-editor-modal.html');
+
         this.flashcardEditorMode = 'create';
         this.flashcardEditorSectionId = sectionId || this.currentRevisionSection;
         this.flashcardEditorDeckName = '';

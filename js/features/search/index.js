@@ -140,6 +140,9 @@ export const searchMethods = {
     },
 
     _executeSearch() {
+        // ⚡ PERFORMANCE: Lazy-initialize search indexes on first search
+        this._ensureSearchIndexes();
+
         const query = this.searchQuery.toLowerCase().trim();
         let results = [];
 

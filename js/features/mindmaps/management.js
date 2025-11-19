@@ -4,8 +4,13 @@
 export const mindmapManagementMethods = {
     /**
      * Opens the mindmap editor modal for creating a new mindmap
+     * ⚡ OPTIMIZED: Lazy-loads template on first use (47 KB)
      */
-    openMindmapEditor(sectionId = null, topicId = null) {
+    async openMindmapEditor(sectionId = null, topicId = null) {
+        // ⚡ Lazy-load mindmap editor template (47 KB) on first use
+        const { loadTemplateLazy } = await import('../../template-loader.js');
+        await loadTemplateLazy('mindmap-editor-modal-container', './templates/mindmap-editor-modal.html');
+
         this.mindmapEditorMode = 'create';
         this.mindmapEditorSectionId = sectionId || this.currentRevisionSection;
         this.mindmapEditorTitle = '';

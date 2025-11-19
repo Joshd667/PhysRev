@@ -4,8 +4,13 @@
 export const noteManagementMethods = {
     /**
      * Opens the note editor modal for creating a new note
+     * ⚡ OPTIMIZED: Lazy-loads template on first use (40 KB)
      */
-    openNoteEditor(sectionId = null, topicId = null) {
+    async openNoteEditor(sectionId = null, topicId = null) {
+        // ⚡ Lazy-load note editor template (40 KB) on first use
+        const { loadTemplateLazy } = await import('../../template-loader.js');
+        await loadTemplateLazy('note-editor-modal-container', './templates/note-editor-modal.html');
+
         this.noteEditorMode = 'create';
         this.noteEditorSectionId = sectionId || this.currentRevisionSection;
         this.noteEditorTitle = '';
