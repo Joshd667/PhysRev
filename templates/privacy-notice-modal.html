@@ -58,10 +58,10 @@
                         </svg>
                     </div>
                     <div>
-                        <strong class="text-slate-800 dark:text-slate-200">Stored Locally on Your Device</strong>
+                        <strong class="text-slate-800 dark:text-slate-200" x-text="isTeamsLogin ? 'Stored with Us & Backed Up' : 'Stored Locally on Your Device'"></strong>
                         <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
                             <span x-show="!isTeamsLogin">All your confidence ratings, notes, flashcards, and study materials are stored in your browser's IndexedDB. Your data never leaves your device.</span>
-                            <span x-show="isTeamsLogin" class="text-orange-700 dark:text-orange-300 font-medium">[TEAMS MODE] Your data will be backed up to your Microsoft Teams account. Confidence ratings will be accessible to your teacher for progress monitoring. Study materials are private unless you choose to share them.</span>
+                            <span x-show="isTeamsLogin" class="text-orange-700 dark:text-orange-300 font-medium">Your data is stored with us and backed up to your Teams user area. Confidence ratings will be accessible to your teacher for progress monitoring. Study materials are private unless you choose to share them.</span>
                         </p>
                     </div>
                 </div>
@@ -234,7 +234,7 @@
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                     </svg>
-                    <span x-text="isTeamsLogin ? 'I understand - Continue to Login' : 'I understand - Start Using the App'"></span>
+                    <span>I Understand</span>
                 </button>
             </div>
         </div>
