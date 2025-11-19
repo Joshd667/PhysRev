@@ -38,7 +38,7 @@ function initWorker() {
                 console.error('Storage Worker error:', e);
                 workerCallbacks.forEach(cb => cb.reject(new Error('Worker error')));
                 workerCallbacks.clear();
-                storageWorker = null;
+                terminateWorker();
             };
         } catch (e) {
             console.warn('Web Worker not available, falling back to main thread');
@@ -46,6 +46,37 @@ function initWorker() {
         }
     }
     return storageWorker;
+}
+
+/**
+ * Terminate the Web Worker and cleanup resources
+ * ✅ FIX: Prevents memory leak from accumulating workers on page reload
+ */
+function terminateWorker() {
+    if (storageWorker) {
+        try {
+            storageWorker.terminate();
+            console.log('🧹 Storage Worker terminated');
+        } catch (e) {
+            console.warn('Failed to terminate worker:', e);
+        }
+        storageWorker = null;
+    }
+    workerCallbacks.clear();
+}
+
+// ✅ FIX: Clean up worker when page is being unloaded or hidden
+// This prevents memory leaks from accumulating workers across page reloads
+if (typeof window !== 'undefined') {
+    window.addEventListener('beforeunload', terminateWorker);
+
+    // Also terminate on page visibility change (when tab is hidden for a while)
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+            // Small delay to allow pending operations to complete
+            setTimeout(terminateWorker, 1000);
+        }
+    });
 }
 
 export const storageUtils = {
@@ -265,5 +296,93 @@ export const storageUtils = {
      */
     async init() {
         return await initIndexedDB();
+    },
+
+    /**
+     * Clear all storage including IndexedDB, Service Worker cache, and localStorage
+     * ✅ FIX: Comprehensive cleanup for troubleshooting cache/memory issues
+     */
+    async clearAllStorage() {
+        const results = {
+            indexedDB: false,
+            serviceWorkerCache: false,
+            localStorage: false
+        };
+
+        try {
+            // 1. Clear IndexedDB
+            await idbClear();
+            results.indexedDB = true;
+            console.log('✅ IndexedDB cleared');
+        } catch (e) {
+            console.error('Failed to clear IndexedDB:', e);
+        }
+
+        try {
+            // 2. Clear Service Worker cache
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                const registration = await navigator.serviceWorker.ready;
+
+                // Send message to service worker to clear cache
+                const messageChannel = new MessageChannel();
+                const cacheCleared = new Promise((resolve) => {
+                    messageChannel.port1.onmessage = (event) => {
+                        if (event.data.type === 'CACHE_CLEARED') {
+                            resolve(true);
+                        }
+                    };
+                    setTimeout(() => resolve(false), 2000); // Timeout after 2s
+                });
+
+                navigator.serviceWorker.controller.postMessage(
+                    { type: 'CLEAR_CACHE' },
+                    [messageChannel.port2]
+                );
+
+                results.serviceWorkerCache = await cacheCleared;
+
+                if (results.serviceWorkerCache) {
+                    console.log('✅ Service Worker cache cleared');
+                } else {
+                    console.warn('⚠️ Service Worker cache clear timeout');
+                }
+            } else {
+                console.log('ℹ️ No Service Worker active');
+                results.serviceWorkerCache = true; // Not an error
+            }
+        } catch (e) {
+            console.error('Failed to clear Service Worker cache:', e);
+        }
+
+        try {
+            // 3. Clear localStorage (legacy)
+            localStorage.clear();
+            results.localStorage = true;
+            console.log('✅ localStorage cleared');
+        } catch (e) {
+            console.error('Failed to clear localStorage:', e);
+        }
+
+        // 4. Terminate worker to free memory
+        terminateWorker();
+
+        const allCleared = results.indexedDB && results.serviceWorkerCache && results.localStorage;
+        console.log(allCleared ? '✅ All storage cleared' : '⚠️ Some storage types failed to clear', results);
+
+        return {
+            success: allCleared,
+            results
+        };
+    },
+
+    /**
+     * Get storage worker stats for debugging
+     */
+    getWorkerStats() {
+        return {
+            workerActive: storageWorker !== null,
+            pendingCallbacks: workerCallbacks.size,
+            lastMessageId: workerMessageId
+        };
     }
 };

@@ -119,16 +119,87 @@ export function isServiceWorkerActive() {
     return navigator.serviceWorker && navigator.serviceWorker.controller;
 }
 
-// Debug function - clear cache manually
+// Debug function - clear Service Worker cache manually
 window.clearSWCache = function() {
     if ('caches' in window) {
         caches.keys().then(names => {
             names.forEach(name => {
                 caches.delete(name);
             });
-            console.log('🗑️ All caches cleared');
+            console.log('🗑️ All Service Worker caches cleared');
             window.location.reload();
         });
+    }
+};
+
+/**
+ * ✅ FIX: Comprehensive storage cleanup function
+ * Clears ALL storage types: IndexedDB, Service Worker cache, localStorage
+ * Usage: Call `clearAllAppStorage()` from browser console to troubleshoot cache/memory issues
+ */
+window.clearAllAppStorage = async function() {
+    console.log('🧹 Starting comprehensive storage cleanup...');
+
+    try {
+        // Import storage utils
+        const { storageUtils } = await import('./utils/storage.js');
+
+        // Clear all storage using the new utility function
+        const result = await storageUtils.clearAllStorage();
+
+        if (result.success) {
+            console.log('✅ All storage cleared successfully!');
+            console.log('🔄 Reloading page in 2 seconds...');
+            setTimeout(() => window.location.reload(), 2000);
+        } else {
+            console.warn('⚠️ Some storage types failed to clear:', result.results);
+            console.log('🔄 Reloading page anyway in 2 seconds...');
+            setTimeout(() => window.location.reload(), 2000);
+        }
+
+        return result;
+    } catch (error) {
+        console.error('❌ Failed to clear storage:', error);
+        console.log('💡 Try using browser DevTools: Application → Clear storage');
+        return { success: false, error: error.message };
+    }
+};
+
+/**
+ * Get storage and worker stats for debugging
+ */
+window.getStorageStats = async function() {
+    try {
+        const { storageUtils } = await import('./utils/storage.js');
+
+        const [quota, size, workerStats] = await Promise.all([
+            storageUtils.estimateQuota(),
+            storageUtils.getStorageSizeFormatted(),
+            Promise.resolve(storageUtils.getWorkerStats())
+        ]);
+
+        const stats = {
+            storage: {
+                used: size,
+                quota: `${(quota.quota / 1024 / 1024).toFixed(0)} MB`,
+                percentUsed: `${quota.percentUsed}%`
+            },
+            worker: workerStats,
+            serviceWorker: {
+                registered: !!window.swRegistration,
+                active: isServiceWorkerActive(),
+                version: window.appUpdateState.currentVersion
+            }
+        };
+
+        console.table(stats.storage);
+        console.table(stats.worker);
+        console.table(stats.serviceWorker);
+
+        return stats;
+    } catch (error) {
+        console.error('Failed to get storage stats:', error);
+        return { error: error.message };
     }
 };
 
