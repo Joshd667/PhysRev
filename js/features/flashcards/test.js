@@ -361,12 +361,12 @@ export const flashcardTestMethods = {
     },
 
     /**
-     * Saves test results history to localStorage
+     * Saves test results history to IndexedDB
      */
     async saveTestResultsHistory() {
         try {
-            const dataToSave = JSON.stringify(this.testResultsHistory);
-            localStorage.setItem('flashcard-test-results', dataToSave);
+            const { idbSet } = await import('../../utils/indexeddb.js');
+            await idbSet('flashcard-test-results', this.testResultsHistory);
         } catch (error) {
             console.error('Failed to save test results:', error);
             await this.showAlert('Failed to save test results. Your browser storage might be full.', 'Save Failed');
@@ -374,13 +374,14 @@ export const flashcardTestMethods = {
     },
 
     /**
-     * Loads test results history from localStorage
+     * Loads test results history from IndexedDB
      */
-    loadTestResultsHistory() {
+    async loadTestResultsHistory() {
         try {
-            const saved = localStorage.getItem('flashcard-test-results');
+            const { idbGet } = await import('../../utils/indexeddb.js');
+            const saved = await idbGet('flashcard-test-results');
             if (saved) {
-                this.testResultsHistory = JSON.parse(saved);
+                this.testResultsHistory = saved;
             } else {
                 this.testResultsHistory = [];
             }

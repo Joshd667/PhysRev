@@ -13,24 +13,29 @@
 
         // Start ALL async operations in parallel
         const initPromises = [
-            // 0. Load HTML templates FIRST
+            // 0. Initialize IndexedDB and migrate from localStorage
+            import('./utils/storage.js').then(({ storageUtils }) => {
+                return storageUtils.init();
+            }),
+
+            // 1. Load HTML templates
             import('./template-loader.js').then(({ loadTemplates }) => {
                 return loadTemplates();
             }),
 
-            // 1. Load Alpine.js in parallel (pinned version for stability)
+            // 2. Load Alpine.js in parallel (pinned version for stability)
             import('https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/module.esm.js').then(module => {
                 window.Alpine = module.default;
                 return module.default;
             }),
 
-            // 2. Placeholder for group configurations (loaded with data below)
+            // 3. Placeholder for group configurations (loaded with data below)
             Promise.resolve(null),
 
-            // 3. Load physics audit tool (refactored)
+            // 4. Load physics audit tool (refactored)
             import('./core/app.js').then(module => module.createApp),
 
-            // 4. Load data (JSON first, CSV fallback) - includes revision mappings
+            // 5. Load data (JSON first, CSV fallback) - includes revision mappings
             loadDataWithFallback()
         ];
 
@@ -46,9 +51,16 @@
         }
 
         // Extract successful results
-        const [templatesLoaded, Alpine, _unused, createApp, dataResult] = results.map(r =>
+        const [idbInit, templatesLoaded, Alpine, _unused, createApp, dataResult] = results.map(r =>
             r.status === 'fulfilled' ? r.value : null
         );
+
+        // Log IndexedDB initialization status
+        if (idbInit && idbInit.success) {
+            console.log('✅ IndexedDB initialized and migration complete');
+        } else {
+            console.warn('⚠️ IndexedDB initialization had issues');
+        }
 
         // Verify critical resources loaded
         if (!Alpine || !createApp || !dataResult) {

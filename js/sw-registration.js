@@ -104,11 +104,15 @@ export function activateUpdate() {
 }
 
 // Performance monitoring
-export function getPerformanceHistory() {
-    if (typeof(Storage) !== "undefined") {
-        return JSON.parse(localStorage.getItem('perfMetrics') || '[]');
+export async function getPerformanceHistory() {
+    try {
+        const { idbGet } = await import('./utils/indexeddb.js');
+        const metrics = await idbGet('perfMetrics');
+        return metrics || [];
+    } catch (error) {
+        console.warn('Failed to load performance metrics:', error);
+        return [];
     }
-    return [];
 }
 
 export function isServiceWorkerActive() {

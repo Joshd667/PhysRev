@@ -1,5 +1,9 @@
 // js/features/auth/data-management.js
 // Enhanced data management with separated storage for better performance
+// Now using IndexedDB for better capacity and performance
+
+import { storageUtils } from '../../utils/storage.js';
+import { idbGet, idbSet, idbRemove } from '../../utils/indexeddb.js';
 
 // Storage keys for separated data
 const STORAGE_KEYS = {
@@ -79,17 +83,15 @@ export const enhancedDataManagement = {
     },
 
     /**
-     * Save specific data type to localStorage (async to avoid blocking)
+     * Save specific data type to IndexedDB (async to avoid blocking)
      */
     async saveDataType(type, data) {
         try {
             const prefix = this.getStoragePrefix();
             const key = prefix + STORAGE_KEYS[type];
 
-            // Use async serialization
-            const serialized = await this._serializeAsync(data);
-            localStorage.setItem(key, serialized);
-            return { success: true };
+            // Use IndexedDB through storage utilities
+            return await storageUtils.save(key, data);
         } catch (error) {
             if (error.name === 'QuotaExceededError') {
                 return await this._handleQuotaExceeded(type, error);
@@ -130,7 +132,7 @@ export const enhancedDataManagement = {
      * Handle quota exceeded error
      */
     async _handleQuotaExceeded(type, error) {
-        const usage = this._getStorageSize();
+        const usage = await this._getStorageSize();
         const usageMB = (usage / 1024 / 1024).toFixed(2);
 
         console.error(`Storage quota exceeded while saving ${type}. Usage: ${usageMB}MB`);
@@ -159,16 +161,10 @@ export const enhancedDataManagement = {
     },
 
     /**
-     * Get current localStorage size
+     * Get current IndexedDB storage size
      */
-    _getStorageSize() {
-        let total = 0;
-        for (let key in localStorage) {
-            if (localStorage.hasOwnProperty(key)) {
-                total += localStorage[key].length + key.length;
-            }
-        }
-        return total;
+    async _getStorageSize() {
+        return await storageUtils.getStorageSize();
     },
 
     /**
@@ -191,8 +187,8 @@ export const enhancedDataManagement = {
             }
         }
 
-        const usage = this._getStorageSize();
-        const quota = 10 * 1024 * 1024;
+        const usage = await this._getStorageSize();
+        const quota = 50 * 1024 * 1024; // IndexedDB has much larger quota
         return {
             usage,
             quota,
@@ -203,14 +199,14 @@ export const enhancedDataManagement = {
     },
 
     /**
-     * Load specific data type from localStorage
+     * Load specific data type from IndexedDB
      */
-    loadDataType(type, defaultValue = null) {
+    async loadDataType(type, defaultValue = null) {
         try {
             const prefix = this.getStoragePrefix();
             const key = prefix + STORAGE_KEYS[type];
-            const data = localStorage.getItem(key);
-            return data ? JSON.parse(data) : defaultValue;
+            const data = await storageUtils.load(key);
+            return data !== null ? data : defaultValue;
         } catch (error) {
             console.error(`Failed to load ${type}:`, error);
             return defaultValue;
@@ -283,18 +279,18 @@ export const enhancedDataManagement = {
             // Check for Teams-specific old data
             if (this.authMethod === 'teams' && this.user?.id) {
                 oldKey = `${STORAGE_KEYS.oldTeamsPrefix}${this.user.id}`;
-                const teamsData = localStorage.getItem(oldKey);
+                const teamsData = await idbGet(oldKey);
                 if (teamsData) {
-                    oldData = JSON.parse(teamsData);
+                    oldData = teamsData;
                 }
             }
 
             // Fallback to general old data
             if (!oldData) {
                 oldKey = STORAGE_KEYS.oldCombined;
-                const generalData = localStorage.getItem(oldKey);
+                const generalData = await idbGet(oldKey);
                 if (generalData) {
-                    oldData = JSON.parse(generalData);
+                    oldData = generalData;
                 }
             }
 
@@ -327,7 +323,7 @@ export const enhancedDataManagement = {
                 }
 
                 // Delete old storage after successful migration
-                localStorage.removeItem(oldKey);
+                await idbRemove(oldKey);
 
                 return true;
             }
@@ -339,17 +335,17 @@ export const enhancedDataManagement = {
         }
     },
 
-    loadSavedData() {
+    async loadSavedData() {
         try {
             // First, check if migration is needed
-            const migrated = this.migrateOldData();
+            const migrated = await this.migrateOldData();
 
-            // Load from separated storage
-            const notesData = this.loadDataType('notes', { data: {} });
-            const flashcardsData = this.loadDataType('flashcards', { data: {} });
-            const mindmapsData = this.loadDataType('mindmaps', { data: {} });
-            const confidenceData = this.loadDataType('confidence', { data: {} });
-            const analyticsData = this.loadDataType('analytics', { data: [] });
+            // Load from separated storage (all async now)
+            const notesData = await this.loadDataType('notes', { data: {} });
+            const flashcardsData = await this.loadDataType('flashcards', { data: {} });
+            const mindmapsData = await this.loadDataType('mindmaps', { data: {} });
+            const confidenceData = await this.loadDataType('confidence', { data: {} });
+            const analyticsData = await this.loadDataType('analytics', { data: [] });
 
             this.userNotes = notesData.data || {};
             this.flashcardDecks = flashcardsData.data || {};
@@ -511,7 +507,7 @@ export const enhancedDataManagement = {
         event.target.value = '';
     },
 
-    clearAllData() {
+    async clearAllData() {
         if (confirm('Are you sure you want to clear ALL your confidence ratings, notes, flashcards, and mindmaps? This cannot be undone.')) {
             // Clear in-memory data
             this.confidenceLevels = {};
@@ -523,18 +519,18 @@ export const enhancedDataManagement = {
             // Get storage prefix
             const prefix = this.getStoragePrefix();
 
-            // Clear all separated storage keys
-            localStorage.removeItem(prefix + STORAGE_KEYS.notes);
-            localStorage.removeItem(prefix + STORAGE_KEYS.flashcards);
-            localStorage.removeItem(prefix + STORAGE_KEYS.mindmaps);
-            localStorage.removeItem(prefix + STORAGE_KEYS.confidence);
-            localStorage.removeItem(prefix + STORAGE_KEYS.analytics);
-            localStorage.removeItem(STORAGE_KEYS.testResults);
+            // Clear all separated storage keys using IndexedDB
+            await storageUtils.remove(prefix + STORAGE_KEYS.notes);
+            await storageUtils.remove(prefix + STORAGE_KEYS.flashcards);
+            await storageUtils.remove(prefix + STORAGE_KEYS.mindmaps);
+            await storageUtils.remove(prefix + STORAGE_KEYS.confidence);
+            await storageUtils.remove(prefix + STORAGE_KEYS.analytics);
+            await storageUtils.remove(STORAGE_KEYS.testResults);
 
             // Also clear old combined storage (if any)
-            localStorage.removeItem(STORAGE_KEYS.oldCombined);
+            await storageUtils.remove(STORAGE_KEYS.oldCombined);
             if (this.authMethod === 'teams' && this.user?.id) {
-                localStorage.removeItem(`${STORAGE_KEYS.oldTeamsPrefix}${this.user.id}`);
+                await storageUtils.remove(`${STORAGE_KEYS.oldTeamsPrefix}${this.user.id}`);
             }
 
             // For Teams users, also clear cloud storage

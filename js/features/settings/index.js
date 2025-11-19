@@ -47,7 +47,7 @@ export const settingsMethods = {
     /**
      * Saves current state to localStorage (for persistent preferences)
      */
-    saveToLocalStorage() {
+    async saveToLocalStorage() {
         try {
             const preferences = {
                 viewMode: this.viewMode,
@@ -55,21 +55,21 @@ export const settingsMethods = {
                 darkMode: this.darkMode,
                 revisionAreaIndicatorStyle: this.revisionAreaIndicatorStyle
             };
-            localStorage.setItem('physicsAuditPreferences', JSON.stringify(preferences));
+            const { idbSet } = await import('../../utils/indexeddb.js');
+            await idbSet('physicsAuditPreferences', preferences);
         } catch (error) {
             console.warn('Failed to save preferences:', error);
         }
     },
 
     /**
-     * Loads preferences from localStorage
+     * Loads preferences from IndexedDB
      */
-    loadPreferences() {
+    async loadPreferences() {
         try {
-            const saved = localStorage.getItem('physicsAuditPreferences');
-            if (saved) {
-                const preferences = JSON.parse(saved);
-
+            const { idbGet } = await import('../../utils/indexeddb.js');
+            const preferences = await idbGet('physicsAuditPreferences');
+            if (preferences) {
                 // Only restore if values are valid
                 if (preferences.viewMode === 'spec' || preferences.viewMode === 'paper') {
                     this.viewMode = preferences.viewMode;
@@ -89,12 +89,12 @@ export const settingsMethods = {
                 }
             } else {
                 // Migration: Check for old darkMode key
-                const oldDarkMode = localStorage.getItem('darkMode');
+                const oldDarkMode = await idbGet('darkMode');
                 if (oldDarkMode !== null) {
-                    this.darkMode = oldDarkMode === 'true';
+                    this.darkMode = oldDarkMode === 'true' || oldDarkMode === true;
                     this.applyDarkMode();
                     // Save to new format
-                    this.saveToLocalStorage();
+                    await this.saveToLocalStorage();
                 } else {
                     // No saved preference, use system preference
                     this.darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;

@@ -1,5 +1,7 @@
 // js/features/auth/guest.js
-// Guest authentication (local storage only)
+// Guest authentication (IndexedDB storage)
+
+import { idbGet, idbSet, idbRemove } from '../../utils/indexeddb.js';
 
 export const guestAuthMethods = {
     loginAsGuest() {
@@ -11,23 +13,22 @@ export const guestAuthMethods = {
         this.completeLogin();
     },
 
-    completeLogin() {
+    async completeLogin() {
         const authData = {
             user: this.user,
             method: this.authMethod,
             expires: Date.now() + (24 * 60 * 60 * 1000)
         };
-        localStorage.setItem('physicsAuditAuth', JSON.stringify(authData));
+        await idbSet('physicsAuditAuth', authData);
         this.isAuthenticated = true;
         this.showLoginScreen = false;
-        this.loadSavedData();
+        await this.loadSavedData();
     },
 
-    checkExistingAuth() {
-        const savedAuth = localStorage.getItem('physicsAuditAuth');
-        if (savedAuth) {
+    async checkExistingAuth() {
+        const authData = await idbGet('physicsAuditAuth');
+        if (authData) {
             try {
-                const authData = JSON.parse(savedAuth);
                 if (authData.expires > Date.now()) {
                     this.user = authData.user;
                     this.authMethod = authData.method;
@@ -36,20 +37,20 @@ export const guestAuthMethods = {
 
                     // Restore Teams token if available (will load teams module if needed)
                     if (authData.method === 'teams' && authData.user.teamsToken) {
-                        this.loadTeamsAuth(authData);
+                        await this.loadTeamsAuth(authData);
                     }
 
-                    this.loadSavedData();
+                    await this.loadSavedData();
                     return;
                 }
             } catch (error) {
-                localStorage.removeItem('physicsAuditAuth');
+                await idbRemove('physicsAuditAuth');
             }
         }
         this.showLoginScreen = true;
     },
 
-    logout() {
+    async logout() {
         if (confirm('Are you sure you want to logout? Your data has been saved.')) {
             // Stop auto-save (if Teams)
             if (this.stopAutoSave) {
@@ -57,14 +58,14 @@ export const guestAuthMethods = {
             }
 
             // Clear authentication
-            localStorage.removeItem('physicsAuditAuth');
+            await idbRemove('physicsAuditAuth');
 
             // Clear user-specific data if it exists
             if (this.user?.id) {
                 if (this.authMethod === 'teams') {
-                    localStorage.removeItem(`physicsAuditData_teams_${this.user.id}`);
+                    await idbRemove(`physicsAuditData_teams_${this.user.id}`);
                 } else {
-                    localStorage.removeItem(`physicsAuditData_student_${this.user.id}`);
+                    await idbRemove(`physicsAuditData_student_${this.user.id}`);
                 }
             }
 
