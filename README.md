@@ -72,7 +72,7 @@ The Physics Knowledge Audit Tool helps students self-assess their confidence lev
   - Filter by confidence level (1-5 ratings or unrated)
   - Filter by topic tags/sections for targeted browsing
   - Relevance scoring with instant results
-- **Guest & Teams Login** - Local storage or Microsoft Teams integration
+- **Guest & Teams Login** - IndexedDB storage or Microsoft Teams integration
 - **Progressive Web App** - Install on device, works offline
 - **Dark Mode** - Automatic dark/light theme switching
 
@@ -83,6 +83,7 @@ The Physics Knowledge Audit Tool helps students self-assess their confidence lev
 ### Technology Stack
 
 - **Frontend Framework**: [Alpine.js](https://alpinejs.dev/) v3.13.3 (reactive UI)
+- **Database**: IndexedDB (client-side storage with 100s of MB capacity)
 - **Styling**: [TailwindCSS](https://tailwindcss.com/) (utility-first CSS)
 - **Icons**: [Lucide Icons](https://lucide.dev/)
 - **Charts**: [Chart.js](https://www.chartjs.org/)
@@ -263,7 +264,8 @@ physics-revision-main/
 │   │   ├── content-filter.js # Shared filter methods generator (eliminates triplication)
 │   │   ├── date.js           # Date formatting utilities
 │   │   ├── statistics.js     # Statistics calculations
-│   │   ├── storage.js        # localStorage helpers
+│   │   ├── storage.js        # Storage utilities (IndexedDB wrapper)
+│   │   ├── indexeddb.js      # IndexedDB core operations
 │   │   ├── topic-lookup.js   # Topic ID to info mapping
 │   │   └── ui.js             # UI utility methods
 │   │
@@ -372,11 +374,11 @@ App ready
 
 ## 💾 Data Storage
 
-### Separated Storage Architecture (v2.0)
+### IndexedDB Storage Architecture
 
-The app uses a **separated storage system** for better performance and scalability. Each data type is stored independently in localStorage, allowing for granular saves (only changed data is written).
+The app uses **IndexedDB** for all client-side storage, providing much larger capacity (hundreds of MB) compared to the previous localStorage implementation (5-10MB limit). Each data type is stored independently as key-value pairs, allowing for granular saves (only changed data is written).
 
-### Local Storage Keys
+### Storage Keys
 
 **Authentication & Preferences:**
 | Key | Purpose | Size |
@@ -404,18 +406,27 @@ The app uses a **separated storage system** for better performance and scalabili
 | `teams_{userId}_physics-analytics-history` | User-specific analytics history | ~10-50KB |
 | `flashcard-test-results` | Test results (not user-prefixed) | ~1-5KB |
 
-**Benefits of Separated Storage:**
+**Benefits of IndexedDB Storage:**
+- ✅ **Much larger capacity** - Hundreds of MB instead of 5-10MB localStorage limit
 - ✅ **Faster saves** - Only changed data type saves (e.g., editing a note only writes notes)
-- ✅ **Better performance** - Smaller write operations reduce lag
-- ✅ **Easier debugging** - Can inspect each storage key independently
-- ✅ **Scalability** - Can handle 30+ sections without slowdown
-- ✅ **Future-ready** - Enables selective sync and export features
+- ✅ **Better performance** - Asynchronous operations don't block UI, structured queries with indexes
+- ✅ **Transaction support** - Ensures data integrity during saves
+- ✅ **Easier debugging** - Can inspect data in DevTools → Application → IndexedDB
+- ✅ **Scalability** - Can handle large datasets without quota errors
+- ✅ **Future-ready** - Enables selective sync, export features, and offline-first architecture
 
-**Automatic Migration:**
-- Old combined storage (`physicsAuditData`) automatically migrates to new format
-- Migration happens once on first load after update
-- Old data deleted after successful migration
-- No data loss during migration
+**Automatic Migration from localStorage:**
+- All localStorage data automatically migrates to IndexedDB on first load
+- Migration happens transparently in the background during app initialization
+- Original localStorage data preserved until migration confirms success
+- No data loss - seamless transition for existing users
+- Migration status tracked to prevent re-running
+
+**Database Structure:**
+- **Database Name**: `PhysicsAuditDB`
+- **Object Store**: `keyValueStore` (simple key-value design)
+- **Index**: `timestamp` index for cleanup operations
+- All data serialized to plain objects to avoid Alpine.js Proxy issues
 
 ### Data Structure
 
@@ -916,9 +927,10 @@ npm run test:coverage # Coverage report
 - Clear browser cache and try again
 
 ### Data not persisting
-- Check localStorage is enabled
-- Check not in private/incognito mode
-- Check localStorage quota not exceeded
+- Check IndexedDB is enabled in browser settings
+- Check not in private/incognito mode (IndexedDB disabled in private browsing)
+- Check storage quota not exceeded (should have 100s of MB available)
+- Open DevTools → Application → IndexedDB to verify data is being stored
 
 ---
 
@@ -1708,6 +1720,56 @@ Completely rewrote canvas rendering and interaction system for optimal performan
 - `js/features/notes/display.js`
 - `js/features/notes/management.js`
 - `js/core/state.js`
+
+### v2.14 - IndexedDB Migration (2025-11-19)
+
+**🗄️ Major Storage Infrastructure Upgrade**
+
+This update migrates the entire storage system from localStorage to IndexedDB, providing dramatically increased capacity and better performance.
+
+**✨ IndexedDB Storage:**
+- **Much larger capacity** - Hundreds of MB instead of 5-10MB localStorage limit
+- **Better performance** - Asynchronous operations, transaction support, structured queries
+- **No quota errors** - Typical IndexedDB quota is 50-100+ MB (browser dependent)
+- **Automatic migration** - All existing localStorage data migrates seamlessly on first load
+- **Simple key-value design** - Maintains compatibility with existing code structure
+
+**📦 New Files:**
+- `js/utils/indexeddb.js` - IndexedDB wrapper with CRUD operations, migration logic
+- Database: `PhysicsAuditDB` with `keyValueStore` object store
+- Timestamp index for cleanup operations
+
+**🔧 Updated Files:**
+- `js/utils/storage.js` - Now uses IndexedDB instead of localStorage, maintains same async API
+- `js/features/auth/data-management.js` - All storage operations now async
+- `js/features/auth/guest.js` - Auth data stored in IndexedDB
+- `js/features/auth/teams.js` - Teams data stored in IndexedDB
+- `js/features/settings/index.js` - Preferences stored in IndexedDB
+- `js/features/flashcards/test.js` - Test results stored in IndexedDB
+- `js/utils/data-integrity.js` - Device secret stored in IndexedDB
+- `js/sw-registration.js` - Performance metrics stored in IndexedDB
+- `js/core/app.js` - Added awaits to all storage operations
+- `js/app-loader.js` - Added IndexedDB initialization to startup sequence
+
+**🔄 Migration Process:**
+- Automatic migration runs on first app load after update
+- All localStorage keys copied to IndexedDB with same key names
+- Migration status tracked to prevent re-running
+- Original localStorage data preserved for safety
+- No user action required
+
+**🐛 Fixes:**
+- Fixed DataCloneError by serializing Alpine.js reactive data to plain objects
+- Fixed quota exceeded errors - IndexedDB handles larger datasets
+- All async functions properly awaited throughout codebase
+
+**📊 Benefits:**
+- Power users can now store 10-50x more data
+- No more "quota exceeded" errors during normal usage
+- Better foundation for future features (sync, offline mode, etc.)
+- Improved data integrity with transaction support
+
+---
 
 ### v2.13 - Separated Storage Architecture & Enhanced Flashcard Testing (2025-10-26)
 
