@@ -295,11 +295,9 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
 
                     this._onlineHandler = () => {
                     this.isOnline = true;
-                    console.log('🌐 Back online');
                 };
                 this._offlineHandler = () => {
                     this.isOnline = false;
-                    console.log('📴 Gone offline');
                 };
                     window.addEventListener('online', this._onlineHandler);
                     window.addEventListener('offline', this._offlineHandler);
@@ -352,14 +350,8 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                     return;
                 }
 
-                console.log('⚡ Building search indexes (first search)...');
-                const startTime = performance.now();
-
                 this._initializeSearchIndexes();
                 searchIndexesInitialized = true;
-
-                const buildTime = performance.now() - startTime;
-                console.log(`✅ Search indexes built in ${buildTime.toFixed(0)}ms`);
             },
 
             _initializeSearchIndexes() {
@@ -517,9 +509,7 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
 
             async syncToMoodleBackend(data) {
                 try {
-                    console.log('Syncing data to backend for student:', this.user.moodleId);
                 } catch (error) {
-                    console.warn('Failed to sync to backend:', error);
                 }
             },
 
@@ -726,18 +716,15 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
 
             async syncDataNow() {
                 if (!this.isOnline) {
-                    console.warn('⚠️ Cannot sync while offline');
                     return;
                 }
 
                 if (this.syncInProgress) {
-                    console.log('ℹ️ Sync already in progress');
                     return;
                 }
 
                 try {
                     this.syncInProgress = true;
-                    console.log('🔄 Manual sync started...');
 
                     // Save current data
                     await this.saveDataAtomic();
@@ -748,7 +735,6 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                     }
 
                     this.lastSyncTime = Date.now();
-                    console.log('✅ Sync complete');
 
                 } catch (error) {
                     console.error('❌ Sync failed:', error);

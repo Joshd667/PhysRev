@@ -27,7 +27,6 @@ async function loadSubjectCSV(filename) {
         const csvData = await loadCSVFile(`resources/subject-cards/${filename}`);
 
         if (csvData.length === 0) {
-            console.warn(`No data loaded from ${filename}`);
             return {};
         }
 
@@ -48,8 +47,6 @@ async function loadSubjectCSV(filename) {
 
 // Load all subject specification data
 export async function loadAllSubjectData() {
-    console.log('Loading all subject data from CSV files...');
-
     // Reset revision mappings before loading
     revisionMapping = {};
     revisionSectionTitles = {};
@@ -72,9 +69,7 @@ export async function loadAllSubjectData() {
     let allData = {};
 
     // Load all CSV files in parallel
-    console.log(`Loading ${csvFiles.length} subject files in parallel...`);
     const loadPromises = csvFiles.map(filename => {
-        console.log(`Starting load: ${filename}`);
         return loadSubjectCSV(filename);
     });
 
@@ -85,9 +80,6 @@ export async function loadAllSubjectData() {
     allSubjectData.forEach(subjectData => {
         allData = { ...allData, ...subjectData };
     });
-
-    console.log(`✅ Loaded ${Object.keys(allData).length} sections from subject CSV files`);
-    console.log(`✅ Built revision mappings for ${Object.keys(revisionMapping).length} revision sections`);
 
     // Initialize global mappings for the enhanced tool
     initializeRevisionMappings();
@@ -101,8 +93,6 @@ function initializeRevisionMappings() {
     window.revisionMapping = revisionMapping;
     window.topicToSectionMapping = topicToSectionMapping;
     window.revisionSectionTitles = revisionSectionTitles;
-
-    console.log('✅ Revision mappings initialized from CSV data');
 }
 
 // Export revision mappings for other modules
@@ -145,8 +135,6 @@ async function loadVideos() {
         const existingVideo = allResources.videos[sectionId].find(v => v.url === videoObject.url);
         if (!existingVideo) {
             allResources.videos[sectionId].push(videoObject);
-        } else {
-            console.log(`⚠️ Skipping duplicate video URL: ${videoObject.url}`);
         }
     });
 
@@ -172,8 +160,6 @@ async function loadNotes() {
         const existingNote = allResources.notes[sectionId].find(n => n.url === noteObject.url);
         if (!existingNote) {
             allResources.notes[sectionId].push(noteObject);
-        } else {
-            console.log(`⚠️ Skipping duplicate note URL: ${noteObject.url}`);
         }
     });
 
@@ -199,8 +185,6 @@ async function loadSimulations() {
         const existingSim = allResources.simulations[sectionId].find(s => s.url === simObject.url);
         if (!existingSim) {
             allResources.simulations[sectionId].push(simObject);
-        } else {
-            console.log(`⚠️ Skipping duplicate simulation URL: ${simObject.url}`);
         }
     });
 
@@ -226,8 +210,6 @@ async function loadQuestions() {
         const existingQuestion = allResources.questions[sectionId].find(q => q.url === questionObject.url);
         if (!existingQuestion) {
             allResources.questions[sectionId].push(questionObject);
-        } else {
-            console.log(`⚠️ Skipping duplicate question URL: ${questionObject.url}`);
         }
     });
 
@@ -251,8 +233,6 @@ async function loadRevisionSections() {
 
 // Load all resource types
 export async function loadAllCSVResources() {
-    console.log('Loading all resources from CSV files...');
-
     const results = await Promise.all([
         loadVideos(),
         loadNotes(),
@@ -263,10 +243,6 @@ export async function loadAllCSVResources() {
 
     const [videoCount, noteCount, simCount, questionCount, sectionCount] = results;
     const totalResources = videoCount + noteCount + simCount + questionCount;
-
-    if (totalResources > 0) {
-        console.log(`✅ Loaded ${totalResources} resources (${sectionCount} revision sections)`);
-    }
 
     return totalResources > 0;
 }
@@ -297,8 +273,6 @@ export async function loadGroups() {
     // Use shared converter
     const groups = convertGroupsCSV(data);
 
-    console.log('✅ Loaded groups from CSV');
-
     return groups;
 }
 
@@ -308,8 +282,6 @@ export async function loadGroups() {
 
 // Load everything at once
 export async function loadAllData() {
-    console.log('🚀 Loading all CSV data (subjects + resources + groups)...');
-
     try {
         // Load subject data, resources, and groups in parallel
         const [subjectData, resourcesLoaded, groups] = await Promise.all([
@@ -317,8 +289,6 @@ export async function loadAllData() {
             loadAllCSVResources(),
             loadGroups()
         ]);
-
-        console.log('✅ All CSV data loaded successfully');
 
         return {
             specificationData: subjectData,

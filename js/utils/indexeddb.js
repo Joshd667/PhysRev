@@ -37,7 +37,6 @@ function initDB() {
 
             // Handle unexpected close
             dbInstance.onclose = () => {
-                console.warn('IndexedDB connection closed unexpectedly');
                 dbInstance = null;
                 dbInitPromise = null;
             };
@@ -47,7 +46,6 @@ function initDB() {
                 dbInstance.close();
                 dbInstance = null;
                 dbInitPromise = null;
-                console.warn('IndexedDB version changed, connection closed');
             };
 
             resolve(dbInstance);
@@ -62,13 +60,10 @@ function initDB() {
 
                 // Create index for timestamp (useful for cleanup operations)
                 objectStore.createIndex('timestamp', 'timestamp', { unique: false });
-
-                console.log('✅ IndexedDB object store created');
             }
         };
 
         request.onblocked = () => {
-            console.warn('IndexedDB upgrade blocked. Please close other tabs.');
             reject(new Error('Database upgrade blocked'));
         };
     });
@@ -326,7 +321,6 @@ export async function idbEstimateQuota() {
                     ((estimate.usage || 0) / estimate.quota * 100).toFixed(1) : 0
             };
         } catch (e) {
-            console.warn('Storage estimate failed:', e);
         }
     }
 
@@ -346,8 +340,6 @@ export async function idbEstimateQuota() {
  */
 export async function migrateFromLocalStorage() {
     try {
-        console.log('🔄 Starting localStorage → IndexedDB migration...');
-
         const db = await getDB();
         let migratedCount = 0;
         let skippedCount = 0;
@@ -356,7 +348,6 @@ export async function migrateFromLocalStorage() {
         const keys = Object.keys(localStorage);
 
         if (keys.length === 0) {
-            console.log('✅ No localStorage data to migrate');
             return { success: true, migrated: 0, skipped: 0 };
         }
 
@@ -388,8 +379,6 @@ export async function migrateFromLocalStorage() {
                 skippedCount++;
             }
         }
-
-        console.log(`✅ Migration complete: ${migratedCount} items migrated, ${skippedCount} skipped`);
 
         // Mark migration as complete
         await idbSet('_migration_complete', {
@@ -438,14 +427,7 @@ export async function initIndexedDB() {
         const migrationComplete = await isMigrationComplete();
 
         if (!migrationComplete && localStorage.length > 0) {
-            console.log('📦 First run detected, migrating localStorage to IndexedDB...');
             const result = await migrateFromLocalStorage();
-
-            if (result.success) {
-                console.log('✅ IndexedDB migration successful');
-            } else {
-                console.warn('⚠️ IndexedDB migration had issues:', result.error);
-            }
         }
 
         return { success: true };

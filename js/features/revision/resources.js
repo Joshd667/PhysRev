@@ -47,8 +47,6 @@ export const revisionResourceMethods = {
                 }
             });
 
-        } else {
-            console.warn('No revision section found for topic:', topicId);
         }
     },
 

@@ -41,8 +41,6 @@ export const teamsAuthMethods = {
         this.loginError = null;
 
         try {
-            console.log('🔐 Authenticating with Microsoft Teams...');
-            
             // Check if we're in Teams context
             if (this.isInTeamsContext()) {
                 await this.authenticateInTeams();
@@ -50,8 +48,6 @@ export const teamsAuthMethods = {
                 // Fallback to web-based OAuth flow
                 await this.authenticateWithAzureAD();
             }
-
-            console.log('✅ Teams authentication successful');
 
         } catch (error) {
             console.error('❌ Teams authentication failed:', error);
@@ -77,11 +73,9 @@ export const teamsAuthMethods = {
 
         return new Promise((resolve, reject) => {
             window.microsoftTeams.initialize();
-            
+
             // Get Teams context
             window.microsoftTeams.getContext((context) => {
-                console.log('Teams context:', context);
-                
                 // Use Teams SSO
                 window.microsoftTeams.authentication.getAuthToken({
                     resources: [TEAMS_CONFIG.CLIENT_ID],
@@ -266,8 +260,6 @@ export const teamsAuthMethods = {
     // Load physics audit data from Teams/SharePoint
     async loadDataFromTeams() {
         try {
-            console.log('📁 Loading data from Teams...');
-
             // For now, we'll store in IndexedDB with user-specific key
             // In production, you might want to use SharePoint or Teams storage
             const userSpecificKey = `physicsAuditData_teams_${this.user.id}`;
@@ -276,13 +268,9 @@ export const teamsAuthMethods = {
             if (parsedData) {
                 this.confidenceLevels = parsedData.confidenceLevels || {};
                 this.analyticsHistoryData = parsedData.analyticsHistory || [];
-                console.log('✅ Data loaded from Teams storage successfully');
-            } else {
-                console.log('📝 No physics audit data found - starting fresh');
             }
 
         } catch (error) {
-            console.warn('⚠️ Failed to load data from Teams:', error);
             // Continue without cloud data
         }
     },
@@ -294,8 +282,6 @@ export const teamsAuthMethods = {
         }
 
         try {
-            console.log('💾 Saving data to Teams...');
-
             // Prepare the data to save (serialize to plain object)
             const dataToSave = JSON.parse(JSON.stringify({
                 confidenceLevels: this.confidenceLevels,
@@ -314,7 +300,6 @@ export const teamsAuthMethods = {
             const userSpecificKey = `physicsAuditData_teams_${this.user.id}`;
             await idbSet(userSpecificKey, dataToSave);
 
-            console.log('✅ Data saved to Teams successfully');
             return true;
 
         } catch (error) {
@@ -333,8 +318,6 @@ export const teamsAuthMethods = {
             this.autoSaveTimer = setInterval(() => {
                 this.saveDataToTeams();
             }, TEAMS_CONFIG.AUTO_SAVE_INTERVAL);
-            
-            console.log('🔄 Auto-save to Teams enabled');
         }
     },
 
@@ -343,7 +326,6 @@ export const teamsAuthMethods = {
         if (this.autoSaveTimer) {
             clearInterval(this.autoSaveTimer);
             this.autoSaveTimer = null;
-            console.log('⏹️ Auto-save stopped');
         }
     }
 };

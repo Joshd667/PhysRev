@@ -112,10 +112,6 @@ export class DataIntegrity {
         if (signedData.timestamp) {
             const age = Date.now() - signedData.timestamp;
             const ninetyDays = 90 * 24 * 60 * 60 * 1000;
-
-            if (age > ninetyDays) {
-                console.warn(`⚠️ Data is ${Math.floor(age / (24 * 60 * 60 * 1000))} days old`);
-            }
         }
 
         return signedData.data;
@@ -134,7 +130,6 @@ export class DataIntegrity {
         for (const [key, value] of Object.entries(confidenceLevels)) {
             // Confidence must be integer 1-5
             if (!Number.isInteger(value) || value < 1 || value > 5) {
-                console.warn(`Invalid confidence level for ${key}: ${value}`);
                 return false;
             }
         }
@@ -155,19 +150,16 @@ export class DataIntegrity {
         for (const result of testResults) {
             // Check required fields
             if (!result.date || !result.setId) {
-                console.warn('Test result missing required fields');
                 return false;
             }
 
             // Score must be between 0-100
             if (typeof result.score !== 'number' || result.score < 0 || result.score > 100) {
-                console.warn(`Invalid test score: ${result.score}`);
                 return false;
             }
 
             // Correct/total must make sense
             if (result.correct > result.total || result.correct < 0) {
-                console.warn('Invalid correct/total count');
                 return false;
             }
         }

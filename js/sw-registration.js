@@ -33,7 +33,6 @@ export function registerServiceWorker() {
 
                             // Dispatch event to notify Alpine.js app
                             window.dispatchEvent(new CustomEvent('app-update-available'));
-                            console.log('📢 Update available - check Settings → Updates tab');
                         }
                     });
                 });
@@ -54,7 +53,6 @@ export function registerServiceWorker() {
                     const messageChannel = new MessageChannel();
                     messageChannel.port1.onmessage = (event) => {
                         window.appUpdateState.currentVersion = event.data.version;
-                        console.log(`✅ SW v${event.data.version} active`);
                     };
                     registration.active.postMessage({ type: 'GET_VERSION' }, [messageChannel.port2]);
                 }
@@ -62,8 +60,6 @@ export function registerServiceWorker() {
                 // ✅ FIX: Listen for update notifications from Service Worker
                 navigator.serviceWorker.addEventListener('message', (event) => {
                     if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
-                        console.log(`🔄 Update detected: ${event.data.url}`);
-
                         // Update global state
                         window.appUpdateState.updateAvailable = true;
 
@@ -81,8 +77,6 @@ export function registerServiceWorker() {
                 console.error('❌ Service Worker registration failed:', error);
             }
         });
-    } else {
-        console.log('❌ Service Worker not supported');
     }
 }
 
@@ -91,22 +85,18 @@ export function registerServiceWorker() {
  */
 export async function checkForUpdates() {
     if (!window.swRegistration) {
-        console.log('⚠️ Service Worker not registered');
         return { available: false, error: 'Service Worker not registered' };
     }
 
     try {
-        console.log('🔍 Checking for updates...');
         await window.swRegistration.update();
 
         // Wait a moment for update to be detected
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         if (window.appUpdateState.updateAvailable) {
-            console.log('✅ Update found!');
             return { available: true };
         } else {
-            console.log('✅ App is up to date');
             return { available: false };
         }
     } catch (error) {
@@ -120,13 +110,10 @@ export async function checkForUpdates() {
  */
 export function activateUpdate() {
     if (window.appUpdateState.newWorker) {
-        console.log('⚡ Activating update...');
         // Set flag so controllerchange knows to reload
         window.appUpdateState.skipWaitingCalled = true;
         window.appUpdateState.newWorker.postMessage({ type: 'SKIP_WAITING' });
         // Controller change event will trigger reload
-    } else {
-        console.warn('⚠️ No pending update to activate');
     }
 }
 
@@ -153,7 +140,6 @@ window.clearSWCache = function() {
             names.forEach(name => {
                 caches.delete(name);
             });
-            console.log('🗑️ All Service Worker caches cleared');
             window.location.reload();
         });
     }
@@ -170,22 +156,13 @@ window.clearSWCache = function() {
  * the Service Worker, which can cause it to reinstall and show console messages.
  */
 window.clearAllAppStorage = async function() {
-    console.log('🧹 Clearing all storage...');
-
     try {
         const { storageUtils } = await import('./utils/storage.js');
 
         // Clear everything including unregistering Service Worker
         const result = await storageUtils.clearAllStorage(true);
 
-        if (result.success) {
-            console.log('✅ All storage cleared!');
-            console.log('🔄 Reloading in 1 second...');
-            setTimeout(() => window.location.reload(), 1000);
-        } else {
-            console.warn('⚠️ Partial clear:', result.results);
-            setTimeout(() => window.location.reload(), 1000);
-        }
+        setTimeout(() => window.location.reload(), 1000);
 
         return result;
     } catch (error) {
@@ -243,7 +220,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     // Store the event for later use
     window.deferredInstallPrompt = e;
-    console.log('📱 PWA install prompt captured - Install button available in Settings → About');
 });
 
 /**
@@ -252,7 +228,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
  */
 window.installPWA = async function() {
     if (!window.deferredInstallPrompt) {
-        console.log('⚠️ Install prompt not available');
         return;
     }
 
@@ -261,7 +236,6 @@ window.installPWA = async function() {
 
     // Wait for the user's response
     const { outcome } = await window.deferredInstallPrompt.userChoice;
-    console.log(`📱 User ${outcome === 'accepted' ? 'accepted' : 'dismissed'} the install prompt`);
 
     // Clear the deferred prompt
     window.deferredInstallPrompt = null;
@@ -269,6 +243,5 @@ window.installPWA = async function() {
 
 // Track successful installation
 window.addEventListener('appinstalled', () => {
-    console.log('🎉 PWA installed successfully!');
     window.deferredInstallPrompt = null;
 });

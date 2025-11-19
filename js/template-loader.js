@@ -38,10 +38,8 @@ export async function loadTemplateLazy(id, path) {
                 window.refreshIconsDebounced();
             }
 
-            console.log(`✅ Lazy-loaded template: ${path}`);
             return true;
         } else {
-            console.warn(`⚠️ Container not found: #${id}`);
             return false;
         }
     } catch (error) {
@@ -95,7 +93,6 @@ export async function loadTemplates() {
                 container.innerHTML = html;
                 return { success: true, path };
             } else {
-                console.warn(`⚠️ Container not found: #${id}`);
                 return { success: false, path };
             }
         } catch (error) {
@@ -106,7 +103,6 @@ export async function loadTemplates() {
 
     const results = await Promise.all(loadPromises);
     const loaded = results.filter(r => r.success).length;
-    console.log(`✅ Templates loaded (${loaded}/${templates.length})`);
 
     // ⚡ Re-initialize Lucide icons after templates are inserted (debounced)
     if (window.refreshIconsDebounced) {
