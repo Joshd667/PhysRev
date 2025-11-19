@@ -240,8 +240,8 @@
                                                         <span x-show="result.tags && result.tags.length > 3" class="text-xs text-gray-500 dark:text-gray-500" x-text="`+${(result.tags?.length || 3) - 3} more`"></span>
                                                     </div>
 
-                                                    <!-- Snippet (pre-highlighted in search method - already sanitized) -->
-                                                    <p class="text-sm text-gray-500 dark:text-gray-500" x-html="result.snippet"></p>
+                                                    <!-- Snippet (SECURITY: Double sanitization for defense in depth) -->
+                                                    <p class="text-sm text-gray-500 dark:text-gray-500" x-html="sanitizeHTML(result.snippet)"></p>
                                                 </div>
 
                                                 <!-- Confidence (only for audit cards) -->
