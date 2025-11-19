@@ -3,7 +3,7 @@
 
 // ✅ ROBUST VERSIONING: Automatic timestamp-based versioning
 // Build systems can replace BUILD_TIMESTAMP with actual build time
-const BUILD_TIMESTAMP = '20250119-002'; // Format: YYYYMMDD-NNN (auto-generated)
+const BUILD_TIMESTAMP = '20250119-003'; // Format: YYYYMMDD-NNN (auto-generated)
 const CACHE_NAME = `physics-audit-v${BUILD_TIMESTAMP}`;
 const APP_VERSION = BUILD_TIMESTAMP;
 
