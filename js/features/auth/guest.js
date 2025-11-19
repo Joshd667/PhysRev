@@ -58,7 +58,12 @@ export const guestAuthMethods = {
     },
 
     async logout() {
-        if (confirm('Are you sure you want to logout? Your data has been saved.')) {
+        const confirmed = await this.showConfirm(
+            'Your data has been saved and will remain on this device. You can log back in anytime to access it.',
+            'Logout Confirmation'
+        );
+
+        if (confirmed) {
             // Stop auto-save (if Teams)
             if (this.stopAutoSave) {
                 this.stopAutoSave();

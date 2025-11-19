@@ -256,8 +256,9 @@ export const settingsMethods = {
     /**
      * Checks if user has seen the privacy notice, and shows it if not
      * Should be called after authentication
+     * @param {boolean} isTeamsMode - Whether this is for Teams login (shows Teams-specific info)
      */
-    async checkAndShowPrivacyNotice() {
+    async checkAndShowPrivacyNotice(isTeamsMode = false) {
         try {
             const { idbGet } = await import('../../utils/indexeddb.js');
             const hasSeenNotice = await idbGet('privacyNoticeSeen');
@@ -266,11 +267,50 @@ export const settingsMethods = {
             if (!hasSeenNotice) {
                 // Delay slightly to ensure templates are loaded and icons are ready
                 setTimeout(() => {
-                    this.openPrivacyNotice();
+                    this.openPrivacyNotice(isTeamsMode);
                 }, 500);
             }
         } catch (error) {
             console.warn('Failed to check privacy notice status:', error);
         }
+    },
+
+    /**
+     * Opens the privacy notice modal
+     * @param {boolean} isTeamsMode - Whether this is for Teams login
+     */
+    openPrivacyNotice(isTeamsMode = false) {
+        this.showPrivacyNoticeModal = true;
+
+        // Store Teams mode for the modal to access
+        window.isTeamsPrivacyMode = isTeamsMode;
+
+        // Refresh icons after modal opens
+        this.$nextTick(() => {
+            if (window.lucide) {
+                lucide.createIcons();
+            }
+        });
+    },
+
+    /**
+     * Continue to Teams login after privacy notice acknowledgment
+     * This is called from the privacy modal when user clicks "Continue to Login"
+     */
+    async continueToTeamsLogin() {
+        // Close privacy modal
+        this.showPrivacyNoticeModal = false;
+
+        // Mark as seen
+        try {
+            const { idbSet } = await import('../../utils/indexeddb.js');
+            await idbSet('privacyNoticeSeen', true);
+            console.log('✅ Privacy notice marked as seen');
+        } catch (error) {
+            console.warn('Failed to save privacy notice status:', error);
+        }
+
+        // Now proceed with actual Teams login
+        await this.loginWithTeams();
     }
 };
