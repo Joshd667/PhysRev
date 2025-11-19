@@ -39,8 +39,6 @@ export class SearchIndex {
                 this.index.get(word).add(item.id);
             });
         });
-
-        console.log(`📇 Search index built: ${this.items.size} items, ${this.index.size} unique words`);
     }
 
     /**
