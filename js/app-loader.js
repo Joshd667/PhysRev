@@ -48,6 +48,7 @@
         const failures = results.filter(r => r.status === 'rejected');
         if (failures.length > 0) {
             console.warn(`⚠️ ${failures.length} resource(s) failed to load:`, failures.map(f => f.reason));
+            console.error('Full failure details:', failures);
         }
 
         // Extract successful results
