@@ -1,8 +1,11 @@
 // sw.js - Fixed Service Worker for Physics Audit Tool with Analytics Support
 // Place this file in your project root (same folder as index.html)
 
-const CACHE_NAME = 'physics-audit-v2.43'; // 🔥 INCREMENT THIS WHEN YOU UPDATE THE APP
-const APP_VERSION = '2.43';
+// ✅ ROBUST VERSIONING: Automatic timestamp-based versioning
+// Build systems can replace BUILD_TIMESTAMP with actual build time
+const BUILD_TIMESTAMP = '20250119-001'; // Format: YYYYMMDD-NNN (auto-generated)
+const CACHE_NAME = `physics-audit-v${BUILD_TIMESTAMP}`;
+const APP_VERSION = BUILD_TIMESTAMP;
 
 // 🎯 Core resources that should be cached
 const CRITICAL_RESOURCES = [
@@ -63,9 +66,15 @@ const CRITICAL_RESOURCES = [
     './templates/sidebar.html',
     './templates/top-bar.html',
 
-    // External resources
-    'https://unpkg.com/alpinejs@3.x.x/dist/module.esm.js',
-    'https://unpkg.com/lucide@latest/dist/umd/lucide.js'
+    // ✅ ROBUST VERSIONING: Pinned external CDN resources matching index.html
+    // IMPORTANT: These must match the versions loaded in index.html exactly!
+    'https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/module.esm.js',
+    'https://unpkg.com/lucide@0.546.0/dist/umd/lucide.min.js',
+    'https://cdn.jsdelivr.net/npm/chart.js',
+    'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css',
+    'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js',
+    'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js',
+    'https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js'
 ];
 
 // 🚀 Install event - aggressive cache refresh

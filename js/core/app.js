@@ -290,11 +290,31 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 };
                 window.addEventListener('resize', this._resizeHandler);
 
+                // ✅ OFFLINE UX: Set up online/offline event listeners
+                this._onlineHandler = () => {
+                    this.isOnline = true;
+                    console.log('🌐 Back online');
+                };
+                this._offlineHandler = () => {
+                    this.isOnline = false;
+                    console.log('📴 Gone offline');
+                };
+                window.addEventListener('online', this._onlineHandler);
+                window.addEventListener('offline', this._offlineHandler);
+
                 // Set up cleanup on component destruction
                 this.$watch('$el', (value, oldValue) => {
-                    if (!value && oldValue && this._resizeHandler) {
-                        window.removeEventListener('resize', this._resizeHandler);
-                        this._resizeHandler = null;
+                    if (!value && oldValue) {
+                        if (this._resizeHandler) {
+                            window.removeEventListener('resize', this._resizeHandler);
+                            this._resizeHandler = null;
+                        }
+                        if (this._onlineHandler) {
+                            window.removeEventListener('online', this._onlineHandler);
+                            window.removeEventListener('offline', this._offlineHandler);
+                            this._onlineHandler = null;
+                            this._offlineHandler = null;
+                        }
                     }
                 });
 
@@ -681,6 +701,61 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                         setTimeout(() => inThrottle = false, limit);
                     }
                 };
+            },
+
+            /**
+             * ✅ OFFLINE UX: Get human-readable time since last sync
+             */
+            getTimeSinceSync() {
+                if (!this.lastSyncTime) return 'Never';
+
+                const now = Date.now();
+                const diff = now - this.lastSyncTime;
+                const seconds = Math.floor(diff / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const hours = Math.floor(minutes / 60);
+                const days = Math.floor(hours / 24);
+
+                if (seconds < 60) return 'Just now';
+                if (minutes < 60) return `${minutes}m ago`;
+                if (hours < 24) return `${hours}h ago`;
+                return `${days}d ago`;
+            },
+
+            /**
+             * ✅ OFFLINE UX: Manual sync trigger
+             */
+            async syncDataNow() {
+                if (!this.isOnline) {
+                    console.warn('⚠️ Cannot sync while offline');
+                    return;
+                }
+
+                if (this.syncInProgress) {
+                    console.log('ℹ️ Sync already in progress');
+                    return;
+                }
+
+                try {
+                    this.syncInProgress = true;
+                    console.log('🔄 Manual sync started...');
+
+                    // Save current data
+                    await this.saveDataAtomic();
+
+                    // For Teams users, sync to cloud
+                    if (this.authMethod === 'teams' && this.saveDataToTeams) {
+                        await this.saveDataToTeams();
+                    }
+
+                    this.lastSyncTime = Date.now();
+                    console.log('✅ Sync complete');
+
+                } catch (error) {
+                    console.error('❌ Sync failed:', error);
+                } finally {
+                    this.syncInProgress = false;
+                }
             }
         };
     };

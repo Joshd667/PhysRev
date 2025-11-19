@@ -260,6 +260,9 @@ export const enhancedDataManagement = {
             // ✅ Execute all saves in a single IndexedDB transaction
             await idbSetBatch(batchItems);
 
+            // ✅ OFFLINE UX: Update last sync timestamp
+            this.lastSyncTime = Date.now();
+
             // For Teams users, trigger cloud sync after local save succeeds
             if (this.authMethod === 'teams' && this.teamsToken && this.saveDataToTeams) {
                 this.saveDataToTeams();
