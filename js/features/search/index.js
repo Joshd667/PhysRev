@@ -295,24 +295,6 @@ export const searchMethods = {
         return results;
     },
 
-    // Helper to get audit cards index
-    _getAuditCardsIndex() {
-        // Access the module-level index from app.js
-        return window.physicsAuditApp?._getAuditCardsIndex?.() || { search: () => new Set(), getItems: () => [], items: new Map() };
-    },
-
-    _getNotesIndex() {
-        return window.physicsAuditApp?._getNotesIndex?.() || { search: () => new Set(), getItems: () => [], items: new Map() };
-    },
-
-    _getFlashcardsIndex() {
-        return window.physicsAuditApp?._getFlashcardsIndex?.() || { search: () => new Set(), getItems: () => [], items: new Map() };
-    },
-
-    _getMindmapsIndex() {
-        return window.physicsAuditApp?._getMindmapsIndex?.() || { search: () => new Set(), getItems: () => [], items: new Map() };
-    },
-
     _searchNotes(query) {
         const results = [];
 
