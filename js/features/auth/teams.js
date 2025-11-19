@@ -107,8 +107,8 @@ export const teamsAuthMethods = {
                             
                             // Load existing data
                             await this.loadDataFromTeams();
-                            
-                            this.completeLogin();
+
+                            await this.completeLogin();
                             this.startAutoSave();
                             
                             resolve();
@@ -220,8 +220,8 @@ export const teamsAuthMethods = {
         
         // Load existing data
         await this.loadDataFromTeams();
-        
-        this.completeLogin();
+
+        await this.completeLogin();
         this.startAutoSave();
     },
 
