@@ -174,6 +174,8 @@ export const searchMethods = {
             }
         }
 
+        console.log(`[Search] Query: "${query}", Found ${results.length} results`);
+
         // Apply sorting
         this._sortSearchResults(results, query);
 
@@ -182,6 +184,7 @@ export const searchMethods = {
         // Note: cachedSearchResults is defined in core/app.js
         // Use helper method that handles both cases
         this._updateSearchResults(results);
+        console.log(`[Search] Results updated, searchResults.length =`, this.searchResults.length);
     },
 
     _sortSearchResults(results, query) {
