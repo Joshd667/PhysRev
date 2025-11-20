@@ -9,9 +9,27 @@ export const flashcardManagementMethods = {
      * ⚡ OPTIMIZED: Lazy-loads template on first use (32 KB)
      */
     async openFlashcardEditor(sectionId = null, topicId = null) {
-        // ⚡ Lazy-load flashcard editor template (32 KB) on first use
-        const { loadTemplateLazy } = await import('../../template-loader.js');
-        await loadTemplateLazy('flashcard-editor-modal-container', './templates/flashcard-editor-modal.html');
+        try {
+            // ⚡ Lazy-load flashcard editor template (32 KB) on first use
+            const { loadTemplateLazy } = await import('../../template-loader.js');
+
+            // 🛡️ SAFETY: Handle version mismatch during updates
+            if (typeof loadTemplateLazy !== 'function') {
+                logger.warn('⚠️ loadTemplateLazy not available - reloading to complete update');
+                window.location.reload();
+                return;
+            }
+
+            await loadTemplateLazy('flashcard-editor-modal-container', './templates/flashcard-editor-modal.html');
+        } catch (error) {
+            logger.error('❌ Failed to open flashcard editor:', error);
+            if (error.message && error.message.includes('not a function')) {
+                logger.warn('🔄 Reloading to complete app update...');
+                window.location.reload();
+                return;
+            }
+            throw error;
+        }
 
         this.flashcardEditorMode = 'create';
         this.flashcardEditorSectionId = sectionId || this.currentRevisionSection;

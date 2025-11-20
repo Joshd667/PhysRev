@@ -9,9 +9,27 @@ export const mindmapManagementMethods = {
      * ⚡ OPTIMIZED: Lazy-loads template on first use (47 KB)
      */
     async openMindmapEditor(sectionId = null, topicId = null) {
-        // ⚡ Lazy-load mindmap editor template (47 KB) on first use
-        const { loadTemplateLazy } = await import('../../template-loader.js');
-        await loadTemplateLazy('mindmap-editor-modal-container', './templates/mindmap-editor-modal.html');
+        try {
+            // ⚡ Lazy-load mindmap editor template (47 KB) on first use
+            const { loadTemplateLazy } = await import('../../template-loader.js');
+
+            // 🛡️ SAFETY: Handle version mismatch during updates
+            if (typeof loadTemplateLazy !== 'function') {
+                logger.warn('⚠️ loadTemplateLazy not available - reloading to complete update');
+                window.location.reload();
+                return;
+            }
+
+            await loadTemplateLazy('mindmap-editor-modal-container', './templates/mindmap-editor-modal.html');
+        } catch (error) {
+            logger.error('❌ Failed to open mindmap editor:', error);
+            if (error.message && error.message.includes('not a function')) {
+                logger.warn('🔄 Reloading to complete app update...');
+                window.location.reload();
+                return;
+            }
+            throw error;
+        }
 
         this.mindmapEditorMode = 'create';
         this.mindmapEditorSectionId = sectionId || this.currentRevisionSection;

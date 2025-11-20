@@ -9,9 +9,27 @@ export const noteManagementMethods = {
      * ⚡ OPTIMIZED: Lazy-loads template on first use (40 KB)
      */
     async openNoteEditor(sectionId = null, topicId = null) {
-        // ⚡ Lazy-load note editor template (40 KB) on first use
-        const { loadTemplateLazy } = await import('../../template-loader.js');
-        await loadTemplateLazy('note-editor-modal-container', './templates/note-editor-modal.html');
+        try {
+            // ⚡ Lazy-load note editor template (40 KB) on first use
+            const { loadTemplateLazy } = await import('../../template-loader.js');
+
+            // 🛡️ SAFETY: Handle version mismatch during updates
+            if (typeof loadTemplateLazy !== 'function') {
+                logger.warn('⚠️ loadTemplateLazy not available - reloading to complete update');
+                window.location.reload();
+                return;
+            }
+
+            await loadTemplateLazy('note-editor-modal-container', './templates/note-editor-modal.html');
+        } catch (error) {
+            logger.error('❌ Failed to open note editor:', error);
+            if (error.message && error.message.includes('not a function')) {
+                logger.warn('🔄 Reloading to complete app update...');
+                window.location.reload();
+                return;
+            }
+            throw error;
+        }
 
         this.noteEditorMode = 'create';
         this.noteEditorSectionId = sectionId || this.currentRevisionSection;
