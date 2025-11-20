@@ -361,11 +361,11 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 flashcardsIndex = new SearchIndex();
                 mindmapsIndex = new SearchIndex();
 
-                console.log('[Search Index] Building indexes...');
-                console.log('[Search Index] specificationData keys:', Object.keys(this.specificationData || {}).length);
-                console.log('[Search Index] userNotes count:', Object.keys(this.userNotes || {}).length);
-                console.log('[Search Index] flashcardDecks count:', Object.keys(this.flashcardDecks || {}).length);
-                console.log('[Search Index] mindmaps count:', Object.keys(this.mindmaps || {}).length);
+                logger.debug('[Search Index] Building indexes...');
+                logger.debug('[Search Index] specificationData keys:', Object.keys(this.specificationData || {}).length);
+                logger.debug('[Search Index] userNotes count:', Object.keys(this.userNotes || {}).length);
+                logger.debug('[Search Index] flashcardDecks count:', Object.keys(this.flashcardDecks || {}).length);
+                logger.debug('[Search Index] mindmaps count:', Object.keys(this.mindmaps || {}).length);
 
                 // ⚡ PERFORMANCE: Pre-compute search text during index build
                 const auditCards = [];
@@ -400,23 +400,23 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                     return `${mindmap.title || ''} ${shapesText} ${(mindmap.tags || []).join(' ')}`;
                 });
 
-                console.log('[Search Index] Indexes built:');
-                console.log('  - Audit cards:', auditCardsIndex.items.size, 'items,', auditCardsIndex.index.size, 'words');
-                console.log('  - Notes:', notesIndex.items.size, 'items,', notesIndex.index.size, 'words');
-                console.log('  - Flashcards:', flashcardsIndex.items.size, 'items,', flashcardsIndex.index.size, 'words');
-                console.log('  - Mindmaps:', mindmapsIndex.items.size, 'items,', mindmapsIndex.index.size, 'words');
+                logger.debug('[Search Index] Indexes built:');
+                logger.debug('  - Audit cards:', auditCardsIndex.items.size, 'items,', auditCardsIndex.index.size, 'words');
+                logger.debug('  - Notes:', notesIndex.items.size, 'items,', notesIndex.index.size, 'words');
+                logger.debug('  - Flashcards:', flashcardsIndex.items.size, 'items,', flashcardsIndex.index.size, 'words');
+                logger.debug('  - Mindmaps:', mindmapsIndex.items.size, 'items,', mindmapsIndex.index.size, 'words');
 
                 // Show sample indexed content to verify no code leaking in
                 if (notesIndex.items.size > 0) {
                     const firstNote = Array.from(notesIndex.items.values())[0];
-                    console.log('[Search Index] Sample note content:',
+                    logger.debug('[Search Index] Sample note content:',
                         (firstNote.title || '').substring(0, 50),
                         (firstNote.content || '').substring(0, 100).replace(/\n/g, ' '));
                 }
                 if (mindmapsIndex.items.size > 0) {
                     const firstMindmap = Array.from(mindmapsIndex.items.values())[0];
                     const sampleShapes = (firstMindmap.shapes || []).slice(0, 2).map(s => s.text || '').join(', ');
-                    console.log('[Search Index] Sample mindmap content:', firstMindmap.title, '| shapes:', sampleShapes.substring(0, 100));
+                    logger.debug('[Search Index] Sample mindmap content:', firstMindmap.title, '| shapes:', sampleShapes.substring(0, 100));
                 }
             },
 
