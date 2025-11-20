@@ -1,4 +1,5 @@
 // js/data/index.js - Using unified CSV loader
+import { logger } from '../utils/logger.js';
 import { loadAllData } from './unified-csv-loader.js';
 
 // CSV-based data loading - will be populated by loadAllData()
@@ -21,7 +22,7 @@ export async function initializeData() {
 
         return true;
     } catch (error) {
-        console.error('❌ Failed to load specification data:', error);
+        logger.error('❌ Failed to load specification data:', error);
 
         // Fallback to empty data structure
         specificationData = {};

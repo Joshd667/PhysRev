@@ -1,3 +1,4 @@
+import { logger } from '../utils/logger.js';
 import { createState } from './state.js';
 import { setupWatchers } from './watchers.js';
 
@@ -324,7 +325,7 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                     // Indexes will be built lazily when user performs first search
 
                 } catch (error) {
-                    console.error('❌ App initialization failed:', error);
+                    logger.error('❌ App initialization failed:', error);
 
                     const fallback = document.getElementById('error-fallback');
                     const errorMessage = document.getElementById('error-message');
@@ -737,7 +738,7 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                     this.lastSyncTime = Date.now();
 
                 } catch (error) {
-                    console.error('❌ Sync failed:', error);
+                    logger.error('❌ Sync failed:', error);
                 } finally {
                     this.syncInProgress = false;
                 }

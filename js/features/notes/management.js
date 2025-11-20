@@ -1,6 +1,8 @@
 // js/features/notes/management.js
 // CRUD operations for user notes
 
+import { logger } from '../../utils/logger.js';
+
 export const noteManagementMethods = {
     /**
      * Opens the note editor modal for creating a new note
@@ -46,7 +48,7 @@ export const noteManagementMethods = {
     editNote(noteId) {
         const note = this.userNotes[noteId];
         if (!note) {
-            console.warn('Note not found:', noteId);
+            logger.warn('Note not found:', noteId);
             return;
         }
 
