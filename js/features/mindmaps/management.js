@@ -114,21 +114,24 @@ export const mindmapManagementMethods = {
 
     /**
      * Closes the mindmap editor modal with unsaved changes warning
+     * @param {boolean} skipConfirmation - Skip the unsaved changes warning (e.g., after saving)
      */
-    async closeMindmapEditor() {
-        // Check if there are unsaved changes
-        const hasContent = this.mindmapEditorTitle.trim() ||
-                          this.mindmapEditorData.nodes.length > 0 ||
-                          this.mindmapEditorData.connections.length > 0;
+    async closeMindmapEditor(skipConfirmation = false) {
+        // Check if there are unsaved changes (unless skipping confirmation)
+        if (!skipConfirmation) {
+            const hasContent = this.mindmapEditorTitle.trim() ||
+                              this.mindmapEditorData.nodes.length > 0 ||
+                              this.mindmapEditorData.connections.length > 0;
 
-        if (hasContent) {
-            const confirmed = await this.showConfirm(
-                'You have unsaved changes. Are you sure you want to close without saving?',
-                'Unsaved Changes'
-            );
+            if (hasContent) {
+                const confirmed = await this.showConfirm(
+                    'You have unsaved changes. Are you sure you want to close without saving?',
+                    'Unsaved Changes'
+                );
 
-            if (!confirmed) {
-                return; // User cancelled, keep editor open
+                if (!confirmed) {
+                    return; // User cancelled, keep editor open
+                }
             }
         }
 
@@ -211,8 +214,8 @@ export const mindmapManagementMethods = {
         // Save to localStorage
         this.saveMindmaps();
 
-        // Close editor
-        this.closeMindmapEditor();
+        // Close editor (skip confirmation since we just saved)
+        this.closeMindmapEditor(true);
 
         // Refresh icons after save
         this.$nextTick(() => {

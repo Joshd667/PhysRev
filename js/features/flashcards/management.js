@@ -130,22 +130,25 @@ export const flashcardManagementMethods = {
 
     /**
      * Closes the flashcard editor modal with unsaved changes warning
+     * @param {boolean} skipConfirmation - Skip the unsaved changes warning (e.g., after saving)
      */
-    async closeFlashcardEditor() {
-        // Check if there are unsaved changes
-        const hasContent = this.flashcardEditorDeckName.trim() ||
-                          this.flashcardEditorCards.length > 0 ||
-                          this.flashcardEditorCurrentCardFront.trim() ||
-                          this.flashcardEditorCurrentCardBack.trim();
+    async closeFlashcardEditor(skipConfirmation = false) {
+        // Check if there are unsaved changes (unless skipping confirmation)
+        if (!skipConfirmation) {
+            const hasContent = this.flashcardEditorDeckName.trim() ||
+                              this.flashcardEditorCards.length > 0 ||
+                              this.flashcardEditorCurrentCardFront.trim() ||
+                              this.flashcardEditorCurrentCardBack.trim();
 
-        if (hasContent) {
-            const confirmed = await this.showConfirm(
-                'You have unsaved changes. Are you sure you want to close without saving?',
-                'Unsaved Changes'
-            );
+            if (hasContent) {
+                const confirmed = await this.showConfirm(
+                    'You have unsaved changes. Are you sure you want to close without saving?',
+                    'Unsaved Changes'
+                );
 
-            if (!confirmed) {
-                return; // User cancelled, keep editor open
+                if (!confirmed) {
+                    return; // User cancelled, keep editor open
+                }
             }
         }
 
@@ -215,8 +218,8 @@ export const flashcardManagementMethods = {
         // Save to localStorage
         this.saveFlashcardDecks();
 
-        // Close editor
-        this.closeFlashcardEditor();
+        // Close editor (skip confirmation since we just saved)
+        this.closeFlashcardEditor(true);
 
         // Refresh icons
         this.$nextTick(() => {
