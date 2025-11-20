@@ -183,14 +183,17 @@ export const searchMethods = {
         this._initSearchPagination();
     },
 
-    _initSearchPagination() {
+    async _initSearchPagination() {
         // Initialize or update search pagination
         if (this.searchPagination) {
             this.searchPagination.updateItems(this.searchResults);
         } else {
-            // Import and create pagination using the magic helper
-            if (this.$paginated) {
-                this.searchPagination = this.$paginated(this.searchResults, 20, 10);
+            // Import pagination function directly to avoid Alpine reactivity traps
+            try {
+                const { paginatedList } = await import('../../components/paginated-list.js');
+                this.searchPagination = paginatedList(this.searchResults, 20, 10);
+            } catch (error) {
+                console.warn('Failed to initialize search pagination:', error);
             }
         }
     },
