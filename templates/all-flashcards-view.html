@@ -225,10 +225,23 @@
         </div>
 
         <!-- Card View Mode -->
-        <div x-show="flashcardsGroupedBySection.length > 0 && flashcardViewMode === 'card'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); })" x-effect="if (flashcardViewMode === 'card' && window.lucide) { $nextTick(() => lucide.createIcons()); }">
-            <template x-for="group in flashcardsGroupedBySection" :key="group.groupTitle">
-                <template x-for="section in group.sections" :key="section.sectionName">
-                    <template x-for="deck in section.decks" :key="deck.id">
+        <!-- ✅ PAGINATION: Flatten and paginate flashcard decks -->
+        <div x-show="flashcardsGroupedBySection.length > 0 && flashcardViewMode === 'card'"
+             x-data="{
+                 get allDecks() {
+                     return flashcardsGroupedBySection.flatMap(g => g.sections.flatMap(s => s.decks));
+                 },
+                 deckPagination: null
+             }"
+             x-init="deckPagination = $paginated(allDecks, 30, 15); $watch('allDecks', (value) => deckPagination.updateItems(value))">
+
+            <!-- Deck count info -->
+            <div x-show="deckPagination && deckPagination.totalCount > 30" class="mb-4 text-sm text-gray-600 dark:text-gray-400 text-center">
+                Showing <span x-text="deckPagination.visibleItems.length"></span> of <span x-text="deckPagination.totalCount"></span> decks
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); })" x-effect="if (flashcardViewMode === 'card' && window.lucide) { $nextTick(() => lucide.createIcons()); }">
+                <template x-for="deck in (deckPagination ? deckPagination.visibleItems : allDecks)" :key="deck.id">
                         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-2 hover:shadow-lg transition-all flex flex-col h-full" :class="deck.pinned ? 'border-yellow-400 dark:border-yellow-500' : 'border-gray-200 dark:border-gray-700'">
                             <div class="p-6 flex-1 flex flex-col">
                                 <!-- Header with Actions -->
@@ -303,9 +316,33 @@
                                 </div>
                             </div>
                         </div>
-                    </template>
                 </template>
-            </template>
+            </div>
+
+            <!-- ✅ PAGINATION: Load More Button for Flashcard Decks -->
+            <div x-show="deckPagination && deckPagination.hasMore" class="flex flex-col items-center gap-3 py-6 mt-4">
+                <!-- Progress bar -->
+                <div class="w-full max-w-md">
+                    <div class="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
+                        <span>Showing <span x-text="deckPagination.visibleItems.length"></span> of <span x-text="deckPagination.totalCount"></span> decks</span>
+                        <span x-text="deckPagination.percentageLoaded + '%'"></span>
+                    </div>
+                    <div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300 ease-out" :style="`width: ${deckPagination.percentageLoaded}%`"></div>
+                    </div>
+                </div>
+
+                <!-- Load More Button -->
+                <button @click="deckPagination.loadMore()" aria-label="Load more flashcard decks" class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center space-x-2">
+                    <i data-lucide="arrow-down-circle" class="w-5 h-5" aria-hidden="true"></i>
+                    <span>Load More (<span x-text="deckPagination.remainingCount"></span> decks)</span>
+                </button>
+
+                <!-- Show All Button -->
+                <button x-show="deckPagination.remainingCount < 30" @click="deckPagination.showAll()" aria-label="Show all flashcard decks" class="px-4 py-2 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium underline">
+                    Show All Decks
+                </button>
+            </div>
         </div>
     </div>
     <!-- End View All Flashcards Mode -->
