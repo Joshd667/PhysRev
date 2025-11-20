@@ -1,6 +1,8 @@
 // js/features/mindmaps/canvas.js
 // Canvas implementation for mind maps
 
+import { logger } from '../../utils/logger.js';
+
 // ⚡ PERFORMANCE: Static defaults outside Alpine's reactive system to save memory
 const DEFAULT_SHAPE_STYLES = {
     rectangle: { borderColor: '#1976d2', borderWidth: 2, borderRadius: '4px', fill: '#ffffff', opacity: 1 },
@@ -708,7 +710,7 @@ export const mindmapCanvasMethods = {
                         selection.addRange(this._savedSelection.cloneRange());
                     } catch (e) {
                         // Selection might be invalid, just continue
-                        console.warn('Could not restore selection:', e);
+                        logger.warn('Could not restore selection:', e);
                     }
                 }
 
@@ -716,7 +718,7 @@ export const mindmapCanvasMethods = {
                 const success = document.execCommand(command, false, value);
 
                 if (!success) {
-                    console.warn('execCommand failed for:', command);
+                    logger.warn('execCommand failed for:', command);
                 }
 
                 // Save the new selection and update format states
@@ -805,7 +807,7 @@ export const mindmapCanvasMethods = {
      */
     async insertEquationIntoShape(latex) {
         if (!this.equationTargetShape) {
-            console.error('No target shape for equation');
+            logger.error('No target shape for equation');
             return;
         }
 
@@ -872,7 +874,7 @@ export const mindmapCanvasMethods = {
             this.renderConnections();
 
         } catch (error) {
-            console.error('Error inserting equation:', error);
+            logger.error('Error inserting equation:', error);
             await this.showAlert('Error inserting equation: ' + error.message, 'Equation Error');
         }
     },
@@ -1104,7 +1106,7 @@ export const mindmapCanvasMethods = {
     renderShapes() {
         const container = document.getElementById('shapesContainer');
         if (!container) {
-            console.warn('shapesContainer not found!');
+            logger.warn('shapesContainer not found!');
             return;
         }
 

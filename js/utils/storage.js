@@ -1,6 +1,6 @@
 // js/utils/storage.js
 // IndexedDB storage utility functions with async operations and quota handling
-// Migrated from localStorage to IndexedDB for better capacity and performance
+// Uses IndexedDB for large storage capacity (100s of MB) and better performance
 
 import {
     idbSet,
@@ -95,8 +95,8 @@ export const storageUtils = {
                 const jsonString = JSON.stringify(data);
                 serializedData = JSON.parse(jsonString);
             } catch (serializeError) {
-                console.error(`Failed to serialize data for key "${key}":`, serializeError);
-                console.log('Problematic data:', data);
+                logger.error(`Failed to serialize data for key "${key}":`, serializeError);
+                logger.log('Problematic data:', data);
                 throw serializeError;
             }
 
@@ -106,8 +106,8 @@ export const storageUtils = {
             if (error.name === 'QuotaExceededError') {
                 return this._handleQuotaExceeded(key, data, error);
             }
-            console.error(`Storage save error for key "${key}":`, error);
-            console.log('Data that failed:', data);
+            logger.error(`Storage save error for key "${key}":`, error);
+            logger.log('Data that failed:', data);
             return { success: false, error: error.message };
         }
     },
@@ -191,12 +191,12 @@ export const storageUtils = {
             const cleaned = originalCount - analyticsData.data.length;
             if (cleaned > 0) {
                 await idbSet(analyticsKey, analyticsData);
-                console.log(`🧹 Cleaned up ${cleaned} old analytics entries`);
+                logger.log(`🧹 Cleaned up ${cleaned} old analytics entries`);
             }
 
             return cleaned;
         } catch (e) {
-            console.warn('Error cleaning analytics:', e);
+            logger.warn('Error cleaning analytics:', e);
             return 0;
         }
     },
@@ -209,7 +209,7 @@ export const storageUtils = {
         const usage = this.getStorageSize();
         const usageMB = (usage / 1024 / 1024).toFixed(2);
 
-        console.warn(`⚠️ Storage quota exceeded. Current usage: ${usageMB}MB`);
+        logger.warn(`⚠️ Storage quota exceeded. Current usage: ${usageMB}MB`);
 
         // 1. Attempt automatic cleanup of old analytics data
         const cleaned = await this.cleanupOldAnalytics();
@@ -219,11 +219,11 @@ export const storageUtils = {
             try {
                 const serializedData = JSON.parse(JSON.stringify(data));
                 await idbSet(key, serializedData);
-                console.log(`✅ Save succeeded after cleanup (removed ${cleaned} entries)`);
+                logger.log(`✅ Save succeeded after cleanup (removed ${cleaned} entries)`);
                 return { success: true, cleaned };
             } catch (retryError) {
                 // Still failed after cleanup
-                console.error('Save failed even after cleanup');
+                logger.error('Save failed even after cleanup');
             }
         }
 
@@ -267,7 +267,7 @@ export const storageUtils = {
             const data = await idbGet(key);
             return data;
         } catch (error) {
-            console.error('Storage load error:', error);
+            logger.error('Storage load error:', error);
             return null;
         }
     },
@@ -282,7 +282,7 @@ export const storageUtils = {
             const data = await idbGetBatch(keys);
             return data;
         } catch (error) {
-            console.error('Storage batch load error:', error);
+            logger.error('Storage batch load error:', error);
             // Return object with all keys set to null on error
             return Object.fromEntries(keys.map(key => [key, null]));
         }
@@ -293,7 +293,7 @@ export const storageUtils = {
             await idbRemove(key);
             return true;
         } catch (error) {
-            console.error('Storage remove error:', error);
+            logger.error('Storage remove error:', error);
             return false;
         }
     },
@@ -303,13 +303,13 @@ export const storageUtils = {
             await idbClear();
             return true;
         } catch (error) {
-            console.error('Storage clear error:', error);
+            logger.error('Storage clear error:', error);
             return false;
         }
     },
 
     /**
-     * Initialize IndexedDB and migrate data from localStorage if needed
+     * Initialize IndexedDB
      * Should be called on app startup
      */
     async init() {
@@ -332,9 +332,9 @@ export const storageUtils = {
             // 1. Clear IndexedDB
             await idbClear();
             results.indexedDB = true;
-            console.log('✅ IndexedDB cleared');
+            logger.log('✅ IndexedDB cleared');
         } catch (e) {
-            console.error('Failed to clear IndexedDB:', e);
+            logger.error('Failed to clear IndexedDB:', e);
         }
 
         try {
@@ -345,7 +345,7 @@ export const storageUtils = {
                     const cacheNames = await caches.keys();
                     await Promise.all(cacheNames.map(name => caches.delete(name)));
                     results.serviceWorkerCache = true;
-                    console.log(`✅ Cleared ${cacheNames.length} Service Worker cache(s)`);
+                    logger.log(`✅ Cleared ${cacheNames.length} Service Worker cache(s)`);
                 }
 
                 // Unregister Service Worker if requested (for truly fresh reload)
@@ -354,33 +354,33 @@ export const storageUtils = {
                     await Promise.all(registrations.map(reg => reg.unregister()));
                     results.serviceWorkerUnregistered = registrations.length > 0;
                     if (results.serviceWorkerUnregistered) {
-                        console.log(`✅ Unregistered ${registrations.length} Service Worker(s)`);
-                        console.log('🔄 Page will reload with NO Service Worker (fresh install)');
+                        logger.log(`✅ Unregistered ${registrations.length} Service Worker(s)`);
+                        logger.log('🔄 Page will reload with NO Service Worker (fresh install)');
                     }
                 }
             } else {
-                console.log('ℹ️ No Service Worker support');
+                logger.log('ℹ️ No Service Worker support');
                 results.serviceWorkerCache = true; // Not an error
                 results.serviceWorkerUnregistered = true;
             }
         } catch (e) {
-            console.error('Failed to clear Service Worker:', e);
+            logger.error('Failed to clear Service Worker:', e);
         }
 
         try {
             // 3. Clear localStorage (legacy)
             localStorage.clear();
             results.localStorage = true;
-            console.log('✅ localStorage cleared');
+            logger.log('✅ localStorage cleared');
         } catch (e) {
-            console.error('Failed to clear localStorage:', e);
+            logger.error('Failed to clear localStorage:', e);
         }
 
         // 4. Terminate worker to free memory
         terminateWorker();
 
         const allCleared = results.indexedDB && results.serviceWorkerCache && results.localStorage;
-        console.log(allCleared ? '✅ All storage cleared' : '⚠️ Some storage types failed to clear', results);
+        logger.log(allCleared ? '✅ All storage cleared' : '⚠️ Some storage types failed to clear', results);
 
         return {
             success: allCleared,
