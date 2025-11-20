@@ -837,25 +837,27 @@ export const mindmapCanvasMethods = {
             // Create equation HTML with container and zero-width spaces for cursor navigation
             const equationHtml = `\u200B<span contenteditable="false" class="katex-container" data-latex="${latex.replace(/"/g, '&quot;')}" style="display: inline; padding: 2px 5px; margin: 0 2px; background: rgba(168, 85, 247, 0.1); border-radius: 4px;">${renderedEquation}</span>\u200B`;
 
-            // If currently editing, insert at cursor position
+            // If currently editing, append to the shape content directly
+            // (We can't use window.getSelection() because the cursor is in the equation editor, not the shape)
             if (this.editingShape && this.editingShape.id === targetShape.id) {
-                const selection = window.getSelection();
-                if (selection.rangeCount > 0) {
-                    const range = selection.getRangeAt(0);
-                    range.deleteContents();
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = equationHtml;
-                    const frag = document.createDocumentFragment();
-                    while (tempDiv.firstChild) {
-                        frag.appendChild(tempDiv.firstChild);
-                    }
-                    range.insertNode(frag);
+                // Simply append to the end of the current content
+                if (targetShape.content) {
+                    targetShape.content += equationHtml;
+                } else {
+                    targetShape.content = equationHtml;
+                }
 
-                    // Get the editable element and update the shape content
-                    const editableEl = document.querySelector(`[data-shape-id="${targetShape.id}"] .shape-content`) ||
-                                     document.querySelector(`[data-shape-id="${targetShape.id}"]`);
+                // Update the DOM element to reflect the new content
+                const shapeEl = document.querySelector(`[data-shape-id="${targetShape.id}"] .shape-content`);
+                if (shapeEl) {
+                    let editableEl;
+                    if (targetShape.type === 'diamond') {
+                        editableEl = shapeEl.querySelector('div');
+                    } else {
+                        editableEl = shapeEl;
+                    }
                     if (editableEl) {
-                        targetShape.content = editableEl.innerHTML;
+                        editableEl.innerHTML = targetShape.content;
                     }
                 }
             } else {
@@ -1585,15 +1587,16 @@ export const mindmapCanvasMethods = {
             shapeEl.appendChild(point);
         });
 
-        // Add hover effect handler via CSS (no JS listeners needed)
-        const style = document.createElement('style');
-        style.textContent = `
-            .connection-point:hover {
-                transform: var(--hover-transform, translate(-50%, 0)) !important;
-            }
-        `;
+        // Add hover glow effect via CSS (no JS listeners needed)
         if (!document.querySelector('#connection-point-hover-style')) {
+            const style = document.createElement('style');
             style.id = 'connection-point-hover-style';
+            style.textContent = `
+                .connection-point:hover {
+                    box-shadow: 0 0 12px rgba(25, 118, 210, 0.8), 0 0 0 4px rgba(25, 118, 210, 0.3) !important;
+                    background-color: #2196F3 !important;
+                }
+            `;
             document.head.appendChild(style);
         }
     },
