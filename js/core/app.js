@@ -405,6 +405,19 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 console.log('  - Notes:', notesIndex.items.size, 'items,', notesIndex.index.size, 'words');
                 console.log('  - Flashcards:', flashcardsIndex.items.size, 'items,', flashcardsIndex.index.size, 'words');
                 console.log('  - Mindmaps:', mindmapsIndex.items.size, 'items,', mindmapsIndex.index.size, 'words');
+
+                // Show sample indexed content to verify no code leaking in
+                if (notesIndex.items.size > 0) {
+                    const firstNote = Array.from(notesIndex.items.values())[0];
+                    console.log('[Search Index] Sample note content:',
+                        (firstNote.title || '').substring(0, 50),
+                        (firstNote.content || '').substring(0, 100).replace(/\n/g, ' '));
+                }
+                if (mindmapsIndex.items.size > 0) {
+                    const firstMindmap = Array.from(mindmapsIndex.items.values())[0];
+                    const sampleShapes = (firstMindmap.shapes || []).slice(0, 2).map(s => s.text || '').join(', ');
+                    console.log('[Search Index] Sample mindmap content:', firstMindmap.title, '| shapes:', sampleShapes.substring(0, 100));
+                }
             },
 
             _rebuildSearchIndexes() {

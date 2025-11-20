@@ -175,6 +175,13 @@ export const searchMethods = {
         }
 
         console.log(`[Search] Query: "${query}", Found ${results.length} results`);
+        if (results.length > 0) {
+            console.log('[Search] First 3 results:', results.slice(0, 3).map(r => ({
+                type: r.type,
+                title: r.title || r.topicTitle,
+                snippet: (r.snippet || '').substring(0, 80)
+            })));
+        }
 
         // Apply sorting
         this._sortSearchResults(results, query);
