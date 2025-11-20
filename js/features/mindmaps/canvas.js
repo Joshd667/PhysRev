@@ -1240,13 +1240,61 @@ export const mindmapCanvasMethods = {
             inner.style.display = 'flex';
             inner.style.alignItems = 'center';
             inner.style.justifyContent = 'center';
-            inner.innerHTML = shape.content || '';
+            // ✅ XSS FIX: Sanitize user content in mindmap shapes
+            if (window.DOMPurify) {
+                inner.innerHTML = DOMPurify.sanitize(shape.content || '', {
+                    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'span'],
+                    ALLOWED_ATTR: ['style'],
+                    ALLOWED_STYLES: {
+                        '*': {
+                            'color': [/^#[0-9A-Fa-f]{3,6}$/],
+                            'font-size': [/^\d+px$/],
+                            'font-weight': [/^(normal|bold)$/],
+                            'font-style': [/^(normal|italic)$/]
+                        }
+                    }
+                });
+            } else {
+                inner.innerHTML = shape.content || '';
+            }
             content.appendChild(inner);
         } else if (shape.type === 'hexagon') {
             content.style.clipPath = 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)';
-            content.innerHTML = shape.content || '';
+            // ✅ XSS FIX: Sanitize user content in mindmap shapes
+            if (window.DOMPurify) {
+                content.innerHTML = DOMPurify.sanitize(shape.content || '', {
+                    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'span'],
+                    ALLOWED_ATTR: ['style'],
+                    ALLOWED_STYLES: {
+                        '*': {
+                            'color': [/^#[0-9A-Fa-f]{3,6}$/],
+                            'font-size': [/^\d+px$/],
+                            'font-weight': [/^(normal|bold)$/],
+                            'font-style': [/^(normal|italic)$/]
+                        }
+                    }
+                });
+            } else {
+                content.innerHTML = shape.content || '';
+            }
         } else {
-            content.innerHTML = shape.content || '';
+            // ✅ XSS FIX: Sanitize user content in mindmap shapes
+            if (window.DOMPurify) {
+                content.innerHTML = DOMPurify.sanitize(shape.content || '', {
+                    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'span'],
+                    ALLOWED_ATTR: ['style'],
+                    ALLOWED_STYLES: {
+                        '*': {
+                            'color': [/^#[0-9A-Fa-f]{3,6}$/],
+                            'font-size': [/^\d+px$/],
+                            'font-weight': [/^(normal|bold)$/],
+                            'font-style': [/^(normal|italic)$/]
+                        }
+                    }
+                });
+            } else {
+                content.innerHTML = shape.content || '';
+            }
         }
 
         // Highlight if selected

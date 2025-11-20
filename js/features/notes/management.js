@@ -62,7 +62,32 @@ export const noteManagementMethods = {
         this.$nextTick(() => {
             const editor = document.getElementById('noteContentEditor');
             if (editor) {
-                editor.innerHTML = note.content;
+                // ✅ XSS FIX: Sanitize user content before loading into editor
+                if (window.DOMPurify) {
+                    editor.innerHTML = DOMPurify.sanitize(note.content, {
+                        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3',
+                                       'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote',
+                                       'code', 'pre', 'a', 'span', 'div', 'table', 'tr',
+                                       'td', 'th', 'thead', 'tbody'],
+                        ALLOWED_ATTR: ['href', 'style', 'class', 'id', 'data-latex', 'contenteditable', 'title'],
+                        ALLOWED_STYLES: {
+                            '*': {
+                                'color': [/^#[0-9A-Fa-f]{3,6}$/],
+                                'background-color': [/^#[0-9A-Fa-f]{3,6}$/],
+                                'font-size': [/^\d+(px|em|rem)$/],
+                                'text-align': [/^(left|right|center|justify)$/],
+                                'font-weight': [/^(normal|bold|\d{3})$/],
+                                'font-style': [/^(normal|italic)$/],
+                                'border-left': [/.*/],
+                                'padding-left': [/.*/],
+                                'margin': [/.*/]
+                            }
+                        }
+                    });
+                } else {
+                    // Fallback if DOMPurify not loaded
+                    editor.innerHTML = note.content;
+                }
                 // Render math in the editor after loading content
                 if (window.renderMathInElement) {
                     window.renderMathInElement(editor, {
