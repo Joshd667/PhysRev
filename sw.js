@@ -152,6 +152,8 @@ async function handleRequest(request) {
                     const cache = await caches.open(CACHE_NAME);
                     await cache.put(request, networkResponse.clone());
                 } catch (cacheError) {
+                    // ✅ IMPROVED: Log cache errors for debugging
+                    console.warn('SW: Failed to cache template:', url.pathname, cacheError.message);
                 }
             }
 
@@ -186,8 +188,24 @@ async function handleRequest(request) {
                                 });
                             }
                         } catch (comparisonError) {
-                            const cache = await caches.open(CACHE_NAME);
-                            await cache.put(request, networkResponse);
+                            // ✅ IMPROVED: Log comparison errors for debugging
+                            // Silent failures make debugging difficult
+                            if (comparisonError.message.includes('body stream already read')) {
+                                // This is expected - stream can only be read once
+                                // Silently update cache with new version
+                            } else {
+                                // Unexpected error - log it
+                                console.warn('SW: Cache comparison failed:', comparisonError.message);
+                            }
+
+                            // Update cache anyway (better to have new content)
+                            try {
+                                const cache = await caches.open(CACHE_NAME);
+                                await cache.put(request, networkResponse);
+                            } catch (cacheError) {
+                                // Cache write failed - not critical, continue
+                                console.warn('SW: Failed to update cache:', cacheError.message);
+                            }
                         }
                     }
                 }).catch(() => {});
@@ -203,12 +221,15 @@ async function handleRequest(request) {
                         const cache = await caches.open(CACHE_NAME);
                         await cache.put(request, networkResponse.clone());
                     } catch (cacheError) {
+                        // ✅ IMPROVED: Log cache errors for debugging
+                        console.warn('SW: Failed to cache JS/HTML:', url.pathname, cacheError.message);
                     }
                 }
 
                 return networkResponse;
             } catch (networkError) {
-                console.error(`❌ Network failed for ${url.pathname}:`, networkError);
+                // ✅ IMPROVED: More detailed error logging
+                console.error(`❌ Network failed for ${url.pathname}:`, networkError.message);
                 throw networkError;
             }
         }
@@ -226,6 +247,8 @@ async function handleRequest(request) {
                     const cache = await caches.open(CACHE_NAME);
                     await cache.put(request, networkResponse.clone());
                 } catch (cacheError) {
+                    // ✅ IMPROVED: Log cache errors for debugging
+                    console.warn('SW: Failed to cache resource:', url.pathname, cacheError.message);
                 }
             }
 
