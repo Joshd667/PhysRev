@@ -361,6 +361,12 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 flashcardsIndex = new SearchIndex();
                 mindmapsIndex = new SearchIndex();
 
+                logger.debug('[Search Index] Building indexes...');
+                logger.debug('[Search Index] specificationData keys:', Object.keys(this.specificationData || {}).length);
+                logger.debug('[Search Index] userNotes count:', Object.keys(this.userNotes || {}).length);
+                logger.debug('[Search Index] flashcardDecks count:', Object.keys(this.flashcardDecks || {}).length);
+                logger.debug('[Search Index] mindmaps count:', Object.keys(this.mindmaps || {}).length);
+
                 // ⚡ PERFORMANCE: Pre-compute search text during index build
                 const auditCards = [];
                 Object.entries(this.specificationData).forEach(([sectionKey, section]) => {
@@ -393,6 +399,25 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                     const shapesText = (mindmap.shapes || []).map(shape => shape.text || '').join(' ');
                     return `${mindmap.title || ''} ${shapesText} ${(mindmap.tags || []).join(' ')}`;
                 });
+
+                logger.debug('[Search Index] Indexes built:');
+                logger.debug('  - Audit cards:', auditCardsIndex.items.size, 'items,', auditCardsIndex.index.size, 'words');
+                logger.debug('  - Notes:', notesIndex.items.size, 'items,', notesIndex.index.size, 'words');
+                logger.debug('  - Flashcards:', flashcardsIndex.items.size, 'items,', flashcardsIndex.index.size, 'words');
+                logger.debug('  - Mindmaps:', mindmapsIndex.items.size, 'items,', mindmapsIndex.index.size, 'words');
+
+                // Show sample indexed content to verify no code leaking in
+                if (notesIndex.items.size > 0) {
+                    const firstNote = Array.from(notesIndex.items.values())[0];
+                    logger.debug('[Search Index] Sample note content:',
+                        (firstNote.title || '').substring(0, 50),
+                        (firstNote.content || '').substring(0, 100).replace(/\n/g, ' '));
+                }
+                if (mindmapsIndex.items.size > 0) {
+                    const firstMindmap = Array.from(mindmapsIndex.items.values())[0];
+                    const sampleShapes = (firstMindmap.shapes || []).slice(0, 2).map(s => s.text || '').join(', ');
+                    logger.debug('[Search Index] Sample mindmap content:', firstMindmap.title, '| shapes:', sampleShapes.substring(0, 100));
+                }
             },
 
             _rebuildSearchIndexes() {

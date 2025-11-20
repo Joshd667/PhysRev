@@ -1,5 +1,7 @@
 // js/modules/search.js
 
+import { logger } from '../../utils/logger.js';
+
 export const searchMethods = {
     // Helper method to safely set search results
     _updateSearchResults(results) {
@@ -174,7 +176,14 @@ export const searchMethods = {
             }
         }
 
-        console.log(`[Search] Query: "${query}", Found ${results.length} results`);
+        logger.debug(`[Search] Query: "${query}", Found ${results.length} results`);
+        if (results.length > 0) {
+            logger.debug('[Search] First 3 results:', results.slice(0, 3).map(r => ({
+                type: r.type,
+                title: r.title || r.topicTitle,
+                snippet: (r.snippet || '').substring(0, 80)
+            })));
+        }
 
         // Apply sorting
         this._sortSearchResults(results, query);
@@ -184,7 +193,7 @@ export const searchMethods = {
         // Note: cachedSearchResults is defined in core/app.js
         // Use helper method that handles both cases
         this._updateSearchResults(results);
-        console.log(`[Search] Results updated, searchResults.length =`, this.searchResults.length);
+        logger.debug(`[Search] Results updated, searchResults.length =`, this.searchResults.length);
     },
 
     _sortSearchResults(results, query) {
