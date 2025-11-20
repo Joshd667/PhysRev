@@ -202,15 +202,27 @@ export const searchMethods = {
         this._initSearchPagination();
     },
 
+    /**
+     * Initialize or update search pagination
+     * Creates pagination with 25 items per page, loading 25 more on each click
+     */
     _initSearchPagination() {
-        // Initialize or update search pagination
-        // Use 25 initial items and load 25 more each time
-        if (this.searchPagination) {
-            this.searchPagination.updateItems(this.searchResults);
-        } else {
-            this.searchPagination = paginatedList(this.searchResults, 25, 25);
+        try {
+            // Ensure searchResults is a valid array
+            const results = Array.isArray(this.searchResults) ? this.searchResults : [];
+
+            if (this.searchPagination) {
+                this.searchPagination.updateItems(results);
+            } else {
+                this.searchPagination = paginatedList(results, 25, 25);
+            }
+
+            logger.debug(`[Search] Pagination initialized: ${this.searchPagination.visibleItems.length} visible of ${this.searchPagination.totalCount} total`);
+        } catch (error) {
+            logger.error('[Search] Failed to initialize pagination:', error);
+            // Fallback: create empty pagination to prevent UI errors
+            this.searchPagination = paginatedList([], 25, 25);
         }
-        logger.debug(`[Search] Pagination initialized: ${this.searchPagination.visibleItems.length} visible of ${this.searchPagination.totalCount} total`);
     },
 
     _sortSearchResults(results, query) {
