@@ -1,6 +1,8 @@
 # Attribution & Third-Party Licenses
 
-This project uses the following open-source libraries and resources. We are grateful to their maintainers and contributors.
+**IMPORTANT:** This software (Physics Knowledge Audit Tool) is proprietary and copyrighted. All rights reserved. See the LICENSE file for details.
+
+However, this proprietary software incorporates the following open-source third-party libraries. We are grateful to their maintainers and contributors. The licenses below apply **only** to those third-party components, not to this software as a whole.
 
 ---
 
@@ -109,13 +111,17 @@ This application uses system native fonts for optimal performance:
 
 ---
 
-## License Compliance
+## License Compliance for Third-Party Components
 
-### MIT License Requirements
+**Note:** The licenses below apply **only** to the third-party libraries used by this software. The Physics Knowledge Audit Tool software itself remains proprietary and is not open source.
+
+### MIT License Requirements (Alpine.js, Chart.js, KaTeX, Tailwind CSS)
 All MIT-licensed libraries require inclusion of the copyright notice and permission notice. These requirements are satisfied by:
 1. This ATTRIBUTION.md file
 2. Inline comments in source code referencing library names
 3. Links to original license texts
+
+**Important:** The MIT licenses of these third-party libraries do NOT extend to the Physics Knowledge Audit Tool software itself. Only the listed third-party components are MIT-licensed.
 
 ### Apache License 2.0 Requirements (DOMPurify)
 The Apache License 2.0 requires:
@@ -124,8 +130,12 @@ The Apache License 2.0 requires:
 - ✅ Notice of modifications (if any): No modifications made to DOMPurify library code
 - ✅ Patent grant: Inherited from original license
 
+**Important:** The Apache 2.0 license of DOMPurify does NOT extend to the Physics Knowledge Audit Tool software itself.
+
 ### ISC License Requirements (Lucide Icons)
 The ISC License is functionally equivalent to MIT License. Requirements satisfied by copyright notice and permission notice in this file.
+
+**Important:** The ISC license of Lucide Icons does NOT extend to the Physics Knowledge Audit Tool software itself.
 
 ---
 
@@ -167,5 +177,21 @@ If you have questions about licensing or attribution, or believe any attribution
 
 ---
 
+## License Summary
+
+**Physics Knowledge Audit Tool:** Proprietary - All Rights Reserved (see LICENSE file)
+
+**Third-Party Libraries Used:**
+- Alpine.js: MIT License
+- Chart.js: MIT License
+- DOMPurify: Apache 2.0 / MPL 2.0
+- KaTeX: MIT License
+- Lucide Icons: ISC License
+- Tailwind CSS: MIT License
+
+The open-source licenses above apply only to their respective libraries, not to the Physics Knowledge Audit Tool software as a whole.
+
+---
+
 **Last Updated:** 2025-11-20
-**Document Version:** 1.0
+**Document Version:** 1.1

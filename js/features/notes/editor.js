@@ -225,7 +225,7 @@ export const noteEditorMethods = {
             "'": '&#39;'
         };
         return String(text).replace(/[&<>"']/g, m => map[m]);
-    }
+    },
 
     /**
      * Export note as HTML and open in new window for printing
