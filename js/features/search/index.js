@@ -91,7 +91,7 @@ export const searchMethods = {
     clearAllSearchFilters() {
         // Clear search query
         this.searchQuery = '';
-        this.searchResults = [];
+        this._setSearchResults([]);
 
         // Reset all filters to default (all 4 selected)
         this.searchFilters = ['audit', 'notes', 'flashcards', 'mindmaps'];
@@ -129,7 +129,7 @@ export const searchMethods = {
                     this._executeSearch();
                 }, 300);
             } else {
-                this.searchResults = [];
+                this._setSearchResults([]);
             }
             return;
         }
@@ -175,7 +175,7 @@ export const searchMethods = {
             window.physicsAuditApp._setSearchResults(results);
         } else {
             // Fallback for edge cases
-            this.searchResults = results.map(result => Object.freeze(result));
+            this._setSearchResults(results.map(result => Object.freeze(result)));
         }
     },
 
