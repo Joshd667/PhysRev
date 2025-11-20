@@ -125,9 +125,27 @@ export const noteManagementMethods = {
     },
 
     /**
-     * Closes the note editor modal
+     * Closes the note editor modal with unsaved changes warning
      */
-    closeNoteEditor() {
+    async closeNoteEditor() {
+        // Check if there are unsaved changes
+        const editor = document.getElementById('noteContentEditor');
+        const content = editor ? editor.innerHTML : this.noteEditorContent;
+        const hasContent = this.noteEditorTitle.trim() ||
+                          (content && content.trim() && content.trim() !== '<br>');
+
+        if (hasContent) {
+            const confirmed = await this.showConfirm(
+                'You have unsaved changes. Are you sure you want to close without saving?',
+                'Unsaved Changes'
+            );
+
+            if (!confirmed) {
+                return; // User cancelled, keep editor open
+            }
+        }
+
+        // Close and reset
         this.showNoteEditor = false;
         this.noteEditorMode = 'create';
         this.noteEditorSectionId = null;

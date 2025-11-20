@@ -113,12 +113,29 @@ export const mindmapManagementMethods = {
     },
 
     /**
-     * Closes the mindmap editor modal
+     * Closes the mindmap editor modal with unsaved changes warning
      */
-    closeMindmapEditor() {
+    async closeMindmapEditor() {
+        // Check if there are unsaved changes
+        const hasContent = this.mindmapEditorTitle.trim() ||
+                          this.mindmapEditorData.nodes.length > 0 ||
+                          this.mindmapEditorData.connections.length > 0;
+
+        if (hasContent) {
+            const confirmed = await this.showConfirm(
+                'You have unsaved changes. Are you sure you want to close without saving?',
+                'Unsaved Changes'
+            );
+
+            if (!confirmed) {
+                return; // User cancelled, keep editor open
+            }
+        }
+
         // Clean up canvas listeners FIRST (before clearing data)
         this.cleanupMindmapCanvas();
 
+        // Close and reset
         this.showMindmapEditor = false;
         this.mindmapEditorMode = 'create';
         this.mindmapEditorSectionId = null;

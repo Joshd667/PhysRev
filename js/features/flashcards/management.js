@@ -129,9 +129,27 @@ export const flashcardManagementMethods = {
     },
 
     /**
-     * Closes the flashcard editor modal
+     * Closes the flashcard editor modal with unsaved changes warning
      */
-    closeFlashcardEditor() {
+    async closeFlashcardEditor() {
+        // Check if there are unsaved changes
+        const hasContent = this.flashcardEditorDeckName.trim() ||
+                          this.flashcardEditorCards.length > 0 ||
+                          this.flashcardEditorCurrentCardFront.trim() ||
+                          this.flashcardEditorCurrentCardBack.trim();
+
+        if (hasContent) {
+            const confirmed = await this.showConfirm(
+                'You have unsaved changes. Are you sure you want to close without saving?',
+                'Unsaved Changes'
+            );
+
+            if (!confirmed) {
+                return; // User cancelled, keep editor open
+            }
+        }
+
+        // Close and reset
         this.showFlashcardEditor = false;
         this.flashcardEditorMode = 'create';
         this.flashcardEditorSectionId = null;
