@@ -1,6 +1,8 @@
 // js/features/flashcards/management.js
 // CRUD operations for flashcard decks
 
+import { logger } from '../../utils/logger.js';
+
 export const flashcardManagementMethods = {
     /**
      * Opens the flashcard editor modal for creating a new deck
@@ -45,7 +47,7 @@ export const flashcardManagementMethods = {
     editFlashcardDeck(deckId) {
         const deck = this.flashcardDecks[deckId];
         if (!deck) {
-            console.warn('Deck not found:', deckId);
+            logger.warn('Deck not found:', deckId);
             return;
         }
 
@@ -98,7 +100,7 @@ export const flashcardManagementMethods = {
         if (backEditor) backEditor.innerHTML = '';
 
         // Show success message
-        console.log(`Card ${this.flashcardEditorCards.length} added to deck`);
+        logger.log(`Card ${this.flashcardEditorCards.length} added to deck`);
     },
 
     /**

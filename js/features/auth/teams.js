@@ -1,6 +1,7 @@
 // js/features/auth/teams.js - Microsoft Teams Authentication
 
 import { idbGet, idbSet, idbRemove } from '../../utils/indexeddb.js';
+import { logger } from '../../utils/logger.js';
 
 // Configuration for Microsoft Teams/Azure AD
 const TEAMS_CONFIG = {
@@ -50,7 +51,7 @@ export const teamsAuthMethods = {
             }
 
         } catch (error) {
-            console.error('❌ Teams authentication failed:', error);
+            logger.error('❌ Teams authentication failed:', error);
             this.loginError = error.message;
         } finally {
             this.isLoading = false;
@@ -81,7 +82,7 @@ export const teamsAuthMethods = {
                     resources: [TEAMS_CONFIG.CLIENT_ID],
                     silent: false,
                     failureCallback: (error) => {
-                        console.error('Teams SSO failed:', error);
+                        logger.error('Teams SSO failed:', error);
                         reject(new Error('Teams authentication failed: ' + error));
                     },
                     successCallback: async (token) => {
@@ -247,7 +248,7 @@ export const teamsAuthMethods = {
             
             return JSON.parse(jsonPayload);
         } catch (error) {
-            console.error('Failed to decode JWT token:', error);
+            logger.error('Failed to decode JWT token:', error);
             return {};
         }
     },
@@ -303,7 +304,7 @@ export const teamsAuthMethods = {
             return true;
 
         } catch (error) {
-            console.error('❌ Failed to save data to Teams:', error);
+            logger.error('❌ Failed to save data to Teams:', error);
             return false;
         }
     },

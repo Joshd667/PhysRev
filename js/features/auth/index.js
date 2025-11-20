@@ -2,6 +2,7 @@
 // Auth facade - loads guest auth immediately, Teams auth on demand
 
 import { guestAuthMethods } from './guest.js';
+import { logger } from '../../utils/logger.js';
 
 let teamsAuthMethods = null;
 
@@ -12,12 +13,12 @@ export async function loadAuthMethods() {
     // Add lazy Teams auth loader
     authMethods.loadTeamsAuth = async function(authData) {
         if (!teamsAuthMethods) {
-            console.log('⚡ Lazy loading Teams auth module...');
+            logger.log('⚡ Lazy loading Teams auth module...');
             const teamsModule = await import('./teams.js');
             teamsAuthMethods = teamsModule.teamsAuthMethods;
             // Bind all Teams methods to this context
             Object.assign(this, teamsAuthMethods);
-            console.log('✅ Teams auth module loaded');
+            logger.log('✅ Teams auth module loaded');
         }
         this.teamsToken = authData.user.teamsToken;
         if (this.startAutoSave) {
@@ -28,12 +29,12 @@ export async function loadAuthMethods() {
     // Add Teams login method that lazy-loads the Teams module
     authMethods.loginWithTeams = async function() {
         if (!teamsAuthMethods) {
-            console.log('⚡ Lazy loading Teams auth module...');
+            logger.log('⚡ Lazy loading Teams auth module...');
             const teamsModule = await import('./teams.js');
             teamsAuthMethods = teamsModule.teamsAuthMethods;
             // Bind all Teams methods to this context
             Object.assign(this, teamsAuthMethods);
-            console.log('✅ Teams auth module loaded');
+            logger.log('✅ Teams auth module loaded');
         }
         // Call the actual Teams login method (now bound to this)
         return teamsAuthMethods.loginWithTeams.call(this);
@@ -53,7 +54,7 @@ export async function loadAuthMethods() {
                 await this.loginWithTeams();
             }
         } catch (error) {
-            console.warn('Failed to check privacy notice status:', error);
+            logger.warn('Failed to check privacy notice status:', error);
             // If check fails, proceed with login anyway
             await this.loginWithTeams();
         }
