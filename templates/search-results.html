@@ -207,7 +207,7 @@
 
                         <div x-show="searchVisible && searchResults.length > 0" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform scale-95 -translate-y-4" x-transition:enter-end="opacity-100 transform scale-100 translate-y-0">
                             <!-- ✅ PAGINATION: Virtualize search results for performance -->
-                            <div class="mb-6" x-data="{ searchPagination: null }" x-init="searchPagination = $paginated(searchResults, 20, 10); $watch('searchResults', (value) => { if (searchPagination) searchPagination.updateItems(value); })">
+                            <div class="mb-6">
                                 <div class="flex items-center justify-between mb-4">
                                     <h2 class="text-xl font-bold text-slate-800 dark:text-slate-200">Search Results</h2>
                                     <span class="text-sm text-gray-600 dark:text-gray-400" x-text="`Showing ${searchPagination ? searchPagination.visibleItems.length : searchResults.length} of ${searchResults.length} result${searchResults.length !== 1 ? 's' : ''} for '${searchQuery}'`"></span>

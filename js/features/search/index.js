@@ -130,6 +130,7 @@ export const searchMethods = {
                 }, 300);
             } else {
                 this.searchResults = [];
+                this._initSearchPagination();
             }
             return;
         }
@@ -176,6 +177,21 @@ export const searchMethods = {
         } else {
             // Fallback for edge cases
             this.searchResults = results.map(result => Object.freeze(result));
+        }
+
+        // Initialize pagination for search results
+        this._initSearchPagination();
+    },
+
+    _initSearchPagination() {
+        // Initialize or update search pagination
+        if (this.searchPagination) {
+            this.searchPagination.updateItems(this.searchResults);
+        } else {
+            // Import and create pagination using the magic helper
+            if (this.$paginated) {
+                this.searchPagination = this.$paginated(this.searchResults, 20, 10);
+            }
         }
     },
 
