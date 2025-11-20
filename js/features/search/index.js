@@ -1,6 +1,15 @@
 // js/modules/search.js
 
 export const searchMethods = {
+    // Helper method to safely set search results
+    _updateSearchResults(results) {
+        if (typeof window.physicsAuditApp !== 'undefined' && window.physicsAuditApp._setSearchResults) {
+            window.physicsAuditApp._setSearchResults(results);
+        } else if (this._setSearchResults) {
+            this._setSearchResults(results);
+        }
+    },
+
     toggleSearch() {
         this.searchVisible = !this.searchVisible;
         if (this.searchVisible) {
@@ -91,7 +100,7 @@ export const searchMethods = {
     clearAllSearchFilters() {
         // Clear search query
         this.searchQuery = '';
-        this._setSearchResults([]);
+        this._updateSearchResults([]);
 
         // Reset all filters to default (all 4 selected)
         this.searchFilters = ['audit', 'notes', 'flashcards', 'mindmaps'];
@@ -129,7 +138,7 @@ export const searchMethods = {
                     this._executeSearch();
                 }, 300);
             } else {
-                this._setSearchResults([]);
+                this._updateSearchResults([]);
             }
             return;
         }
@@ -171,12 +180,8 @@ export const searchMethods = {
         // ⚡ MEMORY FIX: Store results in module-level cache (outside Alpine reactivity)
         // Access via getter in app.js - prevents deep reactive wrapping
         // Note: cachedSearchResults is defined in core/app.js
-        if (typeof window.physicsAuditApp !== 'undefined' && window.physicsAuditApp._setSearchResults) {
-            window.physicsAuditApp._setSearchResults(results);
-        } else {
-            // Fallback for edge cases
-            this._setSearchResults(results.map(result => Object.freeze(result)));
-        }
+        // Use helper method that handles both cases
+        this._updateSearchResults(results);
     },
 
     _sortSearchResults(results, query) {
