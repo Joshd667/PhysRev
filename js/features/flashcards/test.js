@@ -1,6 +1,8 @@
 // js/features/flashcards/test.js
 // Flashcard testing functionality (3D flip interface)
 
+import { logger } from '../../utils/logger.js';
+
 export const flashcardTestMethods = {
     /**
      * Opens the flashcard test mode with all cards from all decks for current section
@@ -45,7 +47,7 @@ export const flashcardTestMethods = {
     async testSingleDeck(deckId) {
         const deck = this.flashcardDecks[deckId];
         if (!deck) {
-            console.warn('Deck not found:', deckId);
+            logger.warn('Deck not found:', deckId);
             return;
         }
 
@@ -371,7 +373,7 @@ export const flashcardTestMethods = {
             const serialized = JSON.parse(JSON.stringify(this.testResultsHistory || []));
             await idbSet('flashcard-test-results', serialized);
         } catch (error) {
-            console.error('Failed to save test results:', error);
+            logger.error('Failed to save test results:', error);
             await this.showAlert('Failed to save test results. Your browser storage might be full.', 'Save Failed');
         }
     },
@@ -389,7 +391,7 @@ export const flashcardTestMethods = {
                 this.testResultsHistory = [];
             }
         } catch (error) {
-            console.error('Failed to load test results:', error);
+            logger.error('Failed to load test results:', error);
             this.testResultsHistory = [];
         }
     }

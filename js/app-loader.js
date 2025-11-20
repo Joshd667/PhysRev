@@ -1,3 +1,5 @@
+import { logger } from './utils/logger.js';
+
 (async function() {
     try {
         const url = new URL(window.location.href);
@@ -35,7 +37,7 @@
 
         const failures = results.filter(r => r.status === 'rejected');
         if (failures.length > 0) {
-            console.error('Full failure details:', failures);
+            logger.error('Full failure details:', failures);
         }
 
         const [idbInit, templatesLoaded, Alpine, _unused, createApp, dataResult] = results.map(r =>
@@ -49,8 +51,8 @@
             if (!createApp) failedResources.push('App creator');
             if (!dataResult) failedResources.push('Data');
 
-            console.error('❌ Failed resources:', failedResources);
-            console.error('All results:', results);
+            logger.error('❌ Failed resources:', failedResources);
+            logger.error('All results:', results);
             throw new Error(`Critical resources failed to load: ${failedResources.join(', ')}`);
         }
 
@@ -66,7 +68,7 @@
             try {
                 return originalEvaluate.call(this, el, expression, extras);
             } catch (error) {
-                console.error('❌ Alpine expression error:', {
+                logger.error('❌ Alpine expression error:', {
                     expression,
                     element: el,
                     error
@@ -88,7 +90,7 @@
         Alpine.start();
 
     } catch (error) {
-        console.error('❌ Failed to initialize Physics Audit Tool:', error);
+        logger.error('❌ Failed to initialize Physics Audit Tool:', error);
         showErrorScreen(error);
     }
 })();

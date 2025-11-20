@@ -7,6 +7,8 @@
  * - Large modals lazy-loaded on first use (settings, editors, privacy)
  */
 
+import { logger } from './utils/logger.js';
+
 // Track which templates have been lazy-loaded
 const lazyLoadedTemplates = new Set();
 
@@ -43,7 +45,7 @@ export async function loadTemplateLazy(id, path) {
             return false;
         }
     } catch (error) {
-        console.error(`❌ Failed to lazy-load ${path}:`, error);
+        logger.error(`❌ Failed to lazy-load ${path}:`, error);
         return false;
     }
 }
@@ -96,7 +98,7 @@ export async function loadTemplates() {
                 return { success: false, path };
             }
         } catch (error) {
-            console.error(`❌ Failed to load ${path}:`, error);
+            logger.error(`❌ Failed to load ${path}:`, error);
             return { success: false, path };
         }
     });

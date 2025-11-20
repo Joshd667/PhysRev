@@ -1,6 +1,8 @@
 // js/features/mindmaps/management.js
 // CRUD operations for user mindmaps
 
+import { logger } from '../../utils/logger.js';
+
 export const mindmapManagementMethods = {
     /**
      * Opens the mindmap editor modal for creating a new mindmap
@@ -49,7 +51,7 @@ export const mindmapManagementMethods = {
     editMindmap(mindmapId) {
         const mindmap = this.mindmaps[mindmapId];
         if (!mindmap) {
-            console.warn('Mindmap not found:', mindmapId);
+            logger.warn('Mindmap not found:', mindmapId);
             return;
         }
 
@@ -232,7 +234,7 @@ export const mindmapManagementMethods = {
     async exportSavedMindmapAsSVG(mindmapId) {
         const mindmap = this.mindmaps[mindmapId];
         if (!mindmap) {
-            console.warn('Mindmap not found:', mindmapId);
+            logger.warn('Mindmap not found:', mindmapId);
             return;
         }
 

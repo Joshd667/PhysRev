@@ -1,6 +1,8 @@
 // js/utils/search-index.js
 // Inverted index for O(1) search lookups
 
+import { logger } from './logger.js';
+
 export class SearchIndex {
     constructor() {
         this.index = new Map(); // word -> Set of item IDs
@@ -23,7 +25,7 @@ export class SearchIndex {
 
         items.forEach(item => {
             if (!item.id) {
-                console.warn('Item without ID, skipping:', item);
+                logger.warn('Item without ID, skipping:', item);
                 return;
             }
 
@@ -155,7 +157,7 @@ export class SearchIndex {
      */
     addItem(item, getSearchableText) {
         if (!item.id) {
-            console.warn('Cannot add item without ID');
+            logger.warn('Cannot add item without ID');
             return;
         }
 

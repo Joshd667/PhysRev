@@ -2,6 +2,8 @@
 // Shared CSV parser used across the application
 // Used by: unified-csv-loader.js, csv-converter.html
 
+import { logger } from './logger.js';
+
 /**
  * Parse a single CSV line, handling quoted fields with commas
  * @param {string} line - A single CSV line
@@ -103,14 +105,14 @@ export async function loadCSVFile(filepath) {
         }
 
         if (!response.ok) {
-            console.warn(`Failed to load ${filepath}: HTTP ${response.status}`);
+            logger.warn(`Failed to load ${filepath}: HTTP ${response.status}`);
             return [];
         }
 
         const csvText = await response.text();
         return parseCSV(csvText);
     } catch (error) {
-        console.error(`Error loading ${filepath}:`, error);
+        logger.error(`Error loading ${filepath}:`, error);
         return [];
     }
 }

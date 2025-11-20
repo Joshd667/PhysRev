@@ -3,6 +3,8 @@
 // Provides a user-friendly interface for A-Level students to create equations
 // without needing to know LaTeX syntax
 
+import { logger } from '../../utils/logger.js';
+
 /**
  * Equation Editor Methods
  *
@@ -320,7 +322,7 @@ export const equationEditorMethods = {
 
         const editor = document.getElementById('noteContentEditor');
         if (!editor) {
-            console.error('Note editor not found');
+            logger.error('Note editor not found');
             return;
         }
 
@@ -370,7 +372,7 @@ export const equationEditorMethods = {
             }, 100);
 
         } catch (error) {
-            console.error('Error inserting equation:', error);
+            logger.error('Error inserting equation:', error);
             await this.showAlert('Error inserting equation: ' + error.message, 'Equation Error');
         }
     }
