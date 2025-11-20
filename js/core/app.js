@@ -361,6 +361,12 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 flashcardsIndex = new SearchIndex();
                 mindmapsIndex = new SearchIndex();
 
+                console.log('[Search Index] Building indexes...');
+                console.log('[Search Index] specificationData keys:', Object.keys(this.specificationData || {}).length);
+                console.log('[Search Index] userNotes count:', Object.keys(this.userNotes || {}).length);
+                console.log('[Search Index] flashcardDecks count:', Object.keys(this.flashcardDecks || {}).length);
+                console.log('[Search Index] mindmaps count:', Object.keys(this.mindmaps || {}).length);
+
                 // ⚡ PERFORMANCE: Pre-compute search text during index build
                 const auditCards = [];
                 Object.entries(this.specificationData).forEach(([sectionKey, section]) => {
@@ -393,6 +399,12 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                     const shapesText = (mindmap.shapes || []).map(shape => shape.text || '').join(' ');
                     return `${mindmap.title || ''} ${shapesText} ${(mindmap.tags || []).join(' ')}`;
                 });
+
+                console.log('[Search Index] Indexes built:');
+                console.log('  - Audit cards:', auditCardsIndex.items.size, 'items,', auditCardsIndex.index.size, 'words');
+                console.log('  - Notes:', notesIndex.items.size, 'items,', notesIndex.index.size, 'words');
+                console.log('  - Flashcards:', flashcardsIndex.items.size, 'items,', flashcardsIndex.index.size, 'words');
+                console.log('  - Mindmaps:', mindmapsIndex.items.size, 'items,', mindmapsIndex.index.size, 'words');
             },
 
             _rebuildSearchIndexes() {
