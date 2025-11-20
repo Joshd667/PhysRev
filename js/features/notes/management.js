@@ -126,22 +126,25 @@ export const noteManagementMethods = {
 
     /**
      * Closes the note editor modal with unsaved changes warning
+     * @param {boolean} skipConfirmation - Skip the unsaved changes warning (e.g., after saving)
      */
-    async closeNoteEditor() {
-        // Check if there are unsaved changes
-        const editor = document.getElementById('noteContentEditor');
-        const content = editor ? editor.innerHTML : this.noteEditorContent;
-        const hasContent = this.noteEditorTitle.trim() ||
-                          (content && content.trim() && content.trim() !== '<br>');
+    async closeNoteEditor(skipConfirmation = false) {
+        // Check if there are unsaved changes (unless skipping confirmation)
+        if (!skipConfirmation) {
+            const editor = document.getElementById('noteContentEditor');
+            const content = editor ? editor.innerHTML : this.noteEditorContent;
+            const hasContent = this.noteEditorTitle.trim() ||
+                              (content && content.trim() && content.trim() !== '<br>');
 
-        if (hasContent) {
-            const confirmed = await this.showConfirm(
-                'You have unsaved changes. Are you sure you want to close without saving?',
-                'Unsaved Changes'
-            );
+            if (hasContent) {
+                const confirmed = await this.showConfirm(
+                    'You have unsaved changes. Are you sure you want to close without saving?',
+                    'Unsaved Changes'
+                );
 
-            if (!confirmed) {
-                return; // User cancelled, keep editor open
+                if (!confirmed) {
+                    return; // User cancelled, keep editor open
+                }
             }
         }
 
@@ -210,8 +213,8 @@ export const noteManagementMethods = {
         // Save to localStorage
         this.saveNotes();
 
-        // Close editor
-        this.closeNoteEditor();
+        // Close editor (skip confirmation since we just saved)
+        this.closeNoteEditor(true);
 
         // Refresh icons after save
         this.$nextTick(() => {
