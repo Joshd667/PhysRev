@@ -1,5 +1,7 @@
 // js/features/revision/resources.js - Revision resource loading methods
 
+import { logger } from '../../utils/logger.js';
+
 export const revisionResourceMethods = {
     openRevisionForTopic(topicId) {
         // Get the revision section from the global mapping
@@ -15,7 +17,7 @@ export const revisionResourceMethods = {
                 try {
                     this.currentRevisionResources = window.getResourcesForSection(section);
                 } catch (error) {
-                    console.error('Error loading resources:', error);
+                    logger.error('Error loading resources:', error);
                     this.currentRevisionResources = {
                         section: null,
                         videos: [],
@@ -25,7 +27,7 @@ export const revisionResourceMethods = {
                     };
                 }
             } else {
-                console.error('getResourcesForSection function not available');
+                logger.error('getResourcesForSection function not available');
                 this.currentRevisionResources = null;
             }
 

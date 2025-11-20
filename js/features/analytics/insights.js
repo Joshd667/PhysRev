@@ -1,5 +1,7 @@
 // js/features/analytics/insights.js - Analytics insights and pagination
 
+import { logger } from '../../utils/logger.js';
+
 export const analyticInsightMethods = {
     showAnalytics() {
         this.showingAnalytics = true;
@@ -74,7 +76,7 @@ export const analyticInsightMethods = {
         if (section && window.revisionMapping[section]) {
             this.openRevisionForTopic(topicId);
         } else {
-            console.warn('No revision section found for topic:', topicId);
+            logger.warn('No revision section found for topic:', topicId);
         }
     }
 };

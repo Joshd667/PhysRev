@@ -2,6 +2,7 @@
 // Combined CSV loader for both subject data and resources
 // Now uses shared utilities to eliminate code duplication
 
+import { logger } from '../utils/logger.js';
 import { parseCSV, loadCSVFile } from '../utils/csv-parser.js';
 import { convertSubjectCSV, convertGroupsCSV } from '../utils/csv-converter.js';
 import {
@@ -40,7 +41,7 @@ async function loadSubjectCSV(filename) {
         return sections;
 
     } catch (error) {
-        console.error(`Error loading subject CSV ${filename}:`, error);
+        logger.error(`Error loading subject CSV ${filename}:`, error);
         return {};
     }
 }
@@ -297,7 +298,7 @@ export async function loadAllData() {
             specModeGroups: groups.specModeGroups
         };
     } catch (error) {
-        console.error('❌ Failed to load CSV data:', error);
+        logger.error('❌ Failed to load CSV data:', error);
         throw error;
     }
 }

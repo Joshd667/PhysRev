@@ -1,6 +1,8 @@
 // js/features/notes/display.js
 // Display and grouping logic for notes view
 
+import { logger } from '../../utils/logger.js';
+
 export const notesDisplayMethods = {
     sortNotes(notes) {
         if (!Array.isArray(notes) || notes.length === 0) return notes;
@@ -30,7 +32,7 @@ export const notesDisplayMethods = {
                 try {
                     this.$refs.notePreviewArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 } catch (error) {
-                    console.warn('Could not scroll to note preview area:', error);
+                    logger.warn('Could not scroll to note preview area:', error);
                 }
             }
             if (window.lucide) {
