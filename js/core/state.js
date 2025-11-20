@@ -39,7 +39,6 @@ export function createState() {
         searchVisible: false,
         searchQuery: '',
         searchResults: [],
-        searchPagination: null,
         searchTimer: null,
         searchFilters: ['audit', 'notes', 'flashcards', 'mindmaps'],
         searchSortBy: 'relevance',

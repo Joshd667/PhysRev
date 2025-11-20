@@ -130,7 +130,6 @@ export const searchMethods = {
                 }, 300);
             } else {
                 this.searchResults = [];
-                this._initSearchPagination();
             }
             return;
         }
@@ -177,24 +176,6 @@ export const searchMethods = {
         } else {
             // Fallback for edge cases
             this.searchResults = results.map(result => Object.freeze(result));
-        }
-
-        // Initialize pagination for search results
-        this._initSearchPagination();
-    },
-
-    async _initSearchPagination() {
-        // Initialize or update search pagination
-        if (this.searchPagination) {
-            this.searchPagination.updateItems(this.searchResults);
-        } else {
-            // Import pagination function directly to avoid Alpine reactivity traps
-            try {
-                const { paginatedList } = await import('../../components/paginated-list.js');
-                this.searchPagination = paginatedList(this.searchResults, 20, 10);
-            } catch (error) {
-                console.warn('Failed to initialize search pagination:', error);
-            }
         }
     },
 
