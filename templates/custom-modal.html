@@ -1,6 +1,10 @@
 <!-- Custom Modal Dialog -->
 <div x-show="showCustomModal"
      x-cloak
+     role="dialog"
+     aria-modal="true"
+     aria-labelledby="modal-title"
+     aria-describedby="modal-description"
      class="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
      @click.self="cancelModal()"
      x-transition:enter="transition ease-out duration-200"
@@ -40,13 +44,13 @@
                         </div>
                     </template>
                 </div>
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white" x-text="modalTitle"></h3>
+                <h3 id="modal-title" class="text-lg font-bold text-gray-900 dark:text-white" x-text="modalTitle"></h3>
             </div>
         </div>
 
         <!-- Modal Body -->
         <div class="px-6 py-4">
-            <p class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed" x-text="modalMessage"></p>
+            <p id="modal-description" class="text-gray-700 dark:text-gray-300 text-sm leading-relaxed" x-text="modalMessage"></p>
 
             <!-- Input field for prompt -->
             <template x-if="modalType === 'prompt'">
@@ -55,6 +59,7 @@
                        @keydown.enter="confirmModal()"
                        @keydown.escape="cancelModal()"
                        x-init="$nextTick(() => $el.focus())"
+                       aria-label="Enter value for prompt"
                        class="mt-4 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-colors"
                        placeholder="Enter value...">
             </template>
@@ -65,6 +70,7 @@
             <!-- Cancel button (for confirm and prompt) -->
             <template x-if="modalType !== 'alert'">
                 <button @click="cancelModal()"
+                        aria-label="Cancel and close dialog"
                         class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                     Cancel
                 </button>
@@ -73,6 +79,7 @@
             <!-- Confirm/OK button -->
             <button @click="confirmModal()"
                     :class="modalType === 'confirm' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-blue-600 hover:bg-blue-700'"
+                    :aria-label="modalType === 'alert' ? 'Acknowledge and close dialog' : 'Confirm action'"
                     class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm">
                 <span x-text="modalType === 'alert' ? 'OK' : 'Confirm'"></span>
             </button>

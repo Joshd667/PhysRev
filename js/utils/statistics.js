@@ -71,15 +71,21 @@ export const statisticsMethods = {
 
     // Overall progress based on the current view mode ('spec' or 'paper')
     getOverallProgress() {
-        const sections = (this.viewMode === 'spec') 
-            ? Object.values(this.specificationData) 
+        const sections = (this.viewMode === 'spec')
+            ? Object.values(this.specificationData)
             : Object.values(this.specificationData).filter(s => s.paper === this.selectedPaper);
 
-        const totalTopics = sections.reduce((sum, section) => sum + section.topics.length, 0);
-        const assessedTopics = Object.keys(this.confidenceLevels).filter(id => 
-            this.confidenceLevels[id] > 0 && sections.some(s => s.topics.some(t => t.id === id))
+        // ✅ PERFORMANCE FIX: Build Set of valid topic IDs once (O(n) instead of O(n²))
+        const validTopicIds = new Set();
+        sections.forEach(section => {
+            section.topics.forEach(topic => validTopicIds.add(topic.id));
+        });
+
+        const totalTopics = validTopicIds.size;
+        const assessedTopics = Object.keys(this.confidenceLevels).filter(id =>
+            this.confidenceLevels[id] > 0 && validTopicIds.has(id)
         ).length;
-        
+
         return totalTopics > 0 ? Math.round((assessedTopics / totalTopics) * 100) : 0;
     },
 
@@ -89,8 +95,14 @@ export const statisticsMethods = {
             ? Object.values(this.specificationData)
             : Object.values(this.specificationData).filter(s => s.paper === this.selectedPaper);
 
+        // ✅ PERFORMANCE FIX: Build Set of valid topic IDs once (O(n) instead of O(n²))
+        const validTopicIds = new Set();
+        sections.forEach(section => {
+            section.topics.forEach(topic => validTopicIds.add(topic.id));
+        });
+
         const relevantLevels = Object.entries(this.confidenceLevels)
-            .filter(([id, level]) => level > 0 && sections.some(s => s.topics.some(t => t.id === id)))
+            .filter(([id, level]) => level > 0 && validTopicIds.has(id))
             .map(([_, level]) => level);
 
         if (relevantLevels.length === 0) return 0;
