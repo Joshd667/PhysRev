@@ -1452,9 +1452,17 @@ export const mindmapCanvasMethods = {
      */
     startDragShape(shape, event) {
         this.draggedShape = shape;
+
+        // Convert mouse position from screen space to canvas space
+        const canvas = document.getElementById('canvasDropZone');
+        const rect = canvas.getBoundingClientRect();
+        const canvasMouseX = (event.clientX - rect.left - this.canvasPan.x) / this.canvasZoom;
+        const canvasMouseY = (event.clientY - rect.top - this.canvasPan.y) / this.canvasZoom;
+
+        // Store offset between mouse position (in canvas space) and shape position
         this.dragStart = {
-            x: event.clientX - shape.x,
-            y: event.clientY - shape.y
+            x: canvasMouseX - shape.x,
+            y: canvasMouseY - shape.y
         };
 
         let hasMoved = false;
@@ -1471,8 +1479,12 @@ export const mindmapCanvasMethods = {
             }
             if (!this.draggedShape) return;
 
-            let newX = e.clientX - this.dragStart.x;
-            let newY = e.clientY - this.dragStart.y;
+            // Convert mouse position from screen space to canvas space
+            const canvasMouseX = (e.clientX - rect.left - this.canvasPan.x) / this.canvasZoom;
+            const canvasMouseY = (e.clientY - rect.top - this.canvasPan.y) / this.canvasZoom;
+
+            let newX = canvasMouseX - this.dragStart.x;
+            let newY = canvasMouseY - this.dragStart.y;
 
             // Snap to grid
             if (this.snapToGrid) {
@@ -2079,8 +2091,9 @@ export const mindmapCanvasMethods = {
                 hasMoved = true;
             }
 
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
+            // Convert screen space delta to canvas space delta (account for zoom)
+            const dx = (e.clientX - startX) / this.canvasZoom;
+            const dy = (e.clientY - startY) / this.canvasZoom;
 
             // Adjust size based on handle position
             if (handlePos === 'se') {
