@@ -1,6 +1,7 @@
 // js/modules/search.js
 
 import { logger } from '../../utils/logger.js';
+import { paginatedList } from '../../components/paginated-list.js';
 
 export const searchMethods = {
     // Helper method to safely set search results
@@ -103,6 +104,7 @@ export const searchMethods = {
         // Clear search query
         this.searchQuery = '';
         this._updateSearchResults([]);
+        this._initSearchPagination();
 
         // Reset all filters to default (all 4 selected)
         this.searchFilters = ['audit', 'notes', 'flashcards', 'mindmaps'];
@@ -141,6 +143,7 @@ export const searchMethods = {
                 }, 300);
             } else {
                 this._updateSearchResults([]);
+                this._initSearchPagination();
             }
             return;
         }
@@ -194,6 +197,20 @@ export const searchMethods = {
         // Use helper method that handles both cases
         this._updateSearchResults(results);
         logger.debug(`[Search] Results updated, searchResults.length =`, this.searchResults.length);
+
+        // Initialize pagination for search results
+        this._initSearchPagination();
+    },
+
+    _initSearchPagination() {
+        // Initialize or update search pagination
+        // Use 25 initial items and load 25 more each time
+        if (this.searchPagination) {
+            this.searchPagination.updateItems(this.searchResults);
+        } else {
+            this.searchPagination = paginatedList(this.searchResults, 25, 25);
+        }
+        logger.debug(`[Search] Pagination initialized: ${this.searchPagination.visibleItems.length} visible of ${this.searchPagination.totalCount} total`);
     },
 
     _sortSearchResults(results, query) {
