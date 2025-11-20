@@ -1909,13 +1909,16 @@ export const mindmapCanvasMethods = {
                     pathElement.setAttribute('y2', toPoint.y);
                 }
 
-                // Make selected connections more visible with thicker stroke and brighter color
+                // Make selected connections more visible with brighter color
                 if (isSelected) {
                     pathElement.setAttribute('stroke', '#2196F3');  // Bright blue when selected
-                    pathElement.setAttribute('stroke-width', (parseFloat(strokeWidth) + 2).toString());  // Thicker
+                    pathElement.setAttribute('stroke-width', strokeWidth);
+                    // Add simple glow using CSS filter (much simpler than complex SVG filter)
+                    pathElement.style.filter = 'drop-shadow(0 0 8px rgba(33, 150, 243, 0.8))';
                 } else {
                     pathElement.setAttribute('stroke', strokeColor);
                     pathElement.setAttribute('stroke-width', strokeWidth);
+                    pathElement.style.filter = 'none';
                 }
 
                 if (connStyle.lineStyle === 'dashed') {
