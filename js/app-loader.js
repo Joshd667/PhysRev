@@ -56,6 +56,10 @@ import { logger } from './utils/logger.js';
             throw new Error(`Critical resources failed to load: ${failedResources.join(', ')}`);
         }
 
+        // Register pagination helpers before starting Alpine
+        const { registerPaginationHelpers } = await import('./components/paginated-list.js');
+        registerPaginationHelpers(Alpine);
+
         Alpine.data('physicsAuditTool', createApp(
             dataResult.specificationData,
             dataResult.paperModeGroups,

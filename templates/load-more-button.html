@@ -1,0 +1,37 @@
+<!-- Reusable Load More Button Component -->
+<!-- Usage: Include this where you want pagination controls -->
+<!-- Requires x-data with hasMore, loadMore(), remainingCount, and showAll() -->
+
+<div x-show="hasMore" class="flex flex-col items-center gap-3 py-6">
+    <!-- Progress indicator -->
+    <div class="w-full max-w-md">
+        <div class="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
+            <span>Showing <span x-text="visibleItems.length"></span> of <span x-text="totalCount"></span></span>
+            <span x-text="percentageLoaded + '%'"></span>
+        </div>
+        <div class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div
+                class="h-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-300 ease-out"
+                :style="`width: ${percentageLoaded}%`"
+            ></div>
+        </div>
+    </div>
+
+    <!-- Load More Button -->
+    <button
+        @click="loadMore()"
+        aria-label="Load more items"
+        class="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center space-x-2">
+        <i data-lucide="arrow-down-circle" class="w-5 h-5" aria-hidden="true"></i>
+        <span>Load More (<span x-text="remainingCount"></span> remaining)</span>
+    </button>
+
+    <!-- Show All Button (for smaller lists) -->
+    <button
+        x-show="remainingCount < 100"
+        @click="showAll()"
+        aria-label="Show all remaining items"
+        class="px-4 py-2 text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium underline">
+        Show All
+    </button>
+</div>
