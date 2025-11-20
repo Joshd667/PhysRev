@@ -2,6 +2,7 @@
 // Settings modal management and preferences
 
 import { checkForUpdates, activateUpdate } from '../../sw-registration.js';
+import { logger } from '../../utils/logger.js';
 
 // ⚡ PERFORMANCE: Cache privacy notice status in memory
 let privacyNoticeSeenCache = null;
@@ -66,7 +67,7 @@ export const settingsMethods = {
             const { idbSet } = await import('../../utils/indexeddb.js');
             await idbSet('physicsAuditPreferences', preferences);
         } catch (error) {
-            console.warn('Failed to save preferences:', error);
+            logger.warn('Failed to save preferences:', error);
         }
     },
 
@@ -114,7 +115,7 @@ export const settingsMethods = {
                 }
             }
         } catch (error) {
-            console.warn('Failed to load preferences:', error);
+            logger.warn('Failed to load preferences:', error);
         }
     },
 
@@ -142,7 +143,7 @@ export const settingsMethods = {
                 }
             });
         } catch (error) {
-            console.error('Update check failed:', error);
+            logger.error('Update check failed:', error);
             this.updateCheckMessage = 'Update check failed. Please try again.';
         } finally {
             this.checkingForUpdates = false;
@@ -153,7 +154,7 @@ export const settingsMethods = {
      * Install update immediately without backup
      */
     installUpdateNow() {
-        console.log('🚀 Installing update now...');
+        logger.log('🚀 Installing update now...');
         activateUpdate();
         // Service worker will reload the page
     },
@@ -171,19 +172,19 @@ export const settingsMethods = {
      */
     async backupAndUpdate() {
         try {
-            console.log('💾 Creating backup before update...');
+            logger.log('💾 Creating backup before update...');
 
             // Use existing backup method
             await this.exportDataBackup();
 
             // Wait a moment for backup to complete
             setTimeout(() => {
-                console.log('🚀 Installing update after backup...');
+                logger.log('🚀 Installing update after backup...');
                 activateUpdate();
                 // Service worker will reload the page
             }, 500);
         } catch (error) {
-            console.error('Backup failed:', error);
+            logger.error('Backup failed:', error);
             alert('Backup failed. Update cancelled for safety.');
         }
     },
@@ -198,31 +199,31 @@ export const settingsMethods = {
         }
 
         try {
-            console.log('🔄 Force refresh initiated - clearing everything...');
+            logger.log('🔄 Force refresh initiated - clearing everything...');
 
             // Clear all caches
             if ('caches' in window) {
                 const cacheNames = await caches.keys();
                 await Promise.all(cacheNames.map(name => {
-                    console.log(`🗑️ Deleting cache: ${name}`);
+                    logger.log(`🗑️ Deleting cache: ${name}`);
                     return caches.delete(name);
                 }));
-                console.log('✅ All Service Worker caches cleared');
+                logger.log('✅ All Service Worker caches cleared');
             }
 
             // Unregister ALL service workers
             if ('serviceWorker' in navigator) {
                 const registrations = await navigator.serviceWorker.getRegistrations();
                 await Promise.all(registrations.map(reg => {
-                    console.log('🗑️ Unregistering service worker');
+                    logger.log('🗑️ Unregistering service worker');
                     return reg.unregister();
                 }));
-                console.log('✅ Service worker unregistered');
+                logger.log('✅ Service worker unregistered');
             }
 
             // Hard reload with cache busting
-            console.log('🔄 Reloading with fresh files...');
-            console.log('📦 Service Worker will re-register and rebuild cache');
+            logger.log('🔄 Reloading with fresh files...');
+            logger.log('📦 Service Worker will re-register and rebuild cache');
 
             // Use cache-busting timestamp to force fresh load
             const url = new URL(window.location.href);
@@ -230,7 +231,7 @@ export const settingsMethods = {
             window.location.href = url.toString();
 
         } catch (error) {
-            console.error('❌ Force refresh failed:', error);
+            logger.error('❌ Force refresh failed:', error);
             alert('Force refresh failed: ' + error.message);
         }
     },
@@ -261,9 +262,9 @@ export const settingsMethods = {
             const { idbSet } = await import('../../utils/indexeddb.js');
             await idbSet('privacyNoticeSeen', true);
             privacyNoticeSeenCache = true; // ⚡ Update cache
-            console.log('✅ Privacy notice marked as seen');
+            logger.log('✅ Privacy notice marked as seen');
         } catch (error) {
-            console.warn('Failed to save privacy notice status:', error);
+            logger.warn('Failed to save privacy notice status:', error);
         }
     },
 
@@ -291,7 +292,7 @@ export const settingsMethods = {
                 this.openPrivacyNotice(isTeamsMode);
             }
         } catch (error) {
-            console.warn('Failed to check privacy notice status:', error);
+            logger.warn('Failed to check privacy notice status:', error);
         }
     },
 
@@ -327,9 +328,9 @@ export const settingsMethods = {
             const { idbSet } = await import('../../utils/indexeddb.js');
             await idbSet('privacyNoticeSeen', true);
             privacyNoticeSeenCache = true; // ⚡ Update cache
-            console.log('✅ Privacy notice marked as seen');
+            logger.log('✅ Privacy notice marked as seen');
         } catch (error) {
-            console.warn('Failed to save privacy notice status:', error);
+            logger.warn('Failed to save privacy notice status:', error);
         }
 
         // Now proceed with actual Teams login

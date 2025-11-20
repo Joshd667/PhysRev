@@ -1,3 +1,5 @@
+import { logger } from '../utils/logger.js';
+
 export function setupWatchers(app) {
     // ⚡ PERFORMANCE: Debounced icon refresh prevents excessive DOM manipulation
     let iconRefreshTimeout = null;
@@ -60,9 +62,9 @@ export function setupWatchers(app) {
             try {
                 if (typeof app.destroyAllCharts === 'function') {
                     app.destroyAllCharts();
-                    console.log('✅ Charts destroyed successfully');
+                    logger.log('✅ Charts destroyed successfully');
                 } else {
-                    console.warn('⚠️ destroyAllCharts not found, attempting manual cleanup');
+                    logger.warn('⚠️ destroyAllCharts not found, attempting manual cleanup');
 
                     if (app.chartInstances && app.chartInstances instanceof Map) {
                         let destroyedCount = 0;
@@ -73,19 +75,19 @@ export function setupWatchers(app) {
                                     destroyedCount++;
                                 }
                             } catch (e) {
-                                console.error(`Failed to destroy chart ${key}:`, e);
+                                logger.error(`Failed to destroy chart ${key}:`, e);
                             }
                         });
                         app.chartInstances.clear();
-                        console.log(`✅ Manual cleanup destroyed ${destroyedCount} charts`);
+                        logger.log(`✅ Manual cleanup destroyed ${destroyedCount} charts`);
                     }
                 }
 
                 if (app.chartInstances && app.chartInstances.size > 0) {
-                    console.warn(`⚠️ ${app.chartInstances.size} charts still remain after cleanup!`);
+                    logger.warn(`⚠️ ${app.chartInstances.size} charts still remain after cleanup!`);
                 }
             } catch (error) {
-                console.error('❌ Chart cleanup failed:', error);
+                logger.error('❌ Chart cleanup failed:', error);
             }
 
             app.analyticsData = null;
@@ -123,7 +125,7 @@ export function setupWatchers(app) {
     });
 
     window.addEventListener('app-update-available', () => {
-        console.log('📢 App update detected by Alpine.js');
+        logger.log('📢 App update detected by Alpine.js');
         app.updateAvailable = true;
     });
 

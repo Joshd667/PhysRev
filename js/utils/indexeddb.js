@@ -2,6 +2,8 @@
 // IndexedDB wrapper providing the same API as localStorage utilities
 // Provides much larger storage capacity and better performance for large datasets
 
+import { logger } from './logger.js';
+
 const DB_NAME = 'PhysicsAuditDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'keyValueStore'; // Simple key-value store
@@ -28,7 +30,7 @@ function initDB() {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
 
         request.onerror = () => {
-            console.error('IndexedDB open error:', request.error);
+            logger.error('IndexedDB open error:', request.error);
             reject(request.error);
         };
 
@@ -92,7 +94,7 @@ async function performTransaction(mode, operation) {
 
         return await operation(store, transaction);
     } catch (error) {
-        console.error('IndexedDB transaction error:', error);
+        logger.error('IndexedDB transaction error:', error);
         throw error;
     }
 }
@@ -302,7 +304,7 @@ export async function idbGetSize() {
         }
         return size;
     } catch (error) {
-        console.error('Error estimating IndexedDB size:', error);
+        logger.error('Error estimating IndexedDB size:', error);
         return 0;
     }
 }
@@ -335,107 +337,21 @@ export async function idbEstimateQuota() {
 }
 
 /**
- * Migrate data from localStorage to IndexedDB
- * This should be called once on first load after migration
- */
-export async function migrateFromLocalStorage() {
-    try {
-        const db = await getDB();
-        let migratedCount = 0;
-        let skippedCount = 0;
-
-        // Get all localStorage keys
-        const keys = Object.keys(localStorage);
-
-        if (keys.length === 0) {
-            return { success: true, migrated: 0, skipped: 0 };
-        }
-
-        // Migrate each key
-        for (const key of keys) {
-            try {
-                const value = localStorage.getItem(key);
-
-                // Skip if value is null or empty
-                if (!value) {
-                    skippedCount++;
-                    continue;
-                }
-
-                // Try to parse as JSON, store as-is if not JSON
-                let parsedValue;
-                try {
-                    parsedValue = JSON.parse(value);
-                } catch {
-                    parsedValue = value; // Store as string if not JSON
-                }
-
-                // Store in IndexedDB
-                await idbSet(key, parsedValue);
-                migratedCount++;
-
-            } catch (error) {
-                console.error(`Failed to migrate key "${key}":`, error);
-                skippedCount++;
-            }
-        }
-
-        // Mark migration as complete
-        await idbSet('_migration_complete', {
-            completed: true,
-            timestamp: Date.now(),
-            migratedCount,
-            skippedCount
-        });
-
-        return {
-            success: true,
-            migrated: migratedCount,
-            skipped: skippedCount
-        };
-
-    } catch (error) {
-        console.error('Migration error:', error);
-        return {
-            success: false,
-            error: error.message
-        };
-    }
-}
-
-/**
- * Check if migration has been completed
- */
-export async function isMigrationComplete() {
-    try {
-        const migrationData = await idbGet('_migration_complete');
-        return migrationData && migrationData.completed === true;
-    } catch (error) {
-        return false;
-    }
-}
-
-/**
- * Initialize IndexedDB and perform migration if needed
+ * Initialize IndexedDB
  * Call this on app startup
+ *
+ * NOTE: localStorage migration removed - this is the first public release
+ * All data is stored directly in IndexedDB from the start
  */
 export async function initIndexedDB() {
     try {
         await initDB();
-
-        // Check if migration needed
-        const migrationComplete = await isMigrationComplete();
-
-        if (!migrationComplete && localStorage.length > 0) {
-            const result = await migrateFromLocalStorage();
-        }
-
         return { success: true };
     } catch (error) {
-        console.error('IndexedDB initialization failed:', error);
+        logger.error('IndexedDB initialization failed:', error);
         return { success: false, error: error.message };
     }
 }
 
 // Auto-initialize on import (can be disabled if manual init preferred)
-// initIndexedDB().catch(console.error);
+// initIndexedDB().catch(logger.error);

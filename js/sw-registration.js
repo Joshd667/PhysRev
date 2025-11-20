@@ -1,5 +1,7 @@
 // js/sw-registration.js - Service Worker Registration with Manual Update Control
 
+import { logger } from './utils/logger.js';
+
 // Global update state - accessible by Alpine.js app
 window.appUpdateState = {
     updateAvailable: false,
@@ -74,7 +76,7 @@ export function registerServiceWorker() {
                 });
 
             } catch (error) {
-                console.error('❌ Service Worker registration failed:', error);
+                logger.error('❌ Service Worker registration failed:', error);
             }
         });
     }
@@ -100,7 +102,7 @@ export async function checkForUpdates() {
             return { available: false };
         }
     } catch (error) {
-        console.error('❌ Update check failed:', error);
+        logger.error('❌ Update check failed:', error);
         return { available: false, error: error.message };
     }
 }
@@ -124,7 +126,7 @@ export async function getPerformanceHistory() {
         const metrics = await idbGet('perfMetrics');
         return metrics || [];
     } catch (error) {
-        console.warn('Failed to load performance metrics:', error);
+        logger.warn('Failed to load performance metrics:', error);
         return [];
     }
 }
@@ -166,7 +168,7 @@ window.clearAllAppStorage = async function() {
 
         return result;
     } catch (error) {
-        console.error('❌ Clear failed:', error);
+        logger.error('❌ Clear failed:', error);
         return { success: false, error: error.message };
     }
 };
@@ -198,13 +200,13 @@ window.getStorageStats = async function() {
             }
         };
 
-        console.table(stats.storage);
-        console.table(stats.worker);
-        console.table(stats.serviceWorker);
+        logger.log('Storage stats:', stats.storage);
+        logger.log('Worker stats:', stats.worker);
+        logger.log('Service Worker stats:', stats.serviceWorker);
 
         return stats;
     } catch (error) {
-        console.error('Failed to get storage stats:', error);
+        logger.error('Failed to get storage stats:', error);
         return { error: error.message };
     }
 };

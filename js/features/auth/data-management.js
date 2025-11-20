@@ -4,6 +4,7 @@
 
 import { storageUtils } from '../../utils/storage.js';
 import { idbGet, idbSet, idbRemove, idbSetBatch } from '../../utils/indexeddb.js';
+import { logger } from '../../utils/logger.js';
 
 // Storage keys for separated data
 const STORAGE_KEYS = {
@@ -25,7 +26,7 @@ export const enhancedDataManagement = {
      */
     _verifyTeamsToken() {
         if (!this.authToken) {
-            console.error('🚨 SECURITY: No auth token present for Teams user');
+            logger.error('🚨 SECURITY: No auth token present for Teams user');
             return false;
         }
 
@@ -33,7 +34,7 @@ export const enhancedDataManagement = {
             // Parse JWT token (format: header.payload.signature)
             const parts = this.authToken.split('.');
             if (parts.length !== 3) {
-                console.error('🚨 SECURITY: Invalid token format');
+                logger.error('🚨 SECURITY: Invalid token format');
                 return false;
             }
 
@@ -44,20 +45,20 @@ export const enhancedDataManagement = {
             if (payload.exp) {
                 const now = Math.floor(Date.now() / 1000);
                 if (payload.exp < now) {
-                    console.error('🚨 SECURITY: Token expired');
+                    logger.error('🚨 SECURITY: Token expired');
                     return false;
                 }
             }
 
             // Verify user ID matches token subject
             if (payload.sub && payload.sub !== this.user?.id) {
-                console.error('🚨 SECURITY: User ID mismatch');
+                logger.error('🚨 SECURITY: User ID mismatch');
                 return false;
             }
 
             return true;
         } catch (error) {
-            console.error('🚨 SECURITY: Token verification failed:', error);
+            logger.error('🚨 SECURITY: Token verification failed:', error);
             return false;
         }
     },
@@ -70,7 +71,7 @@ export const enhancedDataManagement = {
         if (this.authMethod === 'teams' && this.user?.id) {
             // SECURITY: Verify token before granting access to Teams data
             if (!this._verifyTeamsToken()) {
-                console.error('🚨 SECURITY: Token verification failed - forcing logout');
+                logger.error('🚨 SECURITY: Token verification failed - forcing logout');
                 // Trigger logout to prevent unauthorized access
                 if (typeof this.logout === 'function') {
                     this.logout();
@@ -96,7 +97,7 @@ export const enhancedDataManagement = {
             if (error.name === 'QuotaExceededError') {
                 return await this._handleQuotaExceeded(type, error);
             }
-            console.error(`Failed to save ${type}:`, error);
+            logger.error(`Failed to save ${type}:`, error);
             return { success: false, error: error.message };
         }
     },
@@ -135,7 +136,7 @@ export const enhancedDataManagement = {
         const usage = await this._getStorageSize();
         const usageMB = (usage / 1024 / 1024).toFixed(2);
 
-        console.error(`Storage quota exceeded while saving ${type}. Usage: ${usageMB}MB`);
+        logger.error(`Storage quota exceeded while saving ${type}. Usage: ${usageMB}MB`);
 
         // Show user-friendly error using modal if available
         if (this.showCustomModal && this.showAlert) {
@@ -183,7 +184,7 @@ export const enhancedDataManagement = {
                     quotaMB: ((estimate.quota || 10 * 1024 * 1024) / 1024 / 1024).toFixed(2)
                 };
             } catch (e) {
-                console.warn('Storage estimate failed:', e);
+                logger.warn('Storage estimate failed:', e);
             }
         }
 
@@ -208,7 +209,7 @@ export const enhancedDataManagement = {
             const data = await storageUtils.load(key);
             return data !== null ? data : defaultValue;
         } catch (error) {
-            console.error(`Failed to load ${type}:`, error);
+            logger.error(`Failed to load ${type}:`, error);
             return defaultValue;
         }
     },
@@ -228,7 +229,7 @@ export const enhancedDataManagement = {
                 try {
                     return JSON.parse(JSON.stringify(data));
                 } catch (e) {
-                    console.warn('Failed to serialize data, using empty object:', e);
+                    logger.warn('Failed to serialize data, using empty object:', e);
                     return Array.isArray(data) ? [] : {};
                 }
             };
@@ -270,7 +271,7 @@ export const enhancedDataManagement = {
 
             return { success: true };
         } catch (error) {
-            console.error('❌ Atomic save failed:', error);
+            logger.error('❌ Atomic save failed:', error);
             return { success: false, error: error.message };
         }
     },
@@ -383,7 +384,7 @@ export const enhancedDataManagement = {
 
             return false;
         } catch (error) {
-            console.error('❌ Migration failed:', error);
+            logger.error('❌ Migration failed:', error);
             return false;
         }
     },
@@ -438,7 +439,7 @@ export const enhancedDataManagement = {
             this.analyticsHistoryData = historyData;
 
         } catch (error) {
-            console.warn('Could not load saved data:', error);
+            logger.warn('Could not load saved data:', error);
             this.confidenceLevels = {};
             this.analyticsHistoryData = [];
             this.userNotes = {};
