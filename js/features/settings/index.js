@@ -13,18 +13,37 @@ export const settingsMethods = {
      * ⚡ OPTIMIZED: Lazy-loads template on first use
      */
     async openSettings() {
-        // ⚡ Lazy-load settings modal template (57 KB) on first use
-        const { loadTemplateLazy } = await import('../../template-loader.js');
-        await loadTemplateLazy('settings-modal-container', './templates/settings-modal.html');
+        try {
+            // ⚡ Lazy-load settings modal template (57 KB) on first use
+            const { loadTemplateLazy } = await import('../../template-loader.js');
 
-        this.showSettingsModal = true;
-
-        // ⚡ Refresh icons after modal opens (debounced)
-        this.$nextTick(() => {
-            if (window.refreshIconsDebounced) {
-                window.refreshIconsDebounced();
+            // 🛡️ SAFETY: Handle version mismatch during updates
+            if (typeof loadTemplateLazy !== 'function') {
+                logger.warn('⚠️ loadTemplateLazy not available - reloading to complete update');
+                window.location.reload();
+                return;
             }
-        });
+
+            await loadTemplateLazy('settings-modal-container', './templates/settings-modal.html');
+
+            this.showSettingsModal = true;
+
+            // ⚡ Refresh icons after modal opens (debounced)
+            this.$nextTick(() => {
+                if (window.refreshIconsDebounced) {
+                    window.refreshIconsDebounced();
+                }
+            });
+        } catch (error) {
+            logger.error('❌ Failed to open settings:', error);
+            // If lazy loading fails during update, reload to complete the update
+            if (error.message && error.message.includes('not a function')) {
+                logger.warn('🔄 Reloading to complete app update...');
+                window.location.reload();
+            } else {
+                throw error; // Re-throw other errors for global handler
+            }
+        }
     },
 
     /**
@@ -286,6 +305,14 @@ export const settingsMethods = {
             if (!privacyNoticeSeenCache) {
                 // ⚡ Lazy-load privacy modal template (17 KB) only when needed
                 const { loadTemplateLazy } = await import('../../template-loader.js');
+
+                // 🛡️ SAFETY: Handle version mismatch during updates
+                if (typeof loadTemplateLazy !== 'function') {
+                    logger.warn('⚠️ loadTemplateLazy not available - reloading to complete update');
+                    window.location.reload();
+                    return;
+                }
+
                 await loadTemplateLazy('privacy-notice-modal-container', './templates/privacy-notice-modal.html');
 
                 // Show modal
@@ -293,6 +320,12 @@ export const settingsMethods = {
             }
         } catch (error) {
             logger.warn('Failed to check privacy notice status:', error);
+            // If lazy loading fails during update, reload to complete the update
+            if (error.message && error.message.includes('not a function')) {
+                logger.warn('🔄 Reloading to complete app update...');
+                window.location.reload();
+            }
+            // For other errors, just log and continue (user can still use app)
         }
     },
 
