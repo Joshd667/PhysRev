@@ -23,6 +23,22 @@ const DEFAULT_TEXT_STYLE = {
     italic: false
 };
 
+/**
+ * Escape HTML entities to prevent XSS (fallback for when DOMPurify is unavailable)
+ * @param {string} text - Text to escape
+ * @returns {string} - Escaped text safe for innerHTML
+ */
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    };
+    return String(text || '').replace(/[&<>"']/g, m => map[m]);
+}
+
 const DEFAULT_CONNECTOR_STYLE = {
     strokeColor: '#64748b',
     strokeWidth: 2,
@@ -1257,7 +1273,8 @@ export const mindmapCanvasMethods = {
                     }
                 });
             } else {
-                inner.innerHTML = shape.content || '';
+                // ✅ XSS FIX: Use escapeHtml as fallback when DOMPurify unavailable
+                inner.textContent = escapeHtml(shape.content || '');
             }
             content.appendChild(inner);
         } else if (shape.type === 'hexagon') {
@@ -1277,7 +1294,8 @@ export const mindmapCanvasMethods = {
                     }
                 });
             } else {
-                content.innerHTML = shape.content || '';
+                // ✅ XSS FIX: Use escapeHtml as fallback when DOMPurify unavailable
+                content.textContent = escapeHtml(shape.content || '');
             }
         } else {
             // ✅ XSS FIX: Sanitize user content in mindmap shapes
@@ -1295,7 +1313,8 @@ export const mindmapCanvasMethods = {
                     }
                 });
             } else {
-                content.innerHTML = shape.content || '';
+                // ✅ XSS FIX: Use escapeHtml as fallback when DOMPurify unavailable
+                content.textContent = escapeHtml(shape.content || '');
             }
         }
 
