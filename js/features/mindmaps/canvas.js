@@ -1787,53 +1787,11 @@ export const mindmapCanvasMethods = {
         const svg = document.getElementById('connectionsCanvas');
         if (!svg) return;
 
-        // Create glow filter for selected connections if it doesn't exist
+        // Get or create defs for arrow markers
         let defs = svg.querySelector('defs');
         if (!defs) {
             defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
             svg.appendChild(defs);
-        }
-
-        if (!svg.querySelector('#connection-glow')) {
-            const filter = document.createElementNS('http://www.w3.org/2000/svg', 'filter');
-            filter.setAttribute('id', 'connection-glow');
-            filter.setAttribute('x', '-100%');
-            filter.setAttribute('y', '-100%');
-            filter.setAttribute('width', '300%');
-            filter.setAttribute('height', '300%');
-
-            const feGaussianBlur = document.createElementNS('http://www.w3.org/2000/svg', 'feGaussianBlur');
-            feGaussianBlur.setAttribute('in', 'SourceGraphic');
-            feGaussianBlur.setAttribute('stdDeviation', '5');
-            feGaussianBlur.setAttribute('result', 'blur');
-
-            const feFlood = document.createElementNS('http://www.w3.org/2000/svg', 'feFlood');
-            feFlood.setAttribute('flood-color', '#2196f3');
-            feFlood.setAttribute('flood-opacity', '1');
-            feFlood.setAttribute('result', 'color');
-
-            const feComposite = document.createElementNS('http://www.w3.org/2000/svg', 'feComposite');
-            feComposite.setAttribute('in', 'color');
-            feComposite.setAttribute('in2', 'blur');
-            feComposite.setAttribute('operator', 'in');
-            feComposite.setAttribute('result', 'glow');
-
-            const feMerge = document.createElementNS('http://www.w3.org/2000/svg', 'feMerge');
-            const feMergeNode1 = document.createElementNS('http://www.w3.org/2000/svg', 'feMergeNode');
-            feMergeNode1.setAttribute('in', 'glow');
-            const feMergeNode2 = document.createElementNS('http://www.w3.org/2000/svg', 'feMergeNode');
-            feMergeNode2.setAttribute('in', 'glow');
-            const feMergeNode3 = document.createElementNS('http://www.w3.org/2000/svg', 'feMergeNode');
-            feMergeNode3.setAttribute('in', 'SourceGraphic');
-            feMerge.appendChild(feMergeNode1);
-            feMerge.appendChild(feMergeNode2);
-            feMerge.appendChild(feMergeNode3);
-
-            filter.appendChild(feGaussianBlur);
-            filter.appendChild(feFlood);
-            filter.appendChild(feComposite);
-            filter.appendChild(feMerge);
-            defs.appendChild(filter);
         }
 
         // Apply zoom and pan transforms to SVG group
@@ -1951,8 +1909,14 @@ export const mindmapCanvasMethods = {
                     pathElement.setAttribute('y2', toPoint.y);
                 }
 
-                pathElement.setAttribute('stroke', strokeColor);
-                pathElement.setAttribute('stroke-width', strokeWidth);
+                // Make selected connections more visible with thicker stroke and brighter color
+                if (isSelected) {
+                    pathElement.setAttribute('stroke', '#2196F3');  // Bright blue when selected
+                    pathElement.setAttribute('stroke-width', (parseFloat(strokeWidth) + 2).toString());  // Thicker
+                } else {
+                    pathElement.setAttribute('stroke', strokeColor);
+                    pathElement.setAttribute('stroke-width', strokeWidth);
+                }
 
                 if (connStyle.lineStyle === 'dashed') {
                     pathElement.setAttribute('stroke-dasharray', '5,5');
@@ -1960,14 +1924,10 @@ export const mindmapCanvasMethods = {
                     pathElement.setAttribute('stroke-dasharray', '2,2');
                 }
 
-                // Add glow effect if selected
-                if (isSelected) {
-                    pathElement.setAttribute('filter', 'url(#connection-glow)');
-                }
-
-                // Add arrow marker if needed
+                // Add arrow marker if needed (use bright blue for selected connections)
                 if (connStyle.arrowType && connStyle.arrowType !== 'none') {
-                    const markerId = this.createArrowMarkers(svg, strokeColor, connStyle.arrowType);
+                    const arrowColor = isSelected ? '#2196F3' : strokeColor;
+                    const markerId = this.createArrowMarkers(svg, arrowColor, connStyle.arrowType);
                     pathElement.setAttribute('marker-end', `url(#${markerId})`);
                 }
 
