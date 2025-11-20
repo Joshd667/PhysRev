@@ -13,6 +13,7 @@ import {
     idbEstimateQuota,
     initIndexedDB
 } from './indexeddb.js';
+import { logger } from './logger.js';
 
 // ✅ PERFORMANCE: Web Worker for large JSON serialization (>100KB)
 let storageWorker = null;
@@ -36,13 +37,13 @@ function initWorker() {
                 }
             };
             storageWorker.onerror = (e) => {
-                console.error('Storage Worker error:', e);
+                logger.error('Storage Worker error:', e);
                 workerCallbacks.forEach(cb => cb.reject(new Error('Worker error')));
                 workerCallbacks.clear();
                 terminateWorker();
             };
         } catch (e) {
-            console.warn('Web Worker not available, falling back to main thread');
+            logger.warn('Web Worker not available, falling back to main thread');
             storageWorker = null;
         }
     }
@@ -57,9 +58,9 @@ function terminateWorker() {
     if (storageWorker) {
         try {
             storageWorker.terminate();
-            console.log('🧹 Storage Worker terminated');
+            logger.log('🧹 Storage Worker terminated');
         } catch (e) {
-            console.warn('Failed to terminate worker:', e);
+            logger.warn('Failed to terminate worker:', e);
         }
         storageWorker = null;
     }

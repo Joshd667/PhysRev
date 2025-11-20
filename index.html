@@ -14,7 +14,33 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Physics Audit">
 
-    <!-- Security: Strengthened Content Security Policy -->
+    <!-- Security: Content Security Policy
+         ⚠️ KNOWN LIMITATION: unsafe-inline and unsafe-eval are required for Alpine.js
+
+         Why this weakens security:
+         - unsafe-inline: Allows inline event handlers and script tags
+         - unsafe-eval: Allows eval() and new Function() (used by Alpine.js)
+         - This significantly reduces CSP protection against XSS attacks
+
+         Why we can't remove it:
+         - Alpine.js uses inline expressions in HTML (x-on, x-bind, etc.)
+         - Alpine.js reactive system uses new Function() internally
+         - TailwindCSS config uses inline script
+
+         Our mitigation strategy (Defense-in-Depth):
+         1. ✅ DOMPurify sanitization on all user content (9+ files)
+         2. ✅ Input validation (confidence levels, test scores)
+         3. ✅ HMAC data integrity signing
+         4. ✅ Local-first architecture (no external data transmission)
+         5. ✅ Regular security audits and XSS testing
+
+         Future options:
+         - Migrate to CSP Level 3 with nonce support (complex with Service Worker)
+         - Migrate to Vue 3/React with strict CSP (major rewrite)
+         - Monitor Alpine.js for CSP improvements
+
+         See SECURITY.md for full documentation.
+    -->
     <meta http-equiv="Content-Security-Policy"
           content="default-src 'self';
                    script-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://cdn.tailwindcss.com 'unsafe-inline' 'unsafe-eval';
@@ -33,6 +59,7 @@
 
     <!-- 🚀 Preload critical resources -->
     <link rel="preload" href="./resources/combined-data.json" as="fetch" crossorigin>
+    <!-- ⚠️ TODO: Add SRI hash to Alpine.js preload -->
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/module.esm.js" as="script" crossorigin>
     <link rel="dns-prefetch" href="//cdn.jsdelivr.net">
     <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
@@ -62,11 +89,21 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8" crossorigin="anonymous"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
 
-    <!-- Security: DOMPurify for XSS prevention -->
+    <!-- Security: DOMPurify for XSS prevention
+         ⚠️ TODO: Add SRI hash for integrity verification
+         Generate hash: node tools/generate-sri-hashes.js
+         Format: integrity="sha384-HASH" crossorigin="anonymous"
+    -->
     <script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
 
-    <!-- External scripts (deferred for faster page load) -->
+    <!-- External scripts (deferred for faster page load)
+         ⚠️ TODO: Add SRI hashes to prevent supply chain attacks
+         Run: node tools/generate-sri-hashes.js
+    -->
     <script defer src="https://unpkg.com/lucide@0.546.0/dist/umd/lucide.min.js"></script>
+    <!-- ⚠️ TODO: Pin Chart.js version and add SRI
+         Change to: https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js
+    -->
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Your app loader (must be last) -->

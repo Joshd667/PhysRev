@@ -1,0 +1,107 @@
+{
+  "name": "physics-knowledge-audit-tool",
+  "version": "1.0.0",
+  "description": "Progressive Web Application for A-Level Physics revision, confidence tracking, and study material organization",
+  "type": "module",
+  "main": "index.html",
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
+    "test:watch": "vitest --watch",
+    "serve": "python3 -m http.server 8000",
+    "serve:https": "python3 -m http.server 8443 --bind localhost --directory . --protocol HTTP/1.1",
+    "generate-sri": "node tools/generate-sri-hashes.js",
+    "lint:console": "grep -r \"console\\.\" js/ --exclude-dir=node_modules || true"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Joshd667/PhysRev.git"
+  },
+  "keywords": [
+    "physics",
+    "education",
+    "revision",
+    "a-level",
+    "pwa",
+    "study-tool",
+    "flashcards",
+    "notes",
+    "analytics"
+  ],
+  "author": "Josh D",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@vitest/ui": "^1.1.0",
+    "jsdom": "^23.0.1",
+    "vitest": "^1.1.0"
+  },
+  "peerDependencies": {
+    "note": "CDN dependencies listed below are loaded at runtime, not bundled"
+  },
+  "cdnDependencies": {
+    "alpinejs": "3.13.3",
+    "chart.js": "4.4.1",
+    "dompurify": "3.0.6",
+    "katex": "0.16.9",
+    "lucide": "0.546.0",
+    "tailwindcss": "latest"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "browserslist": [
+    "last 2 Chrome versions",
+    "last 2 Firefox versions",
+    "last 2 Safari versions",
+    "last 2 Edge versions",
+    "iOS >= 13",
+    "Android >= 8"
+  ],
+  "files": [
+    "index.html",
+    "manifest.json",
+    "sw.js",
+    "css/",
+    "js/",
+    "resources/",
+    "templates/",
+    "legal/",
+    "favicon.ico",
+    "README.md",
+    "SECURITY.md",
+    "TESTING.md"
+  ],
+  "directories": {
+    "test": "tests",
+    "doc": "."
+  },
+  "homepage": "https://github.com/Joshd667/PhysRev#readme",
+  "bugs": {
+    "url": "https://github.com/Joshd667/PhysRev/issues"
+  },
+  "private": false,
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/Joshd667"
+  },
+  "config": {
+    "sri-algorithm": "sha384",
+    "service-worker-version": "20250119-003"
+  },
+  "custom": {
+    "security": {
+      "sri": "partial",
+      "csp": "enabled-with-unsafe",
+      "xss-protection": "dompurify",
+      "last-audit": "2025-01-20"
+    },
+    "deployment": {
+      "type": "static",
+      "requires-https": true,
+      "offline-capable": true
+    }
+  }
+}

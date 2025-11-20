@@ -1,0 +1,281 @@
+# Physics Knowledge Audit Tool - .gitignore
+
+# ===================================
+# Dependency directories
+# ===================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Package manager lockfiles (optional - uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# ===================================
+# Environment & Configuration
+# ===================================
+
+# Environment variables (NEVER commit these!)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+
+# Teams authentication credentials (CRITICAL - NEVER commit!)
+js/features/auth/teams-config.js
+config/teams-credentials.json
+
+# Local configuration overrides
+config.local.js
+config.local.json
+
+# ===================================
+# IDE & Editor Files
+# ===================================
+
+# VS Code
+.vscode/
+*.code-workspace
+.history/
+
+# JetBrains IDEs (WebStorm, IntelliJ, etc.)
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.*.sw[a-z]
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+.\#*
+.*.elc
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+# ===================================
+# Operating System Files
+# ===================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ===================================
+# Build & Distribution
+# ===================================
+
+# Build outputs
+dist/
+build/
+out/
+.output/
+.nuxt/
+.next/
+.cache/
+
+# Compiled files
+*.min.js
+*.min.css
+*.bundle.js
+*.bundle.css
+
+# Source maps (if generated)
+*.map
+
+# ===================================
+# Testing & Coverage
+# ===================================
+
+# Test coverage
+coverage/
+.nyc_output/
+*.lcov
+.coverage
+htmlcov/
+
+# Test results
+test-results/
+playwright-report/
+test-output/
+
+# ===================================
+# Logs
+# ===================================
+
+# General logs
+*.log
+logs/
+*.log.*
+
+# Runtime logs
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ===================================
+# Temporary Files
+# ===================================
+
+# Temporary directories
+tmp/
+temp/
+.tmp/
+.temp/
+
+# Backup files
+*.bak
+*.backup
+*.old
+*~
+
+# ===================================
+# Service Worker & Cache
+# ===================================
+
+# Service Worker generated files (if any)
+sw-generated.js
+
+# ===================================
+# Security & Sensitive Data
+# ===================================
+
+# API keys, secrets, credentials
+*.key
+*.pem
+*.p12
+*.pfx
+*.cert
+*.crt
+secrets.json
+credentials.json
+
+# User data backups (shouldn't be in repo)
+*.backup.json
+user-data/
+backups/
+
+# ===================================
+# Documentation Generated Files
+# ===================================
+
+# Documentation builds
+docs/_build/
+docs/.doctrees/
+site/
+
+# ===================================
+# Miscellaneous
+# ===================================
+
+# Debug files
+debug/
+*.debug
+
+# Lock files for tools
+.eslintcache
+.stylelintcache
+.prettiercache
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
+# ===================================
+# Project-Specific
+# ===================================
+
+# Old/archived code (if present)
+*.OLD/
+js.OLD/
+backup/
+
+# Development test files
+test.html
+debug.html
+scratch.js
+
+# Local server configs
+.htaccess.local
+nginx.conf.local
+
+# ===================================
+# Keep These Files (Whitelist)
+# ===================================
+
+# Force include important files even if patterns above would exclude them
+!.gitignore
+!.gitattributes
+!README.md
+!SECURITY.md
+!TESTING.md
+
+# Keep template config files
+!js/features/auth/teams-config.template.js
+
+# ===================================
+# END OF .gitignore
+# ===================================
+
+# TIP: To check what would be ignored:
+#   git check-ignore -v <filename>
+#
+# TIP: To untrack a file already committed:
+#   git rm --cached <filename>
+#   Then commit the .gitignore update
