@@ -30,7 +30,7 @@
     "analytics"
   ],
   "author": "Josh D",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "dependencies": {},
   "devDependencies": {
     "@vitest/ui": "^1.1.0",
@@ -82,7 +82,7 @@
   "bugs": {
     "url": "https://github.com/Joshd667/PhysRev/issues"
   },
-  "private": false,
+  "private": true,
   "funding": {
     "type": "individual",
     "url": "https://github.com/sponsors/Joshd667"
