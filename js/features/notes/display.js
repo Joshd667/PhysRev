@@ -59,7 +59,17 @@ export const notesDisplayMethods = {
 
         if (typeof document !== 'undefined') {
             const temp = document.createElement('div');
-            temp.innerHTML = note.content;
+            // ✅ XSS FIX: Sanitize user content before parsing
+            // DOMPurify.sanitize with ALLOWED_TAGS:[] strips all HTML, keeps text only
+            if (window.DOMPurify) {
+                temp.innerHTML = DOMPurify.sanitize(note.content, {
+                    ALLOWED_TAGS: [],        // Strip all HTML tags
+                    KEEP_CONTENT: true       // Keep text content
+                });
+            } else {
+                // Fallback if DOMPurify not loaded: strip tags with regex
+                temp.textContent = note.content.replace(/<[^>]+>/g, ' ');
+            }
             text = (temp.textContent || temp.innerText || '').replace(/\s+/g, ' ').trim();
         } else {
             text = note.content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -272,7 +282,32 @@ export const notesDisplayMethods = {
 
         // Clean up equations for export
         const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = content;
+        // ✅ XSS FIX: Sanitize user content before export
+        if (window.DOMPurify) {
+            tempDiv.innerHTML = DOMPurify.sanitize(content, {
+                ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3',
+                               'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote',
+                               'code', 'pre', 'a', 'span', 'div', 'table', 'tr',
+                               'td', 'th', 'thead', 'tbody'],
+                ALLOWED_ATTR: ['href', 'style', 'class', 'id', 'data-latex', 'contenteditable', 'title'],
+                ALLOWED_STYLES: {
+                    '*': {
+                        'color': [/.*/],
+                        'background-color': [/.*/],
+                        'font-size': [/.*/],
+                        'text-align': [/.*/],
+                        'font-weight': [/.*/],
+                        'font-style': [/.*/],
+                        'border-left': [/.*/],
+                        'padding-left': [/.*/],
+                        'margin': [/.*/],
+                        'display': [/.*/]
+                    }
+                }
+            });
+        } else {
+            tempDiv.innerHTML = content;
+        }
 
         // Find all equation containers and clean them up
         const equations = tempDiv.querySelectorAll('.katex-container');
