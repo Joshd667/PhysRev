@@ -1,0 +1,171 @@
+# Attribution & Third-Party Licenses
+
+This project uses the following open-source libraries and resources. We are grateful to their maintainers and contributors.
+
+---
+
+## Third-Party JavaScript Libraries
+
+### Alpine.js
+- **Version:** 3.13.3
+- **License:** MIT License
+- **Copyright:** Copyright (c) 2019-2024 Caleb Porzio and contributors
+- **Source:** https://github.com/alpinejs/alpine
+- **Usage:** Lightweight reactive UI framework
+- **License Text:** https://github.com/alpinejs/alpine/blob/main/LICENSE.md
+
+### Chart.js
+- **Version:** 4.4.1
+- **License:** MIT License
+- **Copyright:** Copyright (c) 2014-2024 Chart.js Contributors
+- **Source:** https://github.com/chartjs/Chart.js
+- **Usage:** Data visualization and analytics charts
+- **License Text:** https://github.com/chartjs/Chart.js/blob/master/LICENSE.md
+
+### DOMPurify
+- **Version:** 3.0.6
+- **License:** Apache License 2.0 / MPL 2.0 (dual-licensed)
+- **Copyright:** Copyright (c) 2015 Mario Heiderich, Cure53
+- **Source:** https://github.com/cure53/DOMPurify
+- **Usage:** XSS sanitization for user-generated content
+- **License Text:**
+  - Apache 2.0: https://github.com/cure53/DOMPurify/blob/main/LICENSE
+  - MPL 2.0: https://www.mozilla.org/en-US/MPL/2.0/
+
+### KaTeX
+- **Version:** 0.16.9
+- **License:** MIT License
+- **Copyright:** Copyright (c) 2013-2024 Khan Academy and other contributors
+- **Source:** https://github.com/KaTeX/KaTeX
+- **Usage:** Mathematical equation rendering
+- **License Text:** https://github.com/KaTeX/KaTeX/blob/main/LICENSE
+
+### Lucide Icons
+- **Version:** 0.546.0
+- **License:** ISC License
+- **Copyright:** Copyright (c) 2022 Lucide Contributors
+- **Source:** https://github.com/lucide-icons/lucide
+- **Usage:** Icon library for UI elements
+- **License Text:** https://github.com/lucide-icons/lucide/blob/main/LICENSE
+
+### Tailwind CSS
+- **Version:** Latest (via CDN - not recommended for production)
+- **License:** MIT License
+- **Copyright:** Copyright (c) Tailwind Labs, Inc.
+- **Source:** https://github.com/tailwindlabs/tailwindcss
+- **Usage:** Utility-first CSS framework
+- **License Text:** https://github.com/tailwindlabs/tailwindcss/blob/master/LICENSE
+- **Note:** CDN version used for development only. Production deployments should use a build process.
+
+---
+
+## Dev Dependencies (npm)
+
+### Vitest
+- **License:** MIT License
+- **Usage:** Testing framework
+- **Source:** https://github.com/vitest-dev/vitest
+
+### jsdom
+- **License:** MIT License
+- **Usage:** DOM implementation for testing
+- **Source:** https://github.com/jsdom/jsdom
+
+---
+
+## Educational Content
+
+### Physics Curriculum Topics
+The physics topics and learning objectives included in this application are based on publicly available A-Level physics specifications commonly taught in the UK, including content derived from:
+
+- **AQA A-Level Physics Specification**
+  - © Assessment and Qualifications Alliance (AQA)
+  - Used under fair dealing for educational purposes
+
+- **Edexcel (Pearson) A-Level Physics**
+  - © Pearson Education Limited
+  - Used under fair dealing for educational purposes
+
+- **OCR A-Level Physics**
+  - © Oxford Cambridge and RSA Examinations (OCR)
+  - Used under fair dealing for educational purposes
+
+- **WJEC A-Level Physics**
+  - © Welsh Joint Education Committee (WJEC)
+  - Used under fair dealing for educational purposes
+
+**Disclaimer:** This application is an independent educational study tool and is not affiliated with, endorsed by, or sponsored by any exam board. Learning objectives and examples have been written by the application developers to cover A-Level physics content. Users should consult official exam board specifications and resources for authoritative information.
+
+---
+
+## Fonts and Design Resources
+
+### System Fonts
+This application uses system native fonts for optimal performance:
+- **San Francisco** (macOS/iOS): © Apple Inc.
+- **Segoe UI** (Windows): © Microsoft Corporation
+- **Roboto** (Android): © Google LLC - Apache License 2.0
+- **Noto Sans** (Linux): © Google LLC - SIL Open Font License
+
+---
+
+## License Compliance
+
+### MIT License Requirements
+All MIT-licensed libraries require inclusion of the copyright notice and permission notice. These requirements are satisfied by:
+1. This ATTRIBUTION.md file
+2. Inline comments in source code referencing library names
+3. Links to original license texts
+
+### Apache License 2.0 Requirements (DOMPurify)
+The Apache License 2.0 requires:
+- ✅ Copyright notice (included above)
+- ✅ License text reference (linked above)
+- ✅ Notice of modifications (if any): No modifications made to DOMPurify library code
+- ✅ Patent grant: Inherited from original license
+
+### ISC License Requirements (Lucide Icons)
+The ISC License is functionally equivalent to MIT License. Requirements satisfied by copyright notice and permission notice in this file.
+
+---
+
+## Subresource Integrity (SRI)
+
+For security, all CDN resources should include Subresource Integrity (SRI) hashes to prevent supply chain attacks. SRI hashes can be generated using:
+
+```bash
+node tools/generate-sri-hashes.js
+```
+
+**Current SRI Status:**
+- ✅ KaTeX: SRI hash implemented
+- ⚠️ Alpine.js: SRI hash needed
+- ⚠️ Chart.js: SRI hash needed
+- ⚠️ DOMPurify: SRI hash needed
+- ⚠️ Lucide Icons: SRI hash needed
+- ⚠️ Tailwind CSS: SRI hash needed
+
+---
+
+## Contributing
+
+If you add new third-party dependencies to this project, please update this file with:
+1. Library name and version
+2. License type and copyright holder
+3. Source repository link
+4. Brief usage description
+5. Link to license text
+
+---
+
+## Questions or Concerns
+
+If you have questions about licensing or attribution, or believe any attribution is incorrect or incomplete, please:
+1. Open an issue on the project repository
+2. Contact the project maintainers
+3. Refer to individual library license files for authoritative information
+
+---
+
+**Last Updated:** 2025-11-20
+**Document Version:** 1.0

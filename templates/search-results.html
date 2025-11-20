@@ -2,7 +2,8 @@
                         <div x-show="searchVisible" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform -translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" class="mb-6">
                             <div class="space-y-3">
                                 <!-- Search Input -->
-                                <div class="relative max-w-2xl mx-auto">
+                                <div class="relative max-w-2xl mx-auto" role="search">
+                                    <label for="searchInput" class="sr-only">Search physics topics</label>
                                     <input
                                         id="searchInput"
                                         name="search"
@@ -10,21 +11,22 @@
                                         @input="performSearch()"
                                         @keydown.escape="toggleSearch()"
                                         @focus="if (searchQuery.trim()) performSearch()"
-                                        type="text"
+                                        type="search"
+                                        aria-label="Search physics topics"
                                         placeholder="Search topics..."
                                         class="w-full px-4 py-3 pl-12 pr-12 text-lg text-slate-800 dark:text-slate-200 placeholder-slate-500 dark:placeholder-slate-400 bg-white dark:bg-gray-800 border border-slate-300 dark:border-slate-600 rounded-lg focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 shadow-sm transition-all"
                                     />
-                                    <i data-lucide="search" class="w-5 h-5 text-slate-400 dark:text-slate-500 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"></i>
-                                    <button x-show="searchQuery" @click="searchQuery = ''; performSearch(); $nextTick(() => document.getElementById('searchInput')?.focus())" class="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors">
-                                        <i data-lucide="x" class="w-4 h-4 text-slate-400 dark:text-slate-500"></i>
+                                    <i data-lucide="search" class="w-5 h-5 text-slate-400 dark:text-slate-500 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true"></i>
+                                    <button x-show="searchQuery" @click="searchQuery = ''; performSearch(); $nextTick(() => document.getElementById('searchInput')?.focus())" aria-label="Clear search query" class="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors">
+                                        <i data-lucide="x" class="w-4 h-4 text-slate-400 dark:text-slate-500" aria-hidden="true"></i>
                                     </button>
                                 </div>
 
                                 <!-- Filter Buttons Row -->
                                 <div class="flex items-center justify-center gap-2 flex-wrap">
                                     <!-- Clear All Filters Button -->
-                                    <button @click="clearAllSearchFilters()" class="inline-flex items-center px-3 py-1.5 border rounded-lg text-sm font-medium transition-colors bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600/80 whitespace-nowrap" title="Clear all filters">
-                                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                    <button @click="clearAllSearchFilters()" aria-label="Clear all search filters" class="inline-flex items-center px-3 py-1.5 border rounded-lg text-sm font-medium transition-colors bg-gray-100 dark:bg-gray-700/60 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600/80 whitespace-nowrap" title="Clear all filters">
+                                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5" aria-hidden="true"></i>
                                     </button>
 
                                     <!-- Vertical Divider -->

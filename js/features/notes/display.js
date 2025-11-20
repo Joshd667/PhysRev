@@ -272,6 +272,20 @@ export const notesDisplayMethods = {
      * Export a saved note as HTML and open in new window for printing
      * @param {string} noteId - The ID of the note to export
      */
+    /**
+     * Escape HTML entities to prevent XSS
+     */
+    escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        };
+        return String(text).replace(/[&<>"']/g, m => map[m]);
+    },
+
     exportSavedNoteAsHTML(noteId) {
         const note = this.userNotes[noteId];
         if (!note) {
@@ -280,6 +294,7 @@ export const notesDisplayMethods = {
         }
 
         const title = note.title || 'Untitled Note';
+        const escapedTitle = this.escapeHtml(title);
         let content = note.content || '';
 
         // Clean up equations for export
@@ -348,7 +363,7 @@ export const notesDisplayMethods = {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title}</title>
+    <title>${escapedTitle}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <style>
         body {
@@ -397,7 +412,7 @@ export const notesDisplayMethods = {
     </style>
 </head>
 <body>
-    <h1>${title}</h1>
+    <h1>${escapedTitle}</h1>
     ${content}
 </body>
 </html>
