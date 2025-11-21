@@ -111,11 +111,38 @@ The app uses a sophisticated caching and storage strategy combining Service Work
 - **Purpose**: Persistent user data with ~50MB+ capacity
 - **Location**: `js/utils/indexeddb.js`
 - **Database**: `PhysicsAuditDB`
-- **What's Stored**: Notes, flashcards, mindmaps, confidence levels, analytics history
+- **What's Stored**: Notes, flashcards, mindmaps, confidence levels, analytics history, settings, auth tokens
 - **Features**:
   - Automatic migration from localStorage on first load
   - 30-day analytics cleanup to prevent quota issues
   - Asynchronous operations (non-blocking)
+  - HMAC data integrity signing for sensitive data
+
+**Why IndexedDB (not localStorage)?**
+
+| Issue | localStorage | IndexedDB |
+|-------|-------------|-----------|
+| **Capacity** | 5-10 MB limit | 100s of MB |
+| **Performance** | Synchronous (blocks UI) | Asynchronous (non-blocking) |
+| **Data Type** | Strings only | Objects, arrays, blobs |
+| **Transactions** | None | ACID guarantees |
+
+**localStorage Usage (Minimal)**
+
+The app still uses localStorage for 2 specific cases:
+
+1. **Migration Code** (`js/utils/indexeddb.js:340-404`)
+   - One-time migration from legacy localStorage to IndexedDB
+   - Runs automatically on first load for users with old data
+   - Marked complete after migration (never runs again)
+
+2. **Debug Flag** (`js/utils/logger.js`)
+   - Stores `DEBUG` boolean flag
+   - Synchronous access required (logger checks instantly)
+   - Non-sensitive data (just a preference)
+   - Example: `localStorage.setItem('DEBUG', 'true')`
+
+All user data is in IndexedDB. localStorage references are for backward compatibility and debug tooling only.
 
 **3. Web Worker (Serialization)**
 - **Purpose**: Offload heavy JSON processing from main thread

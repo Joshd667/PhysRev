@@ -294,6 +294,39 @@ All saved data is cryptographically signed:
 - ✅ Test results (validated 0-100)
 - ✅ Import/export data
 
+### Storage Security
+
+**Primary Storage:** IndexedDB (all user data)
+**Secondary:** localStorage (debug flag only)
+
+**IndexedDB Security:**
+- ✅ Same-origin policy (domain-isolated)
+- ✅ No network transmission (local-only)
+- ✅ HMAC signing on sensitive data
+- ✅ Automatic migration from legacy localStorage
+- ⚠️ Not encrypted at rest (browser limitation)
+- ⚠️ Accessible via JavaScript (XSS risk mitigated)
+
+**localStorage Usage (Minimal):**
+- ✅ Debug flag only (`DEBUG` boolean)
+- ✅ Migration code (one-time, backward compatibility)
+- ✅ Non-sensitive data only
+
+**Mitigations:**
+- XSS prevention with DOMPurify (100% coverage)
+- Input validation on all imports
+- Local-first architecture (no transmission)
+- User-controlled data clearing
+
+**GDPR Compliance:**
+- ✅ All data stored locally (not transmitted)
+- ✅ No cookies (PECR compliant)
+- ✅ User has full control (export/clear)
+- ✅ 30-day retention for analytics
+- ✅ No personal data in localStorage
+
+For implementation details, see [ARCHITECTURE.md - Storage & Caching](docs/guides/ARCHITECTURE.md#storage--caching-architecture).
+
 ---
 
 ## 📊 Testing & Validation
