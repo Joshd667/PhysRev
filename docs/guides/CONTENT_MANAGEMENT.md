@@ -446,7 +446,7 @@ After updating CSV files:
 
 For production or frequent use, convert CSVs to optimized JSON v2.0:
 
-1. **Open unified converter** (Settings → Admin → CSV to JSON Converter, or `tools/csv-converter-unified.html`)
+1. **Open CSV converter** (Settings → Admin → CSV to JSON Converter, or `tools/csv-converter.html`, or via `tools/index.html` dashboard)
 
 2. **Choose mode**:
    - **Server Mode**: Automatically fetches all 16 CSV files from your web server
