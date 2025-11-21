@@ -70,8 +70,8 @@ export function paginatedList(items = [], pageSize = 50, increment = 25) {
         // Update source data
         updateItems(newItems) {
             this._allItems = newItems;
-            // Reset if current display exceeds new items
-            if (this._displayCount > newItems.length) {
+            // Reset if current display exceeds new items OR if display is zero and we have new items
+            if (this._displayCount > newItems.length || (this._displayCount === 0 && newItems.length > 0)) {
                 this._displayCount = Math.min(this._pageSize, newItems.length);
             }
             logger.debug(`Updated items. Total: ${newItems.length}, Showing: ${this._displayCount}`);
