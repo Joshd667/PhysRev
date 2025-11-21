@@ -140,6 +140,40 @@ export const notesDisplayMethods = {
             );
         }
 
+        // Build list of valid topic IDs based on current filters
+        // This ensures we only group by tags that are relevant to the current view
+        let validTopicIds = null;
+
+        if (this.viewMode === 'paper' && this.selectedPaper) {
+            // In paper mode, only use topics from the selected paper
+            validTopicIds = new Set();
+            this.currentGroups.forEach(item => {
+                if (item.type === 'single') {
+                    const sectionTopics = this.specificationData[item.key]?.topics?.map(t => t.id) || [];
+                    sectionTopics.forEach(id => validTopicIds.add(id));
+                } else if (item.type === 'group' && item.sections) {
+                    item.sections.forEach(sectionKey => {
+                        const sectionTopics = this.specificationData[sectionKey]?.topics?.map(t => t.id) || [];
+                        sectionTopics.forEach(id => validTopicIds.add(id));
+                    });
+                }
+            });
+        } else if (this.contentFilterGroup) {
+            // In group filter mode, only use topics from that group
+            validTopicIds = new Set();
+            const groupItem = this.currentGroups.find(item => item.type === 'group' && item.title === this.contentFilterGroup);
+            if (groupItem && groupItem.sections) {
+                groupItem.sections.forEach(sectionKey => {
+                    const sectionTopics = this.specificationData[sectionKey]?.topics?.map(t => t.id) || [];
+                    sectionTopics.forEach(id => validTopicIds.add(id));
+                });
+            }
+        } else if (this.contentFilterSection) {
+            // In section filter mode, only use topics from that section
+            const sectionTopics = this.specificationData[this.contentFilterSection]?.topics?.map(t => t.id) || [];
+            validTopicIds = new Set(sectionTopics);
+        }
+
         const groupMap = {};
         const pinnedNotes = [];
 
@@ -177,7 +211,12 @@ export const notesDisplayMethods = {
                 groupMap['untagged'].sections['untagged'].notes.push(note);
             } else {
                 // Add to appropriate group and section based on tags
-                note.tags.forEach(tagId => {
+                // Only process tags that are valid for the current view (paper/group/section filter)
+                const tagsToProcess = validTopicIds
+                    ? note.tags.filter(tagId => validTopicIds.has(tagId))
+                    : note.tags;
+
+                tagsToProcess.forEach(tagId => {
                     const topicInfo = this.topicLookup[tagId];
                     if (topicInfo) {
                         const sectionKey = topicInfo.sectionName;
@@ -193,9 +232,9 @@ export const notesDisplayMethods = {
                             }
                         }
 
-                        // If no group found, create a default group
+                        // If no group found, skip this tag (it's not in current view)
                         if (!groupTitle) {
-                            groupTitle = topicInfo.sectionPaper || 'Other Topics';
+                            return;
                         }
 
                         // Create group if it doesn't exist
