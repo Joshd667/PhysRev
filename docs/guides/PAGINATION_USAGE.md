@@ -1,6 +1,25 @@
-# Pagination & Virtual Scroll Usage Guide
+# Pagination Usage Guide
 
-This application includes a powerful pagination system to handle large lists efficiently.
+**For Developers**
+
+This application includes a pagination system to handle large lists efficiently. This guide explains how to use the `$paginated` magic helper and `paginatedList` component in your templates.
+
+---
+
+## Current Usage in App
+
+Pagination is actively used in these templates:
+
+| Template | Usage | Config |
+|----------|-------|--------|
+| `all-notes-view.html` | Notes list | 30 initial, 15 increment |
+| `all-flashcards-view.html` | Flashcard decks list | 30 initial, 15 increment |
+| `search-results.html` | Search results | Dynamic pagination |
+
+**Implementation:** `js/components/paginated-list.js`
+**Registration:** Loaded in `js/app-loader.js` (available globally as `$paginated` magic helper)
+
+---
 
 ## Quick Start
 
@@ -89,7 +108,15 @@ import { paginatedList } from './js/components/paginated-list.js';
 
 ## Virtual Scrolling (Advanced)
 
-For very large lists (1000+ items), use virtual scrolling:
+> **⚠️ Note:** Virtual scrolling is implemented but **not currently used** in the app. The code is available for future use if needed for lists with 1000+ items.
+>
+> **Implementation Note:** There are two virtual scroll implementations:
+> - `js/components/paginated-list.js` - `virtualScrollList()` function (integrated with pagination)
+> - `js/utils/virtual-scroll.js` - Standalone `virtualScroll()` utility
+>
+> Both are registered as `$virtualScroll` magic helper. Consider consolidating these in the future.
+
+For very large lists (1000+ items), virtual scrolling can be used:
 
 ```html
 <div
@@ -276,14 +303,17 @@ pagination.updateItems(newArray);
 
 ---
 
-## Future Enhancements
+## Potential Future Enhancements
 
-Potential improvements:
-- [ ] Infinite scroll (auto-load on scroll)
-- [ ] Search filtering with pagination
-- [ ] Lazy image loading
-- [ ] Pagination state persistence
-- [ ] Keyboard navigation (Page Up/Down)
+> **Note:** These are potential ideas for future development, not active TODOs. The current pagination system meets all current needs.
+
+Possible improvements if needed:
+- Infinite scroll (auto-load on scroll instead of "Load More" button)
+- Search filtering integrated with pagination
+- Lazy image loading for thumbnail-heavy lists
+- Pagination state persistence (remember scroll position)
+- Keyboard navigation (Page Up/Down keys)
+- Virtual scrolling integration for lists with 1000+ items
 
 ---
 

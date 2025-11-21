@@ -93,10 +93,11 @@ http://localhost:8000
 - **[Architecture Guide](docs/guides/ARCHITECTURE.md)** - Technical architecture details
 - **[Deployment Guide](docs/guides/DEPLOYMENT.md)** - Production deployment instructions
 - **[Content Management](docs/guides/CONTENT_MANAGEMENT.md)** - Managing CSV data files
+- **[Pagination Usage](docs/guides/PAGINATION_USAGE.md)** - Using the pagination system
+- **[Data Architecture](docs/guides/DATA_ARCHITECTURE.md)** - Technical data implementation guide
 
 ### Setup Guides
 - **[Teams Authentication](docs/guides/TEAMS_AUTH_SETUP.md)** - Microsoft Teams login setup
-- **[Pagination Usage](docs/guides/PAGINATION_USAGE.md)** - Using the pagination system
 
 ### Security & Audits
 - **[Security Policy](SECURITY.md)** - Security guidelines
