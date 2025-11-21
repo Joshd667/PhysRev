@@ -901,7 +901,7 @@ Right-click index.html → "Open with Live Server"
 
 ### Testing
 
-For testing procedures and checklists, see **[TESTING.md](TESTING.md)**.
+For testing procedures and checklists, see **[TESTING.md](docs/guides/TESTING.md)**.
 
 ### Optimizing Data Loading
 
@@ -1024,7 +1024,7 @@ For 10x faster loading, convert CSVs to JSON using the unified converter:
 
 ## 🧪 Testing
 
-For comprehensive testing checklists and procedures, see **[TESTING.md](TESTING.md)**.
+For comprehensive testing checklists and procedures, see **[TESTING.md](docs/guides/TESTING.md)**.
 
 **Quick Test:**
 ```bash
@@ -1094,7 +1094,7 @@ const urlsToCache = [
 - [ ] Verify Service Worker registers correctly
 - [ ] Test offline functionality
 - [ ] Check all external CDN links work
-- [ ] Complete manual testing checklist (see [TESTING.md](TESTING.md))
+- [ ] Complete manual testing checklist (see [TESTING.md](docs/guides/TESTING.md))
 - [ ] Test manual update flow (increment version, verify badge, test backup)
 
 ---
@@ -2360,7 +2360,7 @@ Reduced console output from 60+ verbose log lines to clean 3-line summary:
 - `README.md` - Moved detailed testing to separate file, updated changelog
 
 **Files Created:**
-- `TESTING.md` - Comprehensive testing guide with all checklists and procedures
+- `docs/guides/TESTING.md` - Comprehensive testing guide with all checklists and procedures
 
 **📊 Performance Improvements:**
 
