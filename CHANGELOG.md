@@ -19,6 +19,15 @@ This changelog focuses on **major milestones** rather than detailed feature chan
 
 Massively expanded and restructured project documentation to reflect current build state, improve developer onboarding, and clarify security risks.
 
+**🛠️ Developer Tools Enhancement (2025-11-21)**
+
+Implemented unified navigation across developer tools with consistent UX:
+- **Toggle Navigation**: Tools ↔ Docs switcher on all tool pages with active state highlighting
+- **Documentation Hub**: GitHub-style markdown viewer with syntax highlighting and auto-generated TOC
+- **Consolidated CSV Converter**: Single unified tool with both server and local modes
+- **Service Worker Exclusion**: Developer tools now bypass cache for always-fresh content
+- **Visual Consistency**: All tools match main app styling with Tailwind CSS and Lucide icons
+
 **New Documentation:**
 - **[docs/guides/README.md](docs/guides/README.md)** - Comprehensive documentation index (NEW)
 - **[CONSOLE_COMMANDS.md](docs/guides/CONSOLE_COMMANDS.md)** - Browser console debugging reference (NEW)
