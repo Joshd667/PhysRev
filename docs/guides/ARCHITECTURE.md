@@ -248,6 +248,7 @@ physics-revision-main/
 │   │   ├── csv-converter.js  # Shared CSV conversion logic (eliminates duplication)
 │   │   ├── resource-schema.js # Shared resource object schemas (single source of truth)
 │   │   ├── content-filter.js # Shared filter methods generator (eliminates triplication)
+│   │   ├── logger.js         # Production-safe logging utility (debug mode toggle)
 │   │   ├── date.js           # Date formatting utilities
 │   │   ├── statistics.js     # Statistics calculations
 │   │   ├── storage.js        # Storage utilities (IndexedDB wrapper)
@@ -297,3 +298,64 @@ physics-revision-main/
 
 ---
 
+
+## Production-Safe Logging
+
+### Logger Utility
+
+**Location:** `js/utils/logger.js`
+
+The app uses a production-safe logger utility that replaces all direct `console.*` calls with conditional logging.
+
+**Implementation:**
+- **Development** (localhost): All logs visible by default
+- **Production**: Only errors logged by default  
+- **Debug mode**: User-controlled toggle for detailed logging
+
+**Migration Status:** ✅ **COMPLETE** (v2.10 - October 2023)
+- All JavaScript modules migrated from `console.*` to `logger.*`
+- Service Worker intentionally kept `console.*` (separate context, useful for debugging)
+- Global error handlers kept `console.error()` (critical errors must always be visible)
+
+**Usage:**
+```javascript
+import { logger } from './utils/logger.js';
+
+logger.log('Debug info')      // Only in debug mode
+logger.warn('Warning')         // Only in debug mode
+logger.error('Critical!')      // ALWAYS logged
+logger.info('Information')     // Only in debug mode
+logger.debug('Trace details')  // Only in debug mode
+```
+
+**Console Access:**
+The logger is available globally for debugging:
+```javascript
+// Toggle debug mode
+logger.enableDebug()          // Show all logs
+logger.disableDebug()         // Production mode (errors only)
+
+// Check status
+logger.isDebugEnabled()       // Returns true/false
+
+// Direct localStorage control
+localStorage.setItem('DEBUG', 'true')    // Enable
+localStorage.removeItem('DEBUG')         // Disable
+```
+
+**Benefits:**
+- ✅ **Clean production console** - No debug noise for end users
+- ✅ **User-controlled debugging** - Users can enable detailed logging when reporting issues
+- ✅ **Performance** - Zero overhead when logs are disabled
+- ✅ **Environment detection** - Automatically shows logs on localhost
+- ✅ **Persistent toggle** - Debug mode survives page reloads (localStorage)
+
+**Architecture Notes:**
+- Module exports singleton `logger` object
+- Checks `window.DEBUG` and `localStorage.DEBUG` on each call
+- Environment detection via `window.location.hostname`
+- No external dependencies
+
+See [DEVELOPMENT.md](DEVELOPMENT.md#debug-mode) for user documentation.
+
+---
