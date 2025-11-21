@@ -62,15 +62,71 @@ Add SRI hashes to CDN dependencies to prevent supply chain attacks.
 - Industry best practice for CDN usage
 - Reduces attack surface
 
-## Documentation
+## Content Development
 
-### Content Management Guide
+### Paper 3 Support
 
-**Priority:** Low
-**Location:** `docs/guides/CONTENT_MANAGEMENT.md:372`
+**Priority:** Medium
+**Location:** CSV files and `js/data/unified-csv-loader.js`
 
-- Track TODOs for incomplete content in the content management guide
-- This appears to be a general note about tracking content completeness
+Paper 3 UI is complete (button, navigation, filtering), but content needs to be added.
+
+**Content work (for educators - see CONTENT_MANAGEMENT.md):**
+- ✅ Paper 3 button exists in sidebar
+- ✅ Paper 3 filtering logic implemented
+- ⚠️ Add Paper 3 groups to `resources/groups.csv`
+- ⚠️ Create Paper 3 topic CSV files (astrophysics.csv, medical-physics.csv, engineering-physics.csv)
+- ⚠️ Add revision resources for Paper 3 topics
+
+**Developer work (if new CSV files are created):**
+
+**Location:** `js/data/unified-csv-loader.js` (lines 57-68)
+
+If educators create new Paper 3 CSV files, they must be registered in the CSV loader array.
+
+**Current array:**
+```javascript
+const csvFiles = [
+    'measurements.csv',
+    'particles.csv',
+    'waves.csv',
+    'mechanics.csv',
+    'electricity.csv',
+    'periodic-motion.csv',
+    'thermal.csv',
+    'fields.csv',
+    'magnetic-fields.csv',
+    'nuclear.csv'
+];
+```
+
+**Required additions (example):**
+```javascript
+const csvFiles = [
+    'measurements.csv',
+    'particles.csv',
+    'waves.csv',
+    'mechanics.csv',
+    'electricity.csv',
+    'periodic-motion.csv',
+    'thermal.csv',
+    'fields.csv',
+    'magnetic-fields.csv',
+    'nuclear.csv',
+    'astrophysics.csv',        // NEW - Paper 3
+    'medical-physics.csv',      // NEW - Paper 3
+    'engineering-physics.csv'   // NEW - Paper 3
+];
+```
+
+**Testing:**
+1. Add new file names to the array
+2. Save the file
+3. Hard refresh browser (Ctrl+Shift+R)
+4. Check browser console for CSV loading errors
+5. Navigate to Paper 3 to verify content appears
+
+**Note:** If Paper 3 content is added to existing CSV files instead of creating new ones, no code changes are needed.
 
 ## Future Enhancements
 
