@@ -272,7 +272,14 @@ export const flashcardManagementMethods = {
         const topicIds = this.currentRevisionTopics.map(topic => topic.id);
 
         return Object.values(this.flashcardDecks || {})
-            .filter(deck => deck.tags && deck.tags.some(tag => topicIds.includes(tag)))
+            .filter(deck => {
+                // Primary: Check if ANY tag matches ANY topic in the revision section
+                if (deck.tags && deck.tags.length > 0) {
+                    return deck.tags.some(tag => topicIds.includes(tag));
+                }
+                // Fallback: For backward compatibility with old decks, check sectionId
+                return deck.sectionId === this.currentRevisionSection;
+            })
             .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
     },
 

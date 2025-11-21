@@ -274,7 +274,14 @@ export const noteManagementMethods = {
         const topicIds = this.currentRevisionTopics.map(topic => topic.id);
 
         return Object.values(this.userNotes || {})
-            .filter(note => note.tags && note.tags.some(tag => topicIds.includes(tag)))
+            .filter(note => {
+                // Primary: Check if ANY tag matches ANY topic in the revision section
+                if (note.tags && note.tags.length > 0) {
+                    return note.tags.some(tag => topicIds.includes(tag));
+                }
+                // Fallback: For backward compatibility with old notes, check sectionId
+                return note.sectionId === this.currentRevisionSection;
+            })
             .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
     },
 
