@@ -2217,6 +2217,33 @@ export const mindmapCanvasMethods = {
     /**
      * Export diagram as SVG
      */
+    /**
+     * Sanitize HTML content for SVG export
+     * Ensures content is safe and well-formed for embedding in SVG foreignObject
+     */
+    sanitizeContentForSVG(content) {
+        if (!content) return '';
+
+        // Use DOMPurify to sanitize and fix malformed HTML
+        if (window.DOMPurify) {
+            return DOMPurify.sanitize(content, {
+                ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'span', 'ul', 'ol', 'li'],
+                ALLOWED_ATTR: ['style'],
+                ALLOWED_STYLES: {
+                    '*': {
+                        'color': [/^#[0-9A-Fa-f]{3,6}$/],
+                        'font-size': [/^\d+px$/],
+                        'font-weight': [/^(normal|bold)$/],
+                        'font-style': [/^(normal|italic)$/]
+                    }
+                }
+            });
+        } else {
+            // Fallback to escaping HTML entities
+            return escapeHtml(content);
+        }
+    }
+
     async exportMindmapAsSVG() {
         if (this.mindmapEditorData.nodes.length === 0) {
             await this.showAlert('Nothing to export! Add some shapes first.', 'Nothing to Export');
@@ -2336,9 +2363,11 @@ export const mindmapCanvasMethods = {
             }
 
             // Use foreignObject to render HTML content (including equations)
+            // ✅ Sanitize content to prevent XML errors and malformed HTML
+            const sanitizedContent = this.sanitizeContentForSVG(shape.content);
             svgContent += `  <foreignObject x="${x}" y="${y}" width="${shape.width}" height="${shape.height}">
     <div xmlns="http://www.w3.org/1999/xhtml" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 8px; box-sizing: border-box; font-family: ${textStyle.fontFamily}; font-size: ${textStyle.fontSize}; color: ${textStyle.color}; font-weight: ${textStyle.bold ? 'bold' : 'normal'}; font-style: ${textStyle.italic ? 'italic' : 'normal'}; overflow: hidden; word-wrap: break-word;">
-      ${shape.content || ''}
+      ${sanitizedContent}
     </div>
   </foreignObject>\n`;
         });
