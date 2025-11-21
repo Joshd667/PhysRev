@@ -186,6 +186,9 @@
             <div x-show="notesViewMode === 'card' && !getNotePreview()"
                  x-data="{
                      get allNotes() {
+                         if (!notesGroupedBySection || !Array.isArray(notesGroupedBySection)) {
+                             return [];
+                         }
                          return notesGroupedBySection.flatMap(g =>
                              (g?.sections || []).flatMap(s => s?.notes || [])
                          ).filter(note => note && note.id);
