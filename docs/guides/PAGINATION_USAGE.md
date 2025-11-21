@@ -317,6 +317,19 @@ Possible improvements if needed:
 
 ---
 
+## Related Documentation
+
+- **[DEVELOPMENT.md](DEVELOPMENT.md)** - Development workflow and adding new features
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** - System architecture and component patterns
+- **[README.md](README.md)** - Complete documentation index
+
+**For implementation details:**
+- Source code: `js/components/paginated-list.js`
+- Component registration: `js/app-loader.js`
+- Current usage examples: `templates/all-notes-view.html`, `templates/all-flashcards-view.html`, `templates/search-results.html`
+
+---
+
 **Created:** 2025-11-20
-**Last Updated:** 2025-11-20
+**Last Updated:** 2025-11-21
 **Version:** 1.0

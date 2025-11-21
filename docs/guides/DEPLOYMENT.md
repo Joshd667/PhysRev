@@ -50,6 +50,8 @@ const BUILD_TIMESTAMP = '20250121-001';  // Increment this
 
 This ensures users get the latest version by invalidating old caches.
 
+> **For detailed versioning guide:** See [DEVELOPMENT.md - Service Worker Versioning](DEVELOPMENT.md#versioning) for complete information on when and how to increment the BUILD_TIMESTAMP.
+
 ### 3. Test Locally
 
 Before deployment, verify everything works:
@@ -283,6 +285,8 @@ The app uses manual update control. Users must click the update badge to install
 - ✅ Data file changes (combined-data.json)
 - ✅ Template changes
 - ❌ External resource changes (videos, notes - just update CSVs)
+
+> **How to increment:** See [DEVELOPMENT.md - Service Worker Versioning](DEVELOPMENT.md#versioning) for step-by-step instructions.
 
 ### Cache Strategy
 

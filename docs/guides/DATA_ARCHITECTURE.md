@@ -781,7 +781,7 @@ window.topicToSectionMapping = topicToSectionMapping;
 
 - **[CONTENT_MANAGEMENT.md](CONTENT_MANAGEMENT.md)** - Guide for teachers/educators editing content
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - Overall system architecture
-- **[TODO.md](../../TODO.md)** - Outstanding tasks (including Paper 3 content work)
+- **[TODO.md](../TODO.md)** - Outstanding tasks (including Paper 3 content work)
 
 ---
 

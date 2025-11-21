@@ -348,7 +348,7 @@ Before deploying to production:
 - [ ] Remove debug console.logs (optional, or ensure debug mode disabled in production)
 - [ ] Verify Teams login button disabled (if not configured)
 - [ ] **Test manual update flow**:
-  - [ ] Increment BUILD_TIMESTAMP in `sw.js` (line 1, format: YYYYMMDD-NNN)
+  - [ ] Increment BUILD_TIMESTAMP in `sw.js` (line 1, format: YYYYMMDD-NNN) - See [DEVELOPMENT.md - Versioning](DEVELOPMENT.md#versioning) for details
   - [ ] Deploy new version
   - [ ] Refresh app - verify badge appears (no auto-reload)
   - [ ] Open Settings → Updates - verify notification shows
