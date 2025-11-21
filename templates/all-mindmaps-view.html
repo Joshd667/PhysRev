@@ -88,7 +88,7 @@
                             <!-- Mindmaps in this section -->
                             <div x-show="sectionExpanded" class="space-y-3">
                                 <template x-for="mindmap in section.mindmaps" :key="mindmap.id">
-                                    <div x-data="{ mindmapExpanded: false }" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+                                    <div :data-mindmap-id="mindmap.id" x-data="{ mindmapExpanded: false }" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
                                         <!-- Mindmap Header (always visible) -->
                                         <div class="p-4 flex items-start justify-between">
                                             <div @click="mindmapExpanded = !mindmapExpanded" class="flex items-start space-x-2 flex-1 cursor-pointer">

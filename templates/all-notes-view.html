@@ -198,7 +198,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); })" x-effect="if (notesViewMode === 'card' && window.lucide) { $nextTick(() => lucide.createIcons()); }">
                     <template x-for="note in (notePagination ? notePagination.visibleItems : allNotes)" :key="note.id">
-                            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-2 hover:shadow-lg transition-all flex flex-col h-full" :class="note.pinned ? 'border-yellow-400 dark:border-yellow-500' : 'border-blue-200 dark:border-blue-700'">
+                            <div :data-note-id="note.id" class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-2 hover:shadow-lg transition-all flex flex-col h-full" :class="note.pinned ? 'border-yellow-400 dark:border-yellow-500' : 'border-blue-200 dark:border-blue-700'">
                                 <div class="p-6 flex-1 flex flex-col">
                                     <!-- Header with Actions -->
                                     <div class="flex items-start justify-between mb-3">
