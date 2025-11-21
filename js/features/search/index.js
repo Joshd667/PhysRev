@@ -370,14 +370,23 @@ export const searchMethods = {
             }
 
             const searchText = `${note.title || ''} ${note.content || ''} ${(note.tags || []).join(' ')}`.toLowerCase();
-            const sectionInfo = this.specificationData[note.sectionId];
+
+            // Try to get section title from the note's tags via topicLookup
+            let sectionTitle = 'Untagged';
+            if (note.tags && note.tags.length > 0 && this.topicLookup) {
+                const firstTagInfo = this.topicLookup[note.tags[0]];
+                if (firstTagInfo && firstTagInfo.sectionTitle) {
+                    sectionTitle = firstTagInfo.sectionTitle;
+                }
+            }
+
             results.push({
                 type: 'note',
                 id: note.id,
                 title: note.title,
                 content: note.content,
                 sectionId: note.sectionId,
-                sectionTitle: sectionInfo?.title || 'Unknown Section',
+                sectionTitle: sectionTitle,
                 tags: note.tags || [],
                 createdAt: note.createdAt,
                 updatedAt: note.updatedAt,
@@ -409,14 +418,22 @@ export const searchMethods = {
             const deckText = `${deck.name || ''} ${(deck.tags || []).join(' ')}`.toLowerCase();
             const cardsText = (deck.cards || []).map(card => `${card.front || ''} ${card.back || ''}`).join(' ').toLowerCase();
             const searchText = `${deckText} ${cardsText}`;
-            const sectionInfo = this.specificationData[deck.sectionId];
+
+            // Try to get section title from the deck's tags via topicLookup
+            let sectionTitle = 'Untagged';
+            if (deck.tags && deck.tags.length > 0 && this.topicLookup) {
+                const firstTagInfo = this.topicLookup[deck.tags[0]];
+                if (firstTagInfo && firstTagInfo.sectionTitle) {
+                    sectionTitle = firstTagInfo.sectionTitle;
+                }
+            }
 
             results.push({
                 type: 'flashcard',
                 id: deck.id,
                 title: deck.name,
                 sectionId: deck.sectionId,
-                sectionTitle: sectionInfo?.title || 'Unknown Section',
+                sectionTitle: sectionTitle,
                 cardCount: deck.cards?.length || 0,
                 tags: deck.tags || [],
                 createdAt: deck.createdAt,
@@ -448,14 +465,22 @@ export const searchMethods = {
 
             const shapesText = (mindmap.shapes || []).map(shape => shape.text || '').join(' ').toLowerCase();
             const searchText = `${mindmap.title || ''} ${shapesText} ${(mindmap.tags || []).join(' ')}`.toLowerCase();
-            const sectionInfo = this.specificationData[mindmap.sectionId];
+
+            // Try to get section title from the mindmap's tags via topicLookup
+            let sectionTitle = 'Untagged';
+            if (mindmap.tags && mindmap.tags.length > 0 && this.topicLookup) {
+                const firstTagInfo = this.topicLookup[mindmap.tags[0]];
+                if (firstTagInfo && firstTagInfo.sectionTitle) {
+                    sectionTitle = firstTagInfo.sectionTitle;
+                }
+            }
 
             results.push({
                 type: 'mindmap',
                 id: mindmap.id,
                 title: mindmap.title,
                 sectionId: mindmap.sectionId,
-                sectionTitle: sectionInfo?.title || 'Unknown Section',
+                sectionTitle: sectionTitle,
                 shapeCount: mindmap.shapes?.length || 0,
                 tags: mindmap.tags || [],
                 createdAt: mindmap.createdAt,
@@ -558,12 +583,43 @@ export const searchMethods = {
                 }, 100);
             });
         } else if (result.type === 'note') {
-            // Navigate to note
+            // Navigate to note - don't filter by section, just show all notes and scroll to the specific one
             this.viewType = 'notes';
-            this.setNotesFilterSection(result.sectionId);
+            this.showingMainMenu = false;
+            this.showingSpecificSection = false;
+            // Clear section/group filters to ensure the note is visible
+            this.contentFilterSection = null;
+            this.contentFilterGroup = null;
+            if (window.innerWidth < 768) this.sidebarVisible = false;
             this.$nextTick(() => {
                 setTimeout(() => {
-                    const noteElement = document.querySelector(`[data-note-id="${result.id}"]`);
+                    // Check if note element exists in DOM (might be paginated out)
+                    let noteElement = document.querySelector(`[data-note-id="${result.id}"]`);
+
+                    // If not found, try to expand pagination to show all notes
+                    if (!noteElement) {
+                        // Find the notes card view container with pagination
+                        const notesContainer = document.querySelector('[x-data*="notePagination"]');
+                        if (notesContainer && window.Alpine) {
+                            // Access Alpine data and call showAll() to load all notes
+                            const alpineData = window.Alpine.$data(notesContainer);
+                            if (alpineData && alpineData.notePagination && typeof alpineData.notePagination.showAll === 'function') {
+                                alpineData.notePagination.showAll();
+                                // Wait for DOM to update after showing all notes
+                                setTimeout(() => {
+                                    noteElement = document.querySelector(`[data-note-id="${result.id}"]`);
+                                    if (noteElement) {
+                                        noteElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        noteElement.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+                                        setTimeout(() => { noteElement.style.backgroundColor = ''; }, 2000);
+                                    }
+                                }, 150);
+                                return; // Exit to avoid double scrolling
+                            }
+                        }
+                    }
+
+                    // If element found or pagination not available, scroll normally
                     if (noteElement) {
                         noteElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         noteElement.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
@@ -572,10 +628,15 @@ export const searchMethods = {
                 }, 100);
             });
         } else if (result.type === 'flashcard') {
-            // Navigate to flashcard deck
+            // Navigate to flashcard deck - don't filter by section, just show all decks and scroll to the specific one
             this.viewType = 'flashcards';
             this.studyMaterialsFilter = 'decks';
-            this.setFlashcardsFilterSection(result.sectionId);
+            this.showingMainMenu = false;
+            this.showingSpecificSection = false;
+            // Clear section/group filters to ensure the deck is visible
+            this.contentFilterSection = null;
+            this.contentFilterGroup = null;
+            if (window.innerWidth < 768) this.sidebarVisible = false;
             this.$nextTick(() => {
                 setTimeout(() => {
                     const deckElement = document.querySelector(`[data-deck-id="${result.id}"]`);
@@ -587,9 +648,14 @@ export const searchMethods = {
                 }, 100);
             });
         } else if (result.type === 'mindmap') {
-            // Navigate to mindmap
+            // Navigate to mindmap - don't filter by section, just show all mindmaps and scroll to the specific one
             this.viewType = 'mindmaps';
-            this.setMindmapsFilterSection(result.sectionId);
+            this.showingMainMenu = false;
+            this.showingSpecificSection = false;
+            // Clear section/group filters to ensure the mindmap is visible
+            this.contentFilterSection = null;
+            this.contentFilterGroup = null;
+            if (window.innerWidth < 768) this.sidebarVisible = false;
             this.$nextTick(() => {
                 setTimeout(() => {
                     const mindmapElement = document.querySelector(`[data-mindmap-id="${result.id}"]`);
