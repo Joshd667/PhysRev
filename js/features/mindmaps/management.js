@@ -316,9 +316,13 @@ export const mindmapManagementMethods = {
      */
     getMindmapsForCurrentSection() {
         if (!this.currentRevisionSection) return [];
+        if (!this.currentRevisionTopics || this.currentRevisionTopics.length === 0) return [];
+
+        // Get topic IDs from current revision topics
+        const topicIds = this.currentRevisionTopics.map(topic => topic.id);
 
         return Object.values(this.mindmaps || {})
-            .filter(mindmap => mindmap.sectionId === this.currentRevisionSection)
+            .filter(mindmap => mindmap.tags && mindmap.tags.some(tag => topicIds.includes(tag)))
             .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
     }
 };

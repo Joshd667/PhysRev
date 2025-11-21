@@ -268,9 +268,13 @@ export const noteManagementMethods = {
      */
     getNotesForCurrentSection() {
         if (!this.currentRevisionSection) return [];
+        if (!this.currentRevisionTopics || this.currentRevisionTopics.length === 0) return [];
+
+        // Get topic IDs from current revision topics
+        const topicIds = this.currentRevisionTopics.map(topic => topic.id);
 
         return Object.values(this.userNotes || {})
-            .filter(note => note.sectionId === this.currentRevisionSection)
+            .filter(note => note.tags && note.tags.some(tag => topicIds.includes(tag)))
             .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
     },
 
