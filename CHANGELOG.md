@@ -20,6 +20,7 @@ This changelog focuses on **major milestones** rather than detailed feature chan
 Massively expanded and restructured project documentation to reflect current build state, improve developer onboarding, and clarify security risks.
 
 **New Documentation:**
+- **[docs/guides/README.md](docs/guides/README.md)** - Comprehensive documentation index (NEW)
 - **[CONSOLE_COMMANDS.md](docs/guides/CONSOLE_COMMANDS.md)** - Browser console debugging reference (NEW)
 - **[TODO.md](docs/TODO.md)** - Outstanding tasks and known issues tracker (NEW)
 
@@ -38,6 +39,7 @@ Massively expanded and restructured project documentation to reflect current bui
 - **[README.md](README.md)** - Updated navigation and categorization
 
 **Key Improvements:**
+- 📚 **Comprehensive documentation index** with audience-based navigation and topic organization
 - ⚠️ **Critical security warnings** for Teams auth (ACTIVE but NON-FUNCTIONAL with placeholder credentials)
 - 🔧 **BUILD_TIMESTAMP versioning** documented consistently across all guides
 - 🧪 **192 comprehensive test items** covering security, performance, accessibility

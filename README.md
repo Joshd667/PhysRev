@@ -84,27 +84,35 @@ http://localhost:8000
 
 ## 📖 Documentation
 
-### User Guides
-- **[Testing Guide](docs/guides/TESTING.md)** - Comprehensive testing checklists
-- **[Attribution](docs/guides/ATTRIBUTION.md)** - Third-party licenses
+### 📚 Start Here
 
-### Developer Guides
-- **[Development Guide](docs/guides/DEVELOPMENT.md)** - Setup, tools, and best practices
-- **[Console Commands](docs/guides/CONSOLE_COMMANDS.md)** - Browser console debugging reference
-- **[Architecture Guide](docs/guides/ARCHITECTURE.md)** - Technical architecture details
-- **[Deployment Guide](docs/guides/DEPLOYMENT.md)** - Production deployment instructions
-- **[Content Management](docs/guides/CONTENT_MANAGEMENT.md)** - Managing CSV data files
-- **[Pagination Usage](docs/guides/PAGINATION_USAGE.md)** - Using the pagination system
-- **[Data Architecture](docs/guides/DATA_ARCHITECTURE.md)** - Technical data implementation guide
+**[Complete Documentation Index](docs/guides/README.md)** - Comprehensive guide index organized by audience (educators, developers, admins) and topic
 
-### Setup Guides
+### Quick Links by Role
+
+**For Educators:**
+- **[Content Management](docs/guides/CONTENT_MANAGEMENT.md)** - Standalone guide for managing physics topics (no coding required)
+
+**For Developers:**
+- **[Development Guide](docs/guides/DEVELOPMENT.md)** - Setup, tools, and workflow
+- **[Architecture Guide](docs/guides/ARCHITECTURE.md)** - Technical architecture and design patterns
+- **[Testing Guide](docs/guides/TESTING.md)** - Comprehensive testing procedures
+
+**For System Administrators:**
+- **[Deployment Guide](docs/guides/DEPLOYMENT.md)** - Production deployment
 - **[Teams Authentication](docs/guides/TEAMS_AUTH_SETUP.md)** - Microsoft Teams login setup
 
-### Security & Audits
-- **[Security Policy](SECURITY.md)** - Security guidelines
-- **[Security Audits](docs/audits/)** - XSS, localStorage, and console logger audits
+### All Documentation Guides
 
-### Legal & Compliance
+- **[Console Commands](docs/guides/CONSOLE_COMMANDS.md)** - Browser console debugging reference
+- **[Data Architecture](docs/guides/DATA_ARCHITECTURE.md)** - Technical data implementation
+- **[Pagination Usage](docs/guides/PAGINATION_USAGE.md)** - Pagination system reference
+- **[Attribution](docs/guides/ATTRIBUTION.md)** - Third-party licenses
+
+### Security & Compliance
+
+- **[Security Policy](SECURITY.md)** - Security guidelines and known issues
+- **[Security Audits](docs/audits/)** - XSS, localStorage, and console logger audits
 - **[Legal Analysis](docs/legal/)** - UK legal compliance documentation
 
 ---
