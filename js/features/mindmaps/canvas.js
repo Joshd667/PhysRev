@@ -2215,9 +2215,6 @@ export const mindmapCanvasMethods = {
     },
 
     /**
-     * Export diagram as SVG
-     */
-    /**
      * Sanitize HTML content for SVG export
      * Ensures content is safe and well-formed for embedding in SVG foreignObject
      */
@@ -2242,8 +2239,11 @@ export const mindmapCanvasMethods = {
             // Fallback to escaping HTML entities
             return escapeHtml(content);
         }
-    }
+    },
 
+    /**
+     * Export diagram as SVG
+     */
     async exportMindmapAsSVG() {
         if (this.mindmapEditorData.nodes.length === 0) {
             await this.showAlert('Nothing to export! Add some shapes first.', 'Nothing to Export');
