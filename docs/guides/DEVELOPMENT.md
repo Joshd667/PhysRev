@@ -89,11 +89,45 @@ Clear all caches and reload the app:
 
 ### Debug Mode
 
-Enable detailed logging:
+The app uses a production-safe logger utility (`js/utils/logger.js`) that conditionally logs messages based on debug mode.
+
+**Enable Debug Mode:**
 ```javascript
 // In browser console
-logger.enableDebug()   // Enable
-logger.disableDebug()  // Disable
+logger.enableDebug()   // Enable detailed logging
+logger.disableDebug()  // Disable (production mode)
+
+// Or use localStorage directly
+localStorage.setItem('DEBUG', 'true')   // Enable
+localStorage.removeItem('DEBUG')        // Disable
+```
+
+**How it works:**
+- **Development** (localhost): All logs visible by default
+- **Production**: Only errors logged by default
+- **Debug mode ON**: All logs visible everywhere
+- **Debug mode persists** across page reloads (stored in localStorage)
+
+**Logger API:**
+```javascript
+import { logger } from './utils/logger.js';
+
+logger.log('Info message')     // Only in debug mode
+logger.warn('Warning')          // Only in debug mode
+logger.error('Error!')          // ALWAYS logged (critical)
+logger.info('Information')      // Only in debug mode
+logger.debug('Debug details')   // Only in debug mode
+```
+
+**Console Access:**
+The logger is available globally in the browser console:
+```javascript
+// Check if debug mode is enabled
+logger.isDebugEnabled()
+
+// Toggle debug mode
+logger.enableDebug()
+logger.disableDebug()
 ```
 
 ### Storage Inspection
