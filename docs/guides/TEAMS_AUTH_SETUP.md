@@ -14,7 +14,7 @@
 const TEAMS_CONFIG = {
     CLIENT_ID: 'your-teams-app-client-id',  // ❌ PLACEHOLDER - NOT REAL
     TENANT_ID: 'your-tenant-id',            // ❌ PLACEHOLDER - NOT REAL
-    REDIRECT_URI: window.location.origin + '/auth-callback.html',  // ⚠️ WRONG PATH
+    REDIRECT_URI: window.location.origin + '/auth-callback.html',  // ✅ Correct path
     // ...
 };
 ```
@@ -23,7 +23,7 @@ const TEAMS_CONFIG = {
 
 1. **❌ Button is enabled** - Users can click "Login with Microsoft Teams" (`index.html` line 232)
 2. **❌ Placeholder credentials** - Will fail OAuth flow with cryptic error
-3. **❌ Redirect URI mismatch** - Points to `/auth-callback.html` but file is at `/tools/auth-callback.html`
+3. **✅ Redirect URI correct** - Points to `/auth-callback.html` at project root ✅
 4. **✅ Protected from commits** - `.gitignore` already has `js/features/auth/teams-config.js` (line 30)
 5. **❌ No configuration template** - `teams-config.template.js` doesn't exist yet
 
@@ -113,9 +113,9 @@ export const TEAMS_CONFIG = {
     TENANT_ID: 'your-tenant-id-here',
 
     // OAuth Redirect URI (must match Azure AD configuration)
-    // ⚠️ IMPORTANT: File is at /tools/auth-callback.html
-    // This should be: https://yourdomain.com/tools/auth-callback.html
-    REDIRECT_URI: window.location.origin + '/tools/auth-callback.html',
+    // ⚠️ IMPORTANT: File is at /auth-callback.html (project root)
+    // This should be: https://yourdomain.com/auth-callback.html
+    REDIRECT_URI: window.location.origin + '/auth-callback.html',
 
     // OAuth Scopes
     SCOPES: ['openid', 'profile', 'email', 'offline_access'],
@@ -169,9 +169,9 @@ import { TEAMS_CONFIG } from './teams-config.js';
      - Multi-tenant (if for multiple organizations)
    - **Redirect URI:**
      - Type: **Single-page application (SPA)**
-     - URL: `https://yourdomain.com/tools/auth-callback.html`
-     - (For testing: `http://localhost:8000/tools/auth-callback.html`)
-     - ⚠️ **CRITICAL:** Must include `/tools/` in the path (file is at `/tools/auth-callback.html`)
+     - URL: `https://yourdomain.com/auth-callback.html`
+     - (For testing: `http://localhost:8000/auth-callback.html`)
+     - ⚠️ **CRITICAL:** File is at project root `/auth-callback.html`
 
 3. **Copy your credentials:**
    - After creating, go to **Overview** page
@@ -207,7 +207,7 @@ import { TEAMS_CONFIG } from './teams-config.js';
 export const TEAMS_CONFIG = {
     CLIENT_ID: 'abc123-your-actual-client-id-xyz789',
     TENANT_ID: 'def456-your-actual-tenant-id-uvw012',
-    REDIRECT_URI: 'https://yourdomain.com/tools/auth-callback.html',
+    REDIRECT_URI: 'https://yourdomain.com/auth-callback.html',
     SCOPES: ['openid', 'profile', 'email', 'offline_access', 'Files.ReadWrite'],
     DATA_FILENAME: 'physics-audit-data.json',
     AUTO_SAVE_INTERVAL: 30000,
@@ -233,7 +233,7 @@ export const TEAMS_CONFIG = {
    → Click "Login with Microsoft Teams"
    → Redirects to Microsoft login
    → User authenticates
-   → Redirects back to /tools/auth-callback.html
+   → Redirects back to /auth-callback.html
    → Callback extracts token and closes window
    → User is logged in
    ```
@@ -339,8 +339,8 @@ export const TEAMS_CONFIG = {
 
 1. **Redirect URI Mismatch**
    - Code says: `REDIRECT_URI: window.location.origin + '/auth-callback.html'` (line 11 in teams.js)
-   - File actually at: `/tools/auth-callback.html`
-   - **Fix needed:** Change line 11 to `+ '/tools/auth-callback.html'`
+   - File actually at: `/auth-callback.html`
+   - **Fix needed:** Change line 11 to `+ '/auth-callback.html'`
 
 2. **No Error Feedback to User**
    - If OAuth fails, error is logged to console but user sees generic "authentication failed"
@@ -557,7 +557,7 @@ In `js/features/auth/teams.js` line 11:
 REDIRECT_URI: window.location.origin + '/auth-callback.html',
 
 // SHOULD BE:
-REDIRECT_URI: window.location.origin + '/tools/auth-callback.html',
+REDIRECT_URI: window.location.origin + '/auth-callback.html',
 ```
 
 ---
@@ -580,7 +580,7 @@ REDIRECT_URI: window.location.origin + '/tools/auth-callback.html',
    - App works perfectly in Guest mode while you configure Azure AD
 
 2. **🟡 Fix Redirect URI** in `js/features/auth/teams.js` line 11
-   - Change `/auth-callback.html` to `/tools/auth-callback.html`
+   - Change `/auth-callback.html` to `/auth-callback.html`
    - Otherwise OAuth flow will fail even with valid credentials
 
 3. **🟢 Create Configuration Template** (Optional but recommended)

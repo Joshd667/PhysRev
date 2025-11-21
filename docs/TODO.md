@@ -80,11 +80,11 @@ Add SRI hashes to CDN dependencies to prevent supply chain attacks.
    - **Impact:** Prevents failed login attempts while Azure AD is being configured
    - **Guest Mode:** Fully functional alternative (no setup needed)
 
-2. **🟡 HIGH: Fix Redirect URI Mismatch**
+2. **✅ RESOLVED: Redirect URI Now Correct**
    - **File:** `js/features/auth/teams.js` (line 11)
-   - **Current:** `REDIRECT_URI: window.location.origin + '/auth-callback.html'`
-   - **Should be:** `REDIRECT_URI: window.location.origin + '/tools/auth-callback.html'`
-   - **Reason:** Callback file is at `/tools/auth-callback.html` not `/auth-callback.html`
+   - **Status:** `REDIRECT_URI: window.location.origin + '/auth-callback.html'`
+   - **File Location:** `/auth-callback.html` ✅
+   - **Note:** auth-callback.html is at project root (not in tools/)
 
 **When Azure AD Permissions Are Obtained:**
 
@@ -102,7 +102,7 @@ Add SRI hashes to CDN dependencies to prevent supply chain attacks.
 
 **Notes:**
 - `.gitignore` already protects `teams-config.js` (line 30) ✅
-- `tools/auth-callback.html` exists ✅
+- `auth-callback.html` exists at project root ✅
 - OAuth PKCE flow is implemented correctly
 - Guest mode is recommended until Teams auth is fully configured
 

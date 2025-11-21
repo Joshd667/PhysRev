@@ -254,14 +254,13 @@ For complete implementation details, see [ARCHITECTURE.md - XSS Protection](docs
    const TEAMS_CONFIG = {
        CLIENT_ID: 'your-teams-app-client-id',  // ❌ PLACEHOLDER
        TENANT_ID: 'your-tenant-id',            // ❌ PLACEHOLDER
-       REDIRECT_URI: window.location.origin + '/auth-callback.html',  // ❌ WRONG PATH
+       REDIRECT_URI: window.location.origin + '/auth-callback.html',  // ✅ Correct path
    };
    ```
 
-3. **Redirect URI Mismatch Bug:**
+3. **✅ Redirect URI Now Correct:**
    - Code points to: `/auth-callback.html`
-   - File actually at: `/tools/auth-callback.html`
-   - **Will fail even with valid credentials**
+   - File located at: `/auth-callback.html` (project root) ✅
    - **Location:** `js/features/auth/teams.js` (line 11)
 
 4. **OneDrive Sync NOT Implemented:**
@@ -293,7 +292,7 @@ See **[docs/guides/TEAMS_AUTH_SETUP.md](docs/guides/TEAMS_AUTH_SETUP.md)** for c
 
 **Credential Protection:**
 - ✅ `.gitignore` already configured (line 30: `js/features/auth/teams-config.js`)
-- ✅ `tools/auth-callback.html` exists
+- ✅ `auth-callback.html` exists at project root
 - ❌ No configuration template file yet (should create `teams-config.template.js`)
 
 **RECOMMENDATION:** **Disable the Teams button immediately** to prevent user confusion. Guest mode provides full functionality while Teams auth is being configured.
