@@ -90,6 +90,7 @@ http://localhost:8000
 
 ### Developer Guides
 - **[Development Guide](docs/guides/DEVELOPMENT.md)** - Setup, tools, and best practices
+- **[Console Commands](docs/guides/CONSOLE_COMMANDS.md)** - Browser console debugging reference
 - **[Architecture Guide](docs/guides/ARCHITECTURE.md)** - Technical architecture details
 - **[Deployment Guide](docs/guides/DEPLOYMENT.md)** - Production deployment instructions
 - **[Content Management](docs/guides/CONTENT_MANAGEMENT.md)** - Managing CSV data files

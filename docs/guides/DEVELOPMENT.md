@@ -87,69 +87,26 @@ See [TESTING.md](TESTING.md) for complete checklist.
 
 ---
 
-## Development Tools
+## Browser Console Commands
 
-### Force Refresh
+The app provides numerous browser console commands for debugging and development.
 
-Clear all caches and reload the app:
-- Open Settings → Admin → "Force Refresh"
-- Or manually: DevTools → Application → Clear Storage
-
-### Debug Mode
-
-The app uses a production-safe logger utility (`js/utils/logger.js`) that conditionally logs messages based on debug mode.
-
-**Enable Debug Mode:**
+**Quick Reference:**
 ```javascript
-// In browser console
-logger.enableDebug()   // Enable detailed logging
-logger.disableDebug()  // Disable (production mode)
-
-// Or use localStorage directly
-localStorage.setItem('DEBUG', 'true')   // Enable
-localStorage.removeItem('DEBUG')        // Disable
+logger.enableDebug()           // Enable verbose logging
+getStorageStats()              // View storage usage
+clearAllAppStorage()           // Clear all data
+navigator.serviceWorker.getRegistration()  // Check SW status
+physicsAuditApp                // Access app instance
 ```
 
-**How it works:**
-- **Development** (localhost): All logs visible by default
-- **Production**: Only errors logged by default
-- **Debug mode ON**: All logs visible everywhere
-- **Debug mode persists** across page reloads (stored in localStorage)
-
-**Logger API:**
-```javascript
-import { logger } from './utils/logger.js';
-
-logger.log('Info message')     // Only in debug mode
-logger.warn('Warning')          // Only in debug mode
-logger.error('Error!')          // ALWAYS logged (critical)
-logger.info('Information')      // Only in debug mode
-logger.debug('Debug details')   // Only in debug mode
-```
-
-**Console Access:**
-The logger is available globally in the browser console:
-```javascript
-// Check if debug mode is enabled
-logger.isDebugEnabled()
-
-// Toggle debug mode
-logger.enableDebug()
-logger.disableDebug()
-```
-
-### Storage Inspection
-
-View storage statistics in browser console:
-```javascript
-getStorageStats()      // View stats
-clearAllAppStorage()   // Clear all data
-```
-
-**DevTools Inspection:**
-- **IndexedDB:** DevTools → Application → IndexedDB → physicsAuditDB
-- **Service Worker:** DevTools → Application → Service Workers
-- **Cache:** DevTools → Application → Cache Storage
+**See [CONSOLE_COMMANDS.md](CONSOLE_COMMANDS.md)** for comprehensive console command reference including:
+- Debug logging commands
+- Storage management commands
+- Service Worker debugging
+- Performance profiling
+- Data access and inspection
+- Common debugging workflows
 
 ---
 
@@ -192,24 +149,18 @@ const BUILD_TIMESTAMP = '20250120-001';  // Format: YYYYMMDD-NNN
 
 ### Debugging Service Worker
 
-**Common DevTools commands:**
-```javascript
-// Check registration status
-navigator.serviceWorker.getRegistration()
-
-// Force update check
-navigator.serviceWorker.getRegistration().then(reg => reg.update())
-
-// Unregister (for testing clean slate)
-navigator.serviceWorker.getRegistration().then(reg => reg.unregister())
-```
-
 **DevTools Panel:**
 - Go to DevTools → Application → Service Workers
 - See active/waiting workers
 - "Update on reload" checkbox (disable for testing manual updates)
 - "Bypass for network" checkbox (for debugging)
 - "Unregister" button (clean slate)
+
+**Console Commands:** See [CONSOLE_COMMANDS.md](CONSOLE_COMMANDS.md#service-worker-commands) for:
+- Check registration status
+- Force update check
+- Unregister Service Worker
+- Monitor state changes
 
 ---
 
@@ -390,21 +341,17 @@ The app uses pagination for large lists (notes, flashcards, search results).
 4. Stop recording
 5. Analyze flame graph and timings
 
-**Using Performance API (in console):**
-```javascript
-performance.mark('start')
-// ... do something expensive
-performance.mark('end')
-performance.measure('task', 'start', 'end')
-console.log(performance.getEntriesByName('task')[0].duration)
-```
-
 **Memory Profiling:**
 1. DevTools → Memory tab
 2. Take heap snapshot
 3. Perform actions
 4. Take another snapshot
 5. Compare to find leaks
+
+**Performance API:** See [CONSOLE_COMMANDS.md](CONSOLE_COMMANDS.md#performance-profiling) for:
+- Performance marks and measures
+- Network timing commands
+- Memory profiling commands
 
 ---
 
@@ -561,6 +508,7 @@ function onSearchInput(query) {
 
 **Essential Reading:**
 - **[ARCHITECTURE.md](ARCHITECTURE.md)** - Technical architecture, patterns, data flow
+- **[CONSOLE_COMMANDS.md](CONSOLE_COMMANDS.md)** - Browser console debugging reference
 - **[TESTING.md](TESTING.md)** - Comprehensive testing procedures
 - **[DEPLOYMENT.md](DEPLOYMENT.md)** - Production deployment guide
 - **[SECURITY.md](../../SECURITY.md)** - Security policy and guidelines
