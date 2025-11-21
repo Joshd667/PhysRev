@@ -55,11 +55,19 @@ export function paginatedList(items = [], pageSize = 50, increment = 25) {
             const newCount = this._displayCount + this._increment;
             this._displayCount = Math.min(newCount, this._allItems.length);
             logger.debug(`Loaded ${this._increment} more items. Now showing ${this._displayCount}/${this._allItems.length}`);
+            // Refresh lucide icons for newly loaded items
+            if (window.lucide) {
+                setTimeout(() => window.lucide.createIcons(), 10);
+            }
         },
 
         showAll() {
             this._displayCount = this._allItems.length;
             logger.debug(`Showing all ${this._allItems.length} items`);
+            // Refresh lucide icons for newly loaded items
+            if (window.lucide) {
+                setTimeout(() => window.lucide.createIcons(), 10);
+            }
         },
 
         reset() {
