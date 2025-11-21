@@ -97,6 +97,7 @@ http://localhost:8000
 - **[Development Guide](docs/guides/DEVELOPMENT.md)** - Setup, tools, and workflow
 - **[Architecture Guide](docs/guides/ARCHITECTURE.md)** - Technical architecture and design patterns
 - **[Testing Guide](docs/guides/TESTING.md)** - Comprehensive testing procedures
+- **[Developer Tools](tools/index.html)** - Dashboard with CSV converter, import tester, docs hub, and more
 
 **For System Administrators:**
 - **[Deployment Guide](docs/guides/DEPLOYMENT.md)** - Production deployment

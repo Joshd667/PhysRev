@@ -78,7 +78,7 @@ See [TESTING.md](TESTING.md) for complete checklist.
 
 **For Production:** Generate `combined-data.json` for 10x faster loading (1 request instead of 16).
 
-**See [DEPLOYMENT.md](DEPLOYMENT.md#1-generate-optimized-data-file)** for complete instructions on using `tools/csv-converter-unified.html`.
+**See [DEPLOYMENT.md](DEPLOYMENT.md#1-generate-optimized-data-file)** for complete instructions on using `tools/csv-converter.html`.
 
 **When to regenerate:**
 - After updating any CSV file in `resources/`
@@ -496,17 +496,29 @@ function onSearchInput(query) {
 
 ## Tools & Utilities
 
-**Developer tools dashboard:** `tools/index.html`
+**Developer tools dashboard:** `tools/index.html` - Centralized hub with toggle navigation between Tools and Docs sections
 
-**Located in `tools/` directory:**
+**Navigation Features:**
+- **Tools ↔ Docs Toggle**: Consistent navigation switcher on all tool pages with active state highlighting
+- **Always Fresh**: Tools directory bypasses Service Worker cache for latest content
+- **Visual Consistency**: All tools match main app styling (Tailwind CSS + Lucide icons)
 
-- **csv-converter-unified.html** - Convert CSV to JSON (10x faster loading)
-- **test-imports.html** - Test JavaScript module imports
-- **generate-sri-hashes.js** - Generate SRI hashes for CDN resources (security)
+**Available Tools:**
+
+**Documentation System:**
+- **documentation.html** - Visual documentation hub organized by role (Educators, Developers, Admins)
+- **markdown-viewer.html** - GitHub-style markdown renderer with syntax highlighting, auto-generated TOC, and dark mode
+
+**Development Tools:**
+- **csv-converter.html** - Unified CSV to JSON converter with server and local modes (10x faster loading)
+- **test-imports.html** - Test JavaScript module imports for debugging
+- **generate-sri-hashes.js** - Generate SRI hashes for CDN resources (Node.js CLI tool)
+
+**See [tools/README.md](../../tools/README.md)** for complete tool documentation and usage workflows.
 
 **Located at project root:**
 
-- **auth-callback.html** - OAuth redirect endpoint for Teams auth (not a dev tool)
+- **auth-callback.html** - OAuth redirect endpoint for Teams auth (part of auth flow, not a dev tool)
 
 ---
 
