@@ -202,16 +202,23 @@ export const mindmapsDisplayMethods = {
         });
 
         // Convert to array structure and sort
-        const groupsArray = Object.values(groupMap).map(group => ({
-            ...group,
-            sections: Object.values(group.sections).sort((a, b) => {
-                return a.sectionTitle.localeCompare(b.sectionTitle);
-            })
-        })).sort((a, b) => {
-            if (a.groupTitle === 'Untagged Mindmaps') return 1;
-            if (b.groupTitle === 'Untagged Mindmaps') return -1;
-            return a.groupTitle.localeCompare(b.groupTitle);
-        });
+        // Filter out any undefined/invalid values to prevent Alpine rendering errors
+        const groupsArray = Object.values(groupMap)
+            .filter(group => group && group.sections)
+            .map(group => ({
+                ...group,
+                sections: Object.values(group.sections)
+                    .filter(section => section && section.sectionTitle && Array.isArray(section.mindmaps))
+                    .sort((a, b) => {
+                        return a.sectionTitle.localeCompare(b.sectionTitle);
+                    })
+            }))
+            .filter(group => group.sections && group.sections.length > 0)
+            .sort((a, b) => {
+                if (a.groupTitle === 'Untagged Mindmaps') return 1;
+                if (b.groupTitle === 'Untagged Mindmaps') return -1;
+                return a.groupTitle.localeCompare(b.groupTitle);
+            });
 
         return groupsArray;
     }
