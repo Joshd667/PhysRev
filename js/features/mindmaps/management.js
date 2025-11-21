@@ -41,16 +41,8 @@ export const mindmapManagementMethods = {
             viewport: { x: 0, y: 0, scale: 1 }
         };
 
-        // Auto-assign tags from current context
-        if (topicId) {
-            // Single topic provided
-            this.mindmapEditorTags = [topicId];
-        } else if (this.currentRevisionTopics && this.currentRevisionTopics.length > 0) {
-            // Multiple topics from revision view
-            this.mindmapEditorTags = this.currentRevisionTopics.map(t => t.id);
-        } else {
-            this.mindmapEditorTags = [];
-        }
+        // Don't auto-assign tags - user must manually select tags
+        this.mindmapEditorTags = [];
 
         this.showMindmapEditor = true;
 
@@ -169,6 +161,12 @@ export const mindmapManagementMethods = {
 
         if (this.mindmapEditorData.nodes.length === 0) {
             await this.showAlert('Please add at least one node to your mindmap', 'No Nodes');
+            return;
+        }
+
+        // Require at least one tag
+        if (!this.mindmapEditorTags || this.mindmapEditorTags.length === 0) {
+            await this.showAlert('Please add at least one tag to your mindmap', 'Missing Tags');
             return;
         }
 

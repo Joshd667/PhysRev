@@ -37,16 +37,8 @@ export const noteManagementMethods = {
         this.noteEditorContent = '';
         this.noteEditorId = null;
 
-        // Auto-assign tags from current context
-        if (topicId) {
-            // Single topic provided
-            this.noteEditorTags = [topicId];
-        } else if (this.currentRevisionTopics && this.currentRevisionTopics.length > 0) {
-            // Multiple topics from revision view
-            this.noteEditorTags = this.currentRevisionTopics.map(t => t.id);
-        } else {
-            this.noteEditorTags = [];
-        }
+        // Don't auto-assign tags - user must manually select tags
+        this.noteEditorTags = [];
 
         this.showNoteEditor = true;
 
@@ -174,6 +166,12 @@ export const noteManagementMethods = {
 
         if (!content.trim() || content.trim() === '<br>') {
             await this.showAlert('Please enter some content for your note', 'Missing Content');
+            return;
+        }
+
+        // Require at least one tag
+        if (!this.noteEditorTags || this.noteEditorTags.length === 0) {
+            await this.showAlert('Please add at least one tag to your note', 'Missing Tags');
             return;
         }
 

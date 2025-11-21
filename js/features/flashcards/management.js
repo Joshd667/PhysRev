@@ -39,16 +39,8 @@ export const flashcardManagementMethods = {
         this.flashcardEditorCurrentCardFront = '';
         this.flashcardEditorCurrentCardBack = '';
 
-        // Auto-assign tags from current context
-        if (topicId) {
-            // Single topic provided
-            this.flashcardEditorTags = [topicId];
-        } else if (this.currentRevisionTopics && this.currentRevisionTopics.length > 0) {
-            // Multiple topics from revision view
-            this.flashcardEditorTags = this.currentRevisionTopics.map(t => t.id);
-        } else {
-            this.flashcardEditorTags = [];
-        }
+        // Don't auto-assign tags - user must manually select tags
+        this.flashcardEditorTags = [];
 
         this.showFlashcardEditor = true;
 
@@ -178,6 +170,12 @@ export const flashcardManagementMethods = {
 
         if (this.flashcardEditorCards.length === 0) {
             await this.showAlert('Please add at least one card to your deck', 'No Cards');
+            return;
+        }
+
+        // Require at least one tag
+        if (!this.flashcardEditorTags || this.flashcardEditorTags.length === 0) {
+            await this.showAlert('Please add at least one tag to your flashcard deck', 'Missing Tags');
             return;
         }
 
