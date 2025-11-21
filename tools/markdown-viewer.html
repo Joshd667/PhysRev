@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - Physics Audit</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+
+    <!-- App styles -->
+    <link rel="stylesheet" href="../css/style.css">
+
+    <!-- GitHub Markdown CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.1/github-markdown.min.css">
+
+    <!-- Highlight.js for code syntax -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" id="highlight-light">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="highlight-dark" disabled>
+
+    <!-- Lucide icons -->
+    <script defer src="https://unpkg.com/lucide@0.546.0/dist/umd/lucide.min.js"></script>
+
+    <style>
+        /* Custom markdown styles to match app */
+        .markdown-body {
+            box-sizing: border-box;
+            min-width: 200px;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 45px;
+        }
+
+        @media (max-width: 767px) {
+            .markdown-body {
+                padding: 15px;
+            }
+        }
+
+        /* Dark mode overrides */
+        .dark .markdown-body {
+            color-scheme: dark;
+            color: #e6edf3;
+            background-color: transparent;
+        }
+
+        .dark .markdown-body a {
+            color: #79c0ff;
+        }
+
+        .dark .markdown-body code {
+            background-color: rgba(110, 118, 129, 0.4);
+            color: #e6edf3;
+        }
+
+        .dark .markdown-body pre {
+            background-color: #161b22;
+        }
+
+        .dark .markdown-body table tr {
+            background-color: #0d1117;
+            border-top-color: #21262d;
+        }
+
+        .dark .markdown-body table tr:nth-child(2n) {
+            background-color: #161b22;
+        }
+
+        .dark .markdown-body table th,
+        .dark .markdown-body table td {
+            border-color: #21262d;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* TOC styles */
+        .toc {
+            position: sticky;
+            top: 1rem;
+            max-height: calc(100vh - 2rem);
+            overflow-y: auto;
+        }
+
+        .toc a {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            padding: 0.25rem 0.5rem;
+            border-left: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .toc a:hover {
+            background: rgba(0, 0, 0, 0.05);
+            border-left-color: #667eea;
+        }
+
+        .dark .toc a:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .toc .toc-h2 { padding-left: 1rem; }
+        .toc .toc-h3 { padding-left: 2rem; font-size: 0.9em; }
+        .toc .toc-h4 { padding-left: 3rem; font-size: 0.85em; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <!-- Header -->
+    <div class="animated-gradient text-white py-4 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="book-open" class="w-8 h-8"></i>
+                    <div>
+                        <h1 class="text-2xl font-bold" id="doc-title">Loading...</h1>
+                        <p class="text-xs opacity-90 mt-0.5" id="doc-path"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="documentation.html" class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 rounded-lg backdrop-blur-sm transition-colors text-sm">
+                        <i data-lucide="library" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Docs</span>
+                    </a>
+                    <a href="index.html" class="flex items-center gap-2 px-3 py-2 bg-white/20 hover:bg-white/30 rounded-lg backdrop-blur-sm transition-colors text-sm">
+                        <i data-lucide="wrench" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Tools</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 py-6">
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Table of Contents (Desktop) -->
+            <aside class="hidden lg:block w-64 flex-shrink-0">
+                <div class="toc bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                        <i data-lucide="list" class="w-4 h-4"></i>
+                        Table of Contents
+                    </h3>
+                    <nav id="toc-nav" class="text-sm text-gray-700 dark:text-gray-300">
+                        <!-- Generated dynamically -->
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 min-w-0">
+                <!-- Loading State -->
+                <div id="loading" class="flex flex-col items-center justify-center py-20">
+                    <div class="spinner mb-4"></div>
+                    <p class="text-gray-600 dark:text-gray-400">Loading documentation...</p>
+                </div>
+
+                <!-- Error State -->
+                <div id="error" class="hidden bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 rounded-lg p-6">
+                    <div class="flex items-start gap-3">
+                        <i data-lucide="alert-circle" class="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5"></i>
+                        <div>
+                            <h3 class="text-lg font-semibold text-red-800 dark:text-red-300 mb-2">Error Loading Documentation</h3>
+                            <p class="text-red-700 dark:text-red-400 mb-4" id="error-message"></p>
+                            <a href="documentation.html" class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
+                                <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                                <span>Back to Documentation</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Markdown Content -->
+                <article id="content" class="hidden bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                    <div class="markdown-body">
+                        <!-- Rendered markdown goes here -->
+                    </div>
+                </article>
+
+                <!-- Mobile TOC Toggle -->
+                <button id="mobile-toc-toggle" class="lg:hidden fixed bottom-6 right-6 w-14 h-14 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-lg flex items-center justify-center transition-colors z-50">
+                    <i data-lucide="list" class="w-6 h-6"></i>
+                </button>
+
+                <!-- Mobile TOC Modal -->
+                <div id="mobile-toc" class="lg:hidden hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50" onclick="closeMobileTOC(event)">
+                    <div class="absolute bottom-0 left-0 right-0 bg-white dark:bg-gray-800 rounded-t-2xl shadow-2xl max-h-[70vh] overflow-y-auto p-6" onclick="event.stopPropagation()">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                <i data-lucide="list" class="w-5 h-5"></i>
+                                Table of Contents
+                            </h3>
+                            <button onclick="closeMobileTOC()" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                <i data-lucide="x" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+                        <nav id="mobile-toc-nav" class="text-sm text-gray-700 dark:text-gray-300">
+                            <!-- Same as desktop TOC -->
+                        </nav>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Marked.js for markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+
+    <!-- Highlight.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <script type="module">
+        // Initialize
+        let isDark = false;
+
+        // Dark mode detection and toggle
+        function updateDarkMode() {
+            isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('highlight-light').disabled = true;
+                document.getElementById('highlight-dark').disabled = false;
+            } else {
+                document.documentElement.classList.remove('dark');
+                document.getElementById('highlight-light').disabled = false;
+                document.getElementById('highlight-dark').disabled = true;
+            }
+        }
+
+        updateDarkMode();
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateDarkMode);
+
+        // Get file parameter from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const filePath = urlParams.get('file');
+
+        if (!filePath) {
+            showError('No documentation file specified. Please select a document from the documentation hub.');
+        } else {
+            loadMarkdown(filePath);
+        }
+
+        // Load and render markdown
+        async function loadMarkdown(path) {
+            try {
+                const response = await fetch(path);
+                if (!response.ok) {
+                    throw new Error(`Failed to load file: ${response.status} ${response.statusText}`);
+                }
+
+                const markdown = await response.text();
+
+                // Configure marked options
+                marked.setOptions({
+                    highlight: function(code, lang) {
+                        if (lang && hljs.getLanguage(lang)) {
+                            try {
+                                return hljs.highlight(code, { language: lang }).value;
+                            } catch (err) {
+                                console.error('Highlight error:', err);
+                            }
+                        }
+                        return code;
+                    },
+                    breaks: true,
+                    gfm: true
+                });
+
+                // Render markdown
+                const html = marked.parse(markdown);
+
+                // Display content
+                document.querySelector('#content .markdown-body').innerHTML = html;
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('content').classList.remove('hidden');
+
+                // Update title
+                const firstHeading = document.querySelector('.markdown-body h1');
+                const docTitle = firstHeading ? firstHeading.textContent : 'Documentation';
+                document.getElementById('doc-title').textContent = docTitle;
+                document.getElementById('doc-path').textContent = path;
+                document.title = `${docTitle} - Physics Audit`;
+
+                // Generate TOC
+                generateTOC();
+
+                // Make relative links work
+                fixRelativeLinks(path);
+
+                // Initialize Lucide icons
+                lucide.createIcons();
+
+            } catch (error) {
+                showError(`Error loading documentation: ${error.message}`);
+            }
+        }
+
+        // Generate table of contents
+        function generateTOC() {
+            const headings = document.querySelectorAll('.markdown-body h2, .markdown-body h3, .markdown-body h4');
+            const tocNav = document.getElementById('toc-nav');
+            const mobileTocNav = document.getElementById('mobile-toc-nav');
+
+            if (headings.length === 0) {
+                tocNav.innerHTML = '<p class="text-gray-500 dark:text-gray-400 italic">No headings found</p>';
+                return;
+            }
+
+            let tocHTML = '';
+            headings.forEach((heading, index) => {
+                const id = `heading-${index}`;
+                heading.id = id;
+
+                const level = heading.tagName.toLowerCase();
+                const text = heading.textContent;
+
+                tocHTML += `<a href="#${id}" class="toc-${level}" onclick="scrollToHeading(event, '${id}')">${text}</a>`;
+            });
+
+            tocNav.innerHTML = tocHTML;
+            mobileTocNav.innerHTML = tocHTML;
+        }
+
+        // Scroll to heading with smooth animation
+        window.scrollToHeading = function(event, id) {
+            event.preventDefault();
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Close mobile TOC if open
+                document.getElementById('mobile-toc').classList.add('hidden');
+            }
+        };
+
+        // Fix relative links in markdown
+        function fixRelativeLinks(currentPath) {
+            const basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+            const links = document.querySelectorAll('.markdown-body a[href]');
+
+            links.forEach(link => {
+                const href = link.getAttribute('href');
+
+                // Skip external links and anchors
+                if (href.startsWith('http') || href.startsWith('#') || href.startsWith('mailto:')) {
+                    link.setAttribute('target', '_blank');
+                    link.setAttribute('rel', 'noopener noreferrer');
+                    return;
+                }
+
+                // Convert relative .md links to use the viewer
+                if (href.endsWith('.md')) {
+                    const fullPath = basePath + href;
+                    link.setAttribute('href', `markdown-viewer.html?file=${fullPath}`);
+                } else {
+                    // Make other relative links absolute
+                    link.setAttribute('href', basePath + href);
+                }
+            });
+        }
+
+        // Show error message
+        function showError(message) {
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('error').classList.remove('hidden');
+            document.getElementById('error-message').textContent = message;
+            lucide.createIcons();
+        }
+
+        // Mobile TOC toggle
+        document.getElementById('mobile-toc-toggle')?.addEventListener('click', () => {
+            document.getElementById('mobile-toc').classList.remove('hidden');
+            lucide.createIcons();
+        });
+
+        window.closeMobileTOC = function(event) {
+            if (event) event.stopPropagation();
+            document.getElementById('mobile-toc').classList.add('hidden');
+        };
+
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

@@ -14,8 +14,16 @@ This directory contains development and build tools for the Physics Audit applic
 
 ### Documentation Hub
 
-#### `documentation.html`
-Centralized documentation portal with all guides organized by role.
+#### `documentation.html` + `markdown-viewer.html`
+Centralized documentation portal with GitHub-style markdown rendering.
+
+**Features:**
+- **Visual organization** by role (Educators, Developers, Admins)
+- **GitHub-style rendering** with syntax highlighting
+- **Auto-generated TOC** for easy navigation
+- **Dark mode support** matching app theme
+- **Relative links work** - click between docs seamlessly
+- **Mobile-friendly** with floating TOC button
 
 **What you'll find:**
 - **For Educators:** Content management guide (CSV editing, adding topics)
@@ -28,6 +36,11 @@ Centralized documentation portal with all guides organized by role.
 - Educators → Content Management
 - Developers → Architecture + Development Setup
 - Admins → Deployment Guide
+
+**Tech Stack:**
+- marked.js - Markdown parsing
+- highlight.js - Code syntax highlighting
+- github-markdown-css - Authentic GitHub styling
 
 ---
 
@@ -132,6 +145,7 @@ Module import verification tool for development.
 | Tool | Type | Requires Server | Node.js Required |
 |------|------|----------------|------------------|
 | documentation.html | Browser | No | No |
+| markdown-viewer.html | Browser | No | No |
 | csv-converter.html | Browser | Optional (has both modes) | No |
 | generate-sri-hashes.js | CLI | No | Yes |
 | test-imports.html | Browser | Yes | No |
