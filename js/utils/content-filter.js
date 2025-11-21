@@ -33,6 +33,10 @@ export function createContentFilterMethods(contentType) {
                     this.expandedGroups[parentGroup.title] = true;
                 }
             }
+            // Close note preview when navigating between sections
+            if (this.notePreviewId) {
+                this.notePreviewId = null;
+            }
         },
 
         /**
@@ -57,6 +61,10 @@ export function createContentFilterMethods(contentType) {
                         this.contentFilterSection = null;
                     }
                 }
+            }
+            // Close note preview when navigating between groups
+            if (this.notePreviewId) {
+                this.notePreviewId = null;
             }
         },
 

@@ -418,6 +418,22 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 this._ensureSearchIndexes();
             },
 
+            // ⚡ PERFORMANCE: Search index getters for search queries
+            _getNotesIndex() {
+                this._ensureSearchIndexes();
+                return notesIndex;
+            },
+
+            _getFlashcardsIndex() {
+                this._ensureSearchIndexes();
+                return flashcardsIndex;
+            },
+
+            _getMindmapsIndex() {
+                this._ensureSearchIndexes();
+                return mindmapsIndex;
+            },
+
             _updateNoteInIndex(note) {
                 if (!notesIndex || !note.id) return;
                 notesIndex.updateItem(note, n =>
