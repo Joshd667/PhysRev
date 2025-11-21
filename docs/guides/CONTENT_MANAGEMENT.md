@@ -1,24 +1,23 @@
 ## 📚 Content Management Guide
 
-### Overview: Excel → CSV → App Data Flow
+**👩‍🏫 FOR TEACHERS AND EDUCATORS**
 
-The Physics Audit Tool uses a **data-driven architecture** where all content is stored in CSV files, which can be easily edited using Excel or Google Sheets. Here's how the system works:
+This guide is for teachers, content creators, and educators who want to add or modify physics topics, learning objectives, and revision resources. **No coding experience required** - all content is managed through Excel or Google Sheets.
+
+### Overview: How Content Works
+
+The Physics Audit Tool stores all content in **CSV files** (spreadsheet format) that you can edit using Excel or Google Sheets:
 
 ```
-Excel/Google Sheets (.xlsx, .xlsm)
-    ↓ Export as CSV
-CSV Files (resources/)
-    ↓ Loaded by unified-csv-loader.js
-JavaScript Objects (in memory)
-    ↓ Displayed by Alpine.js templates
-User Interface (browser)
+Excel/Google Sheets → Export as CSV → App loads the content → Students see it in browser
 ```
 
-**Key Benefits:**
-- ✅ **No coding required** - Edit content in Excel/Sheets
-- ✅ **Version control friendly** - CSV files track changes
-- ✅ **Bulk operations** - Sort, filter, find/replace in Excel
-- ✅ **Easy maintenance** - Non-developers can update content
+**What you can do:**
+- ✅ Add new physics topics and learning objectives
+- ✅ Organize topics into papers (Paper 1, 2, 3)
+- ✅ Add revision resources (videos, notes, simulations, practice questions)
+- ✅ Update existing content anytime
+- ✅ All editing happens in Excel - no coding needed!
 
 ---
 
@@ -282,29 +281,11 @@ section_id,topic_id,section_name,section_title,section_paper,section_icon,revisi
 
 You can add Paper 3 topics to existing CSV files like `fields.csv` or `mechanics.csv` if they're extensions of Paper 1/2 content. Just set `section_paper` to `"Paper 3"`.
 
-**Step 3: Register new CSV files in the loader**
+**Step 3: Developer task (if you created new CSV files)**
 
-If you created new CSV files (Option A), register them in the loader:
+⚠️ **For developers only:** If you created new CSV files (Option A above), they need to be registered in the code. See `docs/TODO.md` under "Content Development → Paper 3 Support" for instructions.
 
-Edit `js/data/unified-csv-loader.js` around line 59:
-
-```javascript
-const csvFiles = [
-    'measurements.csv',
-    'particles.csv',
-    'waves.csv',
-    'mechanics.csv',
-    'electricity.csv',
-    'periodic-motion.csv',
-    'thermal.csv',
-    'fields.csv',
-    'magnetic-fields.csv',
-    'nuclear.csv',
-    'astrophysics.csv',           // NEW - Paper 3
-    'medical-physics.csv',         // NEW - Paper 3
-    'engineering-physics.csv'      // NEW - Paper 3
-];
-```
+**Note:** If you used Option B (adding to existing files), no developer work is needed - skip to Step 4!
 
 **Step 4: Test your changes**
 
@@ -488,38 +469,24 @@ For production or frequent use, convert CSVs to optimized JSON v2.0:
 
 ---
 
-### Understanding Revision Mappings
+### Understanding Colors and Grouping (Optional)
 
-Revision mappings group individual topic cards into revision areas, loaded dynamically from the subject CSV files.
+**How topic colors work:**
 
-**How It Works:**
-The system uses two columns in the subject CSV files (`section_id` and `revision_section_title`) to automatically build the mappings:
+When you give topics the same `section_id` (e.g., `3.1.1`), they automatically:
+- Get grouped together in revision mode
+- Share the same color bar at the top of each card
+- Appear under the same `revision_section_title`
 
+**Example:**
 ```csv
 section_id,topic_id,revision_section_title,...
-3.1.1,3.1.1a,SI Units and Measurements,...
-3.1.1,3.1.1b,SI Units and Measurements,...
-3.1.2,3.1.2a,Errors and Uncertainties,...
+3.1.1,3.1.1a,SI Units and Measurements,...  ← Same section_id = same color group
+3.1.1,3.1.1b,SI Units and Measurements,...  ← Same section_id = same color group
+3.1.2,3.1.2a,Errors and Uncertainties,...   ← Different section_id = different color
 ```
 
-When the app loads:
-1. `unified-csv-loader.js` reads all subject CSV files
-2. Builds `revisionMapping` object: `{ "3.1.1": ["3.1.1a", "3.1.1b"], "3.1.2": [...] }`
-3. Builds `revisionSectionTitles` object: `{ "3.1.1": "SI Units and Measurements", ... }`
-4. Builds `topicToSectionMapping` for reverse lookups: `{ "3.1.1a": "3.1.1", ... }`
-5. Makes them globally available via `window.revisionMapping`, etc.
-
-**Color System:**
-- Each `section_id` (e.g., `"3.1.1"`) gets a unique color via hash-based algorithm
-- All topics with the same `section_id` share that color
-- The color bar appears at the top of each topic card
-- Helps visually identify related content
-
-**Benefits of CSV-Based Mappings:**
-- ✅ **No code changes needed** - Edit mappings in Excel/Google Sheets
-- ✅ **Easier maintenance** - Spreadsheet-based workflow
-- ✅ **Version control friendly** - CSV diffs are readable
-- ✅ **Single source of truth** - No duplication between data files and code
+This makes it easy for students to visually identify related topics. You don't need to manage colors yourself - the app automatically assigns them based on `section_id`.
 
 ---
 
