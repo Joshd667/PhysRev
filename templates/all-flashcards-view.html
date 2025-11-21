@@ -229,7 +229,9 @@
         <div x-show="flashcardsGroupedBySection.length > 0 && flashcardViewMode === 'card'"
              x-data="{
                  get allDecks() {
-                     return flashcardsGroupedBySection.flatMap(g => g.sections.flatMap(s => s.decks));
+                     return flashcardsGroupedBySection.flatMap(g =>
+                         (g?.sections || []).flatMap(s => s?.decks || [])
+                     ).filter(deck => deck && deck.id);
                  },
                  deckPagination: null
              }"
