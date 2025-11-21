@@ -217,4 +217,4 @@ For issues or questions:
 
 ---
 
-**Built with ❤️ for A-Level Physics Students**
+**Built for A-Level Physics Students**
