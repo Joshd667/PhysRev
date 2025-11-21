@@ -582,63 +582,81 @@ export const searchMethods = {
                     }
                 }, 100);
             });
-        } else if (result.type === 'note') {
-            // Navigate to note - don't filter by section, just show all notes and scroll to the specific one
-            this.viewType = 'notes';
+        } else if (result.type === 'note' || result.type === 'flashcard' || result.type === 'mindmap') {
+            // Navigate to Knowledge Audit revision section for this item
+            // Get the first tag to determine which section to open
+            const itemTags = result.tags || [];
+            if (itemTags.length === 0) {
+                // No tags - can't navigate to revision section
+                this.showAlert('This item has no tags. Please add tags to navigate to its revision section.', 'No Tags');
+                return;
+            }
+
+            const firstTag = itemTags[0];
+            const topicInfo = this.topicLookup[firstTag];
+            if (!topicInfo) {
+                this.showAlert('Could not find revision section for this item.', 'Navigation Error');
+                return;
+            }
+
+            // Navigate to Knowledge Audit view
+            this.viewType = 'audit';
             this.showingMainMenu = false;
-            this.showingSpecificSection = false;
-            // Clear section/group filters to ensure the note is visible
-            this.contentFilterSection = null;
-            this.contentFilterGroup = null;
+
+            // Set up revision section
+            this.activeSection = topicInfo.sectionName;
+            const parentGroup = this.currentGroups.find(item =>
+                item.type === "group" && item.sections?.includes(topicInfo.sectionName)
+            );
+            if (parentGroup) {
+                this.lastExpandedGroup = parentGroup.title;
+                this.expandedGroups[parentGroup.title] = true;
+            }
+
+            // Open revision view
+            this.showingSpecificSection = true;
+            this.showingRevision = true;
+            this.studyMaterialsFilter = 'all';
+
             if (window.innerWidth < 768) this.sidebarVisible = false;
+
             this.$nextTick(() => {
                 setTimeout(() => {
-                    const noteElement = document.querySelector(`[data-note-id="${result.id}"]`);
-                    if (noteElement) {
-                        noteElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        noteElement.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
-                        setTimeout(() => { noteElement.style.backgroundColor = ''; }, 2000);
+                    // Try to find and highlight the item in the revision section
+                    let itemElement = null;
+                    if (result.type === 'note') {
+                        itemElement = document.querySelector(`[data-note-id="${result.id}"]`);
+                    } else if (result.type === 'flashcard') {
+                        itemElement = document.querySelector(`[data-deck-id="${result.id}"]`);
+                    } else if (result.type === 'mindmap') {
+                        itemElement = document.querySelector(`[data-mindmap-id="${result.id}"]`);
                     }
-                }, 100);
-            });
-        } else if (result.type === 'flashcard') {
-            // Navigate to flashcard deck - don't filter by section, just show all decks and scroll to the specific one
-            this.viewType = 'flashcards';
-            this.studyMaterialsFilter = 'decks';
-            this.showingMainMenu = false;
-            this.showingSpecificSection = false;
-            // Clear section/group filters to ensure the deck is visible
-            this.contentFilterSection = null;
-            this.contentFilterGroup = null;
-            if (window.innerWidth < 768) this.sidebarVisible = false;
-            this.$nextTick(() => {
-                setTimeout(() => {
-                    const deckElement = document.querySelector(`[data-deck-id="${result.id}"]`);
-                    if (deckElement) {
-                        deckElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        deckElement.style.backgroundColor = 'rgba(147, 51, 234, 0.1)';
-                        setTimeout(() => { deckElement.style.backgroundColor = ''; }, 2000);
+
+                    if (itemElement) {
+                        itemElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        itemElement.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+
+                        // Clear highlight when any interactive button is clicked
+                        const clearHighlight = () => {
+                            itemElement.style.backgroundColor = '';
+                            document.removeEventListener('click', handleClick);
+                        };
+
+                        const handleClick = (e) => {
+                            // Check if click is on an interactive element
+                            if (e.target.closest('button, a, input, select, textarea')) {
+                                clearHighlight();
+                            }
+                        };
+
+                        document.addEventListener('click', handleClick);
+
+                        // Also clear after 5 seconds as fallback
+                        setTimeout(() => {
+                            clearHighlight();
+                        }, 5000);
                     }
-                }, 100);
-            });
-        } else if (result.type === 'mindmap') {
-            // Navigate to mindmap - don't filter by section, just show all mindmaps and scroll to the specific one
-            this.viewType = 'mindmaps';
-            this.showingMainMenu = false;
-            this.showingSpecificSection = false;
-            // Clear section/group filters to ensure the mindmap is visible
-            this.contentFilterSection = null;
-            this.contentFilterGroup = null;
-            if (window.innerWidth < 768) this.sidebarVisible = false;
-            this.$nextTick(() => {
-                setTimeout(() => {
-                    const mindmapElement = document.querySelector(`[data-mindmap-id="${result.id}"]`);
-                    if (mindmapElement) {
-                        mindmapElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        mindmapElement.style.backgroundColor = 'rgba(6, 182, 212, 0.1)';
-                        setTimeout(() => { mindmapElement.style.backgroundColor = ''; }, 2000);
-                    }
-                }, 100);
+                }, 150);
             });
         }
     },
