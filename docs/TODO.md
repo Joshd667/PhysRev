@@ -108,6 +108,268 @@ Add SRI hashes to CDN dependencies to prevent supply chain attacks.
 
 ---
 
+## Legal & Compliance
+
+### Privacy Notice / Privacy Policy
+
+**Priority:** 🔴 HIGH - GDPR Requirement (Articles 13/14)
+**Status:** ❌ Missing
+**Documentation:** See **[UK_LEGAL_COMPLIANCE_ANALYSIS.md](legal/UK_LEGAL_COMPLIANCE_ANALYSIS.md)** for complete compliance analysis
+
+**Why this matters:**
+- Required by UK GDPR before deployment
+- Informs users about data collection and processing
+- Demonstrates compliance with legal obligations
+- Reduces risk of ICO investigation
+
+**What to include:**
+1. **Data Collected:**
+   - Confidence ratings (1-5 scale on physics topics)
+   - Study materials (notes, flashcards, mindmaps)
+   - Analytics history (30-day retention)
+   - Test results
+   - User preferences (view modes, dark mode)
+   - Authentication data (Teams only - name, email)
+
+2. **Storage Location:**
+   - IndexedDB on user's device (client-side only)
+   - No external transmission (unless Teams explicitly enabled)
+   - Service Worker cache for app assets
+
+3. **Retention Periods:**
+   - Analytics: 30-day automatic cleanup
+   - User materials: No automatic deletion (user-controlled)
+   - Backup files: User-initiated only
+
+4. **User Rights:**
+   - Right to access (export data as JSON)
+   - Right to rectification (edit all data)
+   - Right to erasure (clear all data function)
+   - Right to data portability (JSON export/import)
+
+5. **Legal Basis:**
+   - Legitimate interest for educational analytics (GDPR Article 6(1)(f))
+   - Consent for optional preferences
+
+6. **Data Controller:**
+   - Contact information for data controller
+   - If school deployment: School as data controller, app as processor
+
+7. **Third-Party Services:**
+   - CDN libraries (cached locally after first visit)
+   - Microsoft Teams/Graph API (if enabled)
+   - No tracking or analytics services
+
+**Where to add:**
+- Create `docs/legal/PRIVACY_NOTICE.md`
+- Link from main README.md
+- Display in app (Settings → About or Legal)
+
+---
+
+### Data Retention Policy Documentation
+
+**Priority:** 🔴 HIGH - GDPR Requirement (Article 13)
+**Status:** ⚠️ Implemented in code but not documented for users
+
+**Current implementation:**
+- Analytics history: 30-day automatic cleanup (code: `js/utils/data-management.js`)
+- User study materials: No automatic deletion (user-controlled)
+
+**What to document:**
+1. **Analytics Data:**
+   - Retention: 30 days from creation
+   - Automatic cleanup: Yes
+   - Purpose: Progress tracking and insights
+
+2. **User Study Materials:**
+   - Retention: Indefinite (user-controlled)
+   - Automatic cleanup: No
+   - User control: Full deletion via Settings
+
+3. **Backup Files:**
+   - Retention: User-initiated export only
+   - Storage: User's device/chosen location
+   - Automatic cleanup: No
+
+4. **Storage Quota:**
+   - Limit: ~50MB+ (browser-dependent)
+   - Warning: User notified at quota limit
+   - Mitigation: Analytics cleanup, user export/delete
+
+**Where to add:**
+- Include in PRIVACY_NOTICE.md
+- Or create separate `docs/legal/DATA_RETENTION_POLICY.md`
+
+---
+
+### Legal Basis Documentation
+
+**Priority:** 🔴 HIGH - GDPR Requirement (Article 6)
+**Status:** ❌ Not documented
+
+**Recommended legal basis:**
+- **Legitimate interest** for educational analytics (GDPR Article 6(1)(f))
+- **Consent** for optional features (Teams login, preferences)
+
+**What to document:**
+1. **Legitimate Interest Assessment:**
+   - Purpose: Educational analytics for student learning
+   - Necessity: Essential for tracking progress and identifying knowledge gaps
+   - Balance test: Minimal privacy impact (local-only storage, no identifiers)
+   - User expectations: Reasonable expectation of progress tracking in educational tool
+
+2. **Consent Mechanism:**
+   - Teams login: Explicit consent via login button
+   - User preferences: Implicit consent via settings changes
+   - Withdrawal: Clear data deletion, logout functions
+
+**Where to add:**
+- Include in PRIVACY_NOTICE.md as "Legal Basis for Processing"
+
+---
+
+### Terms of Service
+
+**Priority:** 🟡 MEDIUM - Recommended but not legally required
+**Status:** ❌ Missing
+
+**What to include:**
+1. **Acceptable Use Policy:**
+   - Educational purposes only
+   - No harmful content in study materials
+   - No attempts to circumvent security
+
+2. **Liability Limitations:**
+   - App provided "as-is"
+   - No warranty for data persistence
+   - User responsible for backups
+   - Storage quota limits disclosed
+
+3. **User Responsibilities:**
+   - Maintain device security
+   - Regular data backups recommended
+   - Appropriate content in notes/flashcards
+
+4. **Service Modifications:**
+   - Right to modify app features
+   - Update notification via Service Worker
+   - User control over update installation
+
+**Where to add:**
+- Create `docs/legal/TERMS_OF_SERVICE.md`
+- Link from app (Settings → Legal)
+
+---
+
+### Accessibility Statement
+
+**Priority:** 🟡 MEDIUM - WCAG 2.1 recommended for public sector
+**Status:** ❌ Missing
+
+**Current implementation:**
+- ✅ Dark mode support
+- ✅ Keyboard navigation (Alpine.js native)
+- ❌ Not tested with screen readers
+- ❌ Not tested with other assistive technologies
+
+**What to include:**
+1. **Conformance Level:**
+   - Target: WCAG 2.1 Level AA
+   - Current status: Unknown (not tested)
+
+2. **Known Issues:**
+   - Screen reader compatibility: Untested
+   - Color contrast: Not formally audited
+   - Focus indicators: Present but not comprehensive
+
+3. **Planned Improvements:**
+   - Screen reader testing
+   - ARIA labels for interactive elements
+   - Comprehensive keyboard navigation audit
+
+4. **Feedback Mechanism:**
+   - Contact email for accessibility issues
+   - Commitment to address reported issues
+
+**Where to add:**
+- Create `docs/legal/ACCESSIBILITY_STATEMENT.md`
+- Link from app footer or Settings
+
+---
+
+### Data Processing Agreement (DPA)
+
+**Priority:** 🔴 HIGH (if school deployment)
+**Status:** ❌ Not executed
+**Applies to:** Institutional/school deployments only
+
+**When required:**
+- School deploys app for students
+- School is data controller, app is data processor
+- GDPR Article 28 requirement
+
+**What to include:**
+1. **Roles:**
+   - School: Data controller
+   - App/developer: Data processor
+
+2. **Processing Details:**
+   - Subject matter: Educational analytics
+   - Nature: Local storage, progress tracking
+   - Purpose: Student self-assessment
+   - Data subjects: A-Level physics students
+
+3. **Security Measures:**
+   - Client-side storage only
+   - XSS prevention (DOMPurify)
+   - CSP enforcement
+   - User data control (export/delete)
+
+4. **Sub-processors:**
+   - CDN providers (cached locally)
+   - Microsoft (if Teams enabled)
+
+**Action:**
+- Create template DPA for schools
+- Execute before school deployment
+
+---
+
+### Microsoft Data Processing Agreement
+
+**Priority:** 🔴 HIGH (if Teams integration enabled)
+**Status:** ⚠️ Teams integration disabled
+**Applies to:** Only if Teams auth is enabled and cloud sync implemented
+
+**When required:**
+- Teams authentication enabled
+- OneDrive sync implemented (currently not implemented)
+- Organization uses Microsoft 365
+
+**What to verify:**
+1. **Organization has Microsoft DPA:**
+   - Check with IT department/admin
+   - Microsoft 365 subscriptions typically include DPA
+   - Verify DPA covers Graph API usage
+
+2. **Data Flow Documentation:**
+   - User authentication via Azure AD
+   - User profile data (name, email) from Graph API
+   - OneDrive file storage (if sync implemented)
+
+3. **Privacy Notice Update:**
+   - Disclose Microsoft as sub-processor
+   - Explain Teams data flow
+   - Link to Microsoft's privacy policy
+
+**Action:**
+- Verify Microsoft DPA before enabling Teams
+- Update Privacy Notice with Teams details
+- Document data flow in legal analysis
+
+---
+
 ## Content Development
 
 ### Paper 3 Support
