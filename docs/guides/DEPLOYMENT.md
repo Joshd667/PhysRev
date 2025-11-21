@@ -10,7 +10,7 @@ This guide covers deploying the Physics Knowledge Audit Tool to production envir
 
 For **10x faster loading** in production, generate `combined-data.json`:
 
-**Tool Location:** `tools/csv-converter-unified.html`
+**Tool Location:** `tools/csv-converter.html` (or access via `tools/index.html` dashboard)
 
 **Two conversion modes:**
 - **Server Mode** - Fetches CSVs from running web server (for deployed apps)
@@ -18,7 +18,7 @@ For **10x faster loading** in production, generate `combined-data.json`:
 
 **Steps:**
 1. Start local server: `python3 -m http.server 8000`
-2. Open `http://localhost:8000/tools/csv-converter-unified.html`
+2. Open `http://localhost:8000/tools/` (dashboard) or `http://localhost:8000/tools/csv-converter.html`
 3. Choose "Server Mode" (easiest) or "Local Mode"
 4. Click "Convert to JSON"
 5. Save as `resources/combined-data.json`
