@@ -322,7 +322,14 @@ export const mindmapManagementMethods = {
         const topicIds = this.currentRevisionTopics.map(topic => topic.id);
 
         return Object.values(this.mindmaps || {})
-            .filter(mindmap => mindmap.tags && mindmap.tags.some(tag => topicIds.includes(tag)))
+            .filter(mindmap => {
+                // Primary: Check if ANY tag matches ANY topic in the revision section
+                if (mindmap.tags && mindmap.tags.length > 0) {
+                    return mindmap.tags.some(tag => topicIds.includes(tag));
+                }
+                // Fallback: For backward compatibility with old mindmaps, check sectionId
+                return mindmap.sectionId === this.currentRevisionSection;
+            })
             .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
     }
 };
