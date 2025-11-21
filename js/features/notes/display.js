@@ -285,6 +285,11 @@ export const notesDisplayMethods = {
                 ...group,
                 sections: Object.values(group.sections)
                     .filter(section => section && section.sectionTitle && Array.isArray(section.notes))
+                    .map(section => ({
+                        ...section,
+                        // Ensure all notes have valid IDs - critical for Alpine's x-for
+                        notes: section.notes.filter(note => note && note.id !== undefined && note.id !== null)
+                    }))
                     .sort((a, b) => {
                         return a.sectionTitle.localeCompare(b.sectionTitle);
                     })
@@ -297,7 +302,10 @@ export const notesDisplayMethods = {
             });
 
         // Add pinned notes section at the top (always show in list view, even if empty)
-        if (this.notesViewMode === 'list' || sortedPinnedNotes.length > 0) {
+        // Filter pinned notes to ensure valid IDs
+        const validPinnedNotes = sortedPinnedNotes.filter(note => note && note.id !== undefined && note.id !== null);
+
+        if (this.notesViewMode === 'list' || validPinnedNotes.length > 0) {
             groupsArray.unshift({
                 groupTitle: 'Pinned Notes',
                 groupIcon: 'pin',
@@ -306,7 +314,7 @@ export const notesDisplayMethods = {
                     sectionTitle: 'Pinned Notes',
                     sectionIcon: 'pin',
                     sectionPaper: '',
-                    notes: sortedPinnedNotes
+                    notes: validPinnedNotes
                 }]
             });
         }

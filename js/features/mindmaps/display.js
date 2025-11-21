@@ -209,6 +209,11 @@ export const mindmapsDisplayMethods = {
                 ...group,
                 sections: Object.values(group.sections)
                     .filter(section => section && section.sectionTitle && Array.isArray(section.mindmaps))
+                    .map(section => ({
+                        ...section,
+                        // Ensure all mindmaps have valid IDs - critical for Alpine's x-for
+                        mindmaps: section.mindmaps.filter(mindmap => mindmap && mindmap.id !== undefined && mindmap.id !== null)
+                    }))
                     .sort((a, b) => {
                         return a.sectionTitle.localeCompare(b.sectionTitle);
                     })

@@ -118,26 +118,59 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
             // ⚡ PERFORMANCE: Cached getters for expensive template computations
             get notesGroupedBySection() {
                 if (this._cachedNotesGroupedDirty) {
-                    this._cachedNotesGrouped = this.getNotesGroupedBySection();
+                    try {
+                        const result = this.getNotesGroupedBySection();
+                        // Ensure we always have a valid array structure
+                        if (!result || !Array.isArray(result)) {
+                            this._cachedNotesGrouped = [];
+                        } else {
+                            this._cachedNotesGrouped = result;
+                        }
+                    } catch (error) {
+                        logger.error('Error in getNotesGroupedBySection:', error);
+                        this._cachedNotesGrouped = [];
+                    }
                     this._cachedNotesGroupedDirty = false;
                 }
-                return this._cachedNotesGrouped;
+                return this._cachedNotesGrouped || [];
             },
 
             get flashcardsGroupedBySection() {
                 if (this._cachedFlashcardsGroupedDirty) {
-                    this._cachedFlashcardsGrouped = this.getFlashcardsGroupedBySection();
+                    try {
+                        const result = this.getFlashcardsGroupedBySection();
+                        // Ensure we always have a valid array structure
+                        if (!result || !Array.isArray(result)) {
+                            this._cachedFlashcardsGrouped = [];
+                        } else {
+                            this._cachedFlashcardsGrouped = result;
+                        }
+                    } catch (error) {
+                        logger.error('Error in getFlashcardsGroupedBySection:', error);
+                        this._cachedFlashcardsGrouped = [];
+                    }
                     this._cachedFlashcardsGroupedDirty = false;
                 }
-                return this._cachedFlashcardsGrouped;
+                return this._cachedFlashcardsGrouped || [];
             },
 
             get mindmapsGroupedBySection() {
                 if (this._cachedMindmapsGroupedDirty) {
-                    this._cachedMindmapsGrouped = this.getMindmapsGroupedBySection();
+                    try {
+                        const result = this.getMindmapsGroupedBySection();
+                        // Ensure we always have a valid array structure
+                        if (!result || !Array.isArray(result)) {
+                            this._cachedMindmapsGrouped = [];
+                        } else {
+                            this._cachedMindmapsGrouped = result;
+                        }
+                    } catch (error) {
+                        logger.error('Error in getMindmapsGroupedBySection:', error);
+                        this._cachedMindmapsGrouped = [];
+                    }
                     this._cachedMindmapsGroupedDirty = false;
                 }
-                return this._cachedMindmapsGrouped;
+                return this._cachedMindmapsGrouped || [];
             },
 
             get inheritedTags() {

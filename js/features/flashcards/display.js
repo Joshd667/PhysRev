@@ -357,7 +357,8 @@ export const flashcardsDisplayMethods = {
                     .filter(section => section && section.sectionTitle && Array.isArray(section.decks))
                     .map(section => ({
                         ...section,
-                        decks: this.sortFlashcardDecks(section.decks)
+                        // Ensure all decks have valid IDs - critical for Alpine's x-for
+                        decks: this.sortFlashcardDecks(section.decks.filter(deck => deck && deck.id !== undefined && deck.id !== null))
                     }))
                     .sort((a, b) => {
                         return a.sectionTitle.localeCompare(b.sectionTitle);
@@ -371,9 +372,11 @@ export const flashcardsDisplayMethods = {
             });
 
         const sortedPinnedDecks = this.sortFlashcardDecks(pinnedDecks);
+        // Filter pinned decks to ensure valid IDs
+        const validPinnedDecks = sortedPinnedDecks.filter(deck => deck && deck.id !== undefined && deck.id !== null);
 
         // Add pinned section at the top (always show in list view, even if empty)
-        if (this.flashcardViewMode === 'list' || sortedPinnedDecks.length > 0) {
+        if (this.flashcardViewMode === 'list' || validPinnedDecks.length > 0) {
             groupsArray.unshift({
                 groupTitle: 'Pinned Flashcards',
                 groupIcon: 'pin',
@@ -382,7 +385,7 @@ export const flashcardsDisplayMethods = {
                     sectionTitle: 'Pinned Decks',
                     sectionIcon: 'pin',
                     sectionPaper: '',
-                    decks: sortedPinnedDecks
+                    decks: validPinnedDecks
                 }]
             });
         }
