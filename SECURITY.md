@@ -1,12 +1,30 @@
-# Security Documentation
+# Security Policy
 
-## Overview
+**For Developers & System Administrators**
 
 This document outlines security considerations, known vulnerabilities, and mitigation strategies for the Physics Knowledge Audit Tool.
 
-**Last Updated:** 2025-01-20
+**Last Updated:** 2025-11-21
 **Security Review Status:** Completed
 **Overall Risk Level:** MEDIUM-LOW
+
+---
+
+## Table of Contents
+
+- [Critical Security Issues](#-critical-security-issues)
+  - [Subresource Integrity (SRI) for CDN Dependencies](#1-subresource-integrity-sri-for-cdn-dependencies)
+  - [Content Security Policy (CSP) Limitations](#2-content-security-policy-csp---unsafe-inline-and-unsafe-eval)
+  - [XSS Prevention](#3-xss-prevention---innerhtml-usage)
+- [Authentication & Authorization](#-authentication--authorization)
+  - [Guest Mode](#guest-mode-local-only)
+  - [Microsoft Teams Integration](#microsoft-teams-integration)
+- [Data Integrity & Privacy](#%EF%B8%8F-data-integrity--privacy)
+- [Testing & Validation](#-testing--validation)
+- [Known Vulnerabilities](#-known-vulnerabilities)
+- [Security Checklist](#-security-checklist-before-production)
+- [Reporting Security Issues](#-reporting-security-issues)
+- [Related Documentation](#-related-documentation)
 
 ---
 
@@ -21,12 +39,12 @@ This document outlines security considerations, known vulnerabilities, and mitig
 #### Current State
 
 Some CDN dependencies lack SRI hashes:
-- ✅ KaTeX: Has SRI hashes
-- ❌ Alpine.js 3.13.3: Missing SRI
-- ❌ DOMPurify 3.0.6: Missing SRI
-- ❌ Chart.js: Missing SRI + missing version pin
-- ❌ Lucide Icons 0.546.0: Missing SRI
-- ❌ TailwindCSS CDN: Missing SRI (dynamic loading)
+- ✅ KaTeX: Has SRI hashes (lines 88-90 of index.html)
+- ⚠️ Alpine.js 3.13.3: Missing SRI (preload at line 62, script tag elsewhere)
+- ⚠️ DOMPurify 3.0.6: Missing SRI (line 97)
+- ⚠️ Chart.js: Missing SRI + missing version pin (line 104+)
+- ⚠️ Lucide Icons: Missing SRI
+- ⚠️ TailwindCSS CDN: Missing SRI (may not be possible with CDN build)
 
 #### Why This Matters
 
@@ -34,26 +52,36 @@ Without SRI hashes, if a CDN is compromised, malicious code could be injected in
 
 #### Mitigation Steps
 
-**IMMEDIATE ACTION REQUIRED:**
+**Tool Available:** `tools/generate-sri-hashes.js`
+
+**Implementation Steps:**
 
 1. **Generate SRI Hashes:**
    ```bash
-   # Run the SRI hash generator
    node tools/generate-sri-hashes.js
    ```
 
 2. **Add SRI Hashes to index.html:**
    - Copy the generated hashes
    - Add `integrity="sha384-..."` and `crossorigin="anonymous"` attributes
-   - See examples in index.html (KaTeX already has this)
+   - See example: KaTeX already has SRI (lines 88-90)
 
 3. **Pin Chart.js Version:**
-   - Currently: `https://cdn.jsdelivr.net/npm/chart.js` (no version)
+   - Currently: `https://cdn.jsdelivr.net/npm/chart.js` (unpinned)
    - Change to: `https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js`
+   - Version 4.4.1 is current as per package.json
 
-4. **Update Service Worker Cache:**
-   - After adding SRI, update `sw.js` CRITICAL_RESOURCES array
-   - Increment BUILD_TIMESTAMP to force cache refresh
+4. **Update Service Worker:**
+   - Increment BUILD_TIMESTAMP in `sw.js` (line 1)
+   - Format: `const BUILD_TIMESTAMP = 'YYYYMMDD-NNN'`
+   - Forces cache refresh with new SRI attributes
+
+5. **Test CSP Compatibility:**
+   - Verify resources load correctly
+   - Check browser console for CSP violations
+   - Test offline mode (Service Worker caching)
+
+**See [docs/TODO.md#subresource-integrity-sri-hashes](docs/TODO.md#subresource-integrity-sri-hashes)** for detailed implementation checklist.
 
 #### Alternative: Move to Bundled Dependencies
 
@@ -199,71 +227,80 @@ For complete implementation details, see [ARCHITECTURE.md - XSS Protection](docs
 ### Guest Mode (Local-Only)
 
 **Security Level:** HIGH ✅
+**Status:** Fully functional and recommended
 
 - All data stored in IndexedDB (client-side only)
 - No network transmission
 - No authentication required
 - Perfect for privacy-conscious users
+- Full feature parity with Teams mode
 
 ### Microsoft Teams Integration
 
-**Security Level:** MEDIUM ⚠️
+**Security Level:** LOW ⚠️
+**Status:** 🔴 ACTIVE BUT NON-FUNCTIONAL (Placeholder Credentials)
 
-**Current Issues:**
+**CRITICAL SECURITY RISKS:**
 
-1. **Placeholder Credentials:**
+1. **Teams Login Button is ENABLED with Fake Credentials**
+   - Users can click "Login with Microsoft Teams"
+   - OAuth flow will fail with "Application not found" error
+   - Creates user confusion and support burden
+   - **Location:** `index.html` (line 231-242)
+
+2. **Placeholder Credentials in Source Code:**
    ```javascript
-   // js/features/auth/teams.js
-   CLIENT_ID: 'your-teams-app-client-id',  // ❌ Must be replaced
-   TENANT_ID: 'your-tenant-id'             // ❌ Must be replaced
+   // js/features/auth/teams.js (lines 7-17)
+   const TEAMS_CONFIG = {
+       CLIENT_ID: 'your-teams-app-client-id',  // ❌ PLACEHOLDER
+       TENANT_ID: 'your-tenant-id',            // ❌ PLACEHOLDER
+       REDIRECT_URI: window.location.origin + '/auth-callback.html',  // ❌ WRONG PATH
+   };
    ```
 
-2. **Missing Configuration Management:**
-   - Credentials hardcoded in source
-   - No environment variable support
-   - Risk of accidental credential exposure
+3. **Redirect URI Mismatch Bug:**
+   - Code points to: `/auth-callback.html`
+   - File actually at: `/tools/auth-callback.html`
+   - **Will fail even with valid credentials**
+   - **Location:** `js/features/auth/teams.js` (line 11)
 
-**What To Do If You Need Teams Auth:**
+4. **OneDrive Sync NOT Implemented:**
+   - Configuration variables exist
+   - Functions are called but empty/incomplete
+   - Data still stored locally in IndexedDB (not synced)
+   - Misleading documentation in code comments
 
-**Option 1: Environment Configuration (Recommended)**
-```javascript
-// Create js/config.js (add to .gitignore!)
-export const TEAMS_CONFIG = {
-    CLIENT_ID: process.env.TEAMS_CLIENT_ID || 'your-client-id',
-    TENANT_ID: process.env.TEAMS_TENANT_ID || 'your-tenant-id',
-    // ...
-};
-```
+**IMMEDIATE ACTIONS REQUIRED:**
 
-**Option 2: Configuration File (Good for Testing)**
-```javascript
-// Create config.local.js (add to .gitignore!)
-export const TEAMS_CONFIG = {
-    CLIENT_ID: 'actual-client-id-here',
-    TENANT_ID: 'actual-tenant-id-here',
-    // ...
-};
-```
-
-**Option 3: Remove Teams Auth Entirely**
-
-If you don't plan to use Teams integration:
-```bash
-# Remove Teams auth to reduce attack surface
-rm js/features/auth/teams.js
-# Update js/features/auth/index.js to remove Teams import
-```
-
-**RECOMMENDATION:**
-Until you have Azure AD credentials, **disable Teams auth in the UI** to avoid confusion:
-
-```javascript
-// In index.html, comment out Teams login button
-<!-- Teams Login Button -->
-<!-- TEMPORARILY DISABLED - Awaiting Azure AD credentials
-<button @click="initiateTeamsLogin()">...</button>
+**Option 1: Disable Teams Button (🔴 RECOMMENDED)**
+```html
+<!-- In index.html (line 231-242), comment out Teams button -->
+<!-- TEMPORARILY DISABLED - Awaiting Azure AD App Registration
+<button @click="initiateTeamsLogin()" ...>
+    Login with Microsoft Teams
+</button>
 -->
 ```
+
+**Option 2: Fix for Production Use**
+
+See **[docs/guides/TEAMS_AUTH_SETUP.md](docs/guides/TEAMS_AUTH_SETUP.md)** for complete setup guide including:
+- Azure AD app registration
+- Creating `js/features/auth/teams-config.js` with real credentials
+- Fixing redirect URI mismatch
+- Testing procedures
+- Security testing checklist
+
+**Credential Protection:**
+- ✅ `.gitignore` already configured (line 30: `js/features/auth/teams-config.js`)
+- ✅ `tools/auth-callback.html` exists
+- ❌ No configuration template file yet (should create `teams-config.template.js`)
+
+**RECOMMENDATION:** **Disable the Teams button immediately** to prevent user confusion. Guest mode provides full functionality while Teams auth is being configured.
+
+**See Also:**
+- **[docs/TODO.md](docs/TODO.md#authentication--infrastructure)** - Teams auth TODO items
+- **[docs/guides/TEAMS_AUTH_SETUP.md](docs/guides/TEAMS_AUTH_SETUP.md)** - Complete setup guide
 
 ---
 
@@ -383,35 +420,52 @@ For implementation details, see [ARCHITECTURE.md - Storage & Caching](docs/guide
 
 ## 📋 Security Checklist (Before Production)
 
+**See [docs/guides/DEPLOYMENT.md](docs/guides/DEPLOYMENT.md)** for complete deployment guide.
+
 ### Pre-Deployment
 
-- [ ] All CDN scripts have SRI hashes
-- [ ] Chart.js version pinned
-- [ ] Service Worker cache updated with new hashes
-- [ ] All innerHTML usage audited and sanitized
-- [ ] Console statements wrapped in debug flag
-- [ ] Teams auth credentials configured OR disabled
-- [ ] .gitignore created (prevent credential leaks)
-- [ ] Security tests passing (100% coverage for security modules)
-- [ ] CSP tested and working
-- [ ] Privacy notice displayed on first use
+- [ ] **SRI Hashes:** All CDN scripts have `integrity` attributes
+- [ ] **Chart.js:** Version pinned to 4.4.1
+- [ ] **Service Worker:** BUILD_TIMESTAMP incremented in `sw.js` (line 1)
+- [ ] **XSS Protection:** All innerHTML usage audited and sanitized
+- [ ] **Debug Mode:** Console logging disabled in production (or wrapped in logger.debug)
+- [ ] **Teams Auth:** Either fully configured OR button disabled in `index.html`
+- [ ] **Git Protection:** `.gitignore` configured (includes `teams-config.js`)
+- [ ] **Security Tests:** All tests passing (`npm test`)
+- [ ] **CSP:** Content Security Policy tested and working
+- [ ] **Combined Data:** `combined-data.json` generated for fast loading
 
 ### Post-Deployment Monitoring
 
-- [ ] Monitor browser console for CSP violations
-- [ ] Review error logs weekly
-- [ ] Update CDN dependencies quarterly
-- [ ] Re-run SRI hash generator after any CDN version updates
-- [ ] Annual security review
+- [ ] **CSP Violations:** Monitor browser console in production
+- [ ] **Error Logs:** Review weekly for security issues
+- [ ] **Dependency Updates:** Check CDN dependencies quarterly
+- [ ] **SRI Updates:** Re-run `tools/generate-sri-hashes.js` after dependency updates
+- [ ] **Security Review:** Annual comprehensive security audit
+- [ ] **Teams Auth:** Monitor for failed login attempts if enabled
+
+### Security Testing
+
+See **[docs/guides/TESTING.md#security-manual-testing](docs/guides/TESTING.md#security-manual-testing)** for:
+- XSS attempt testing in all user input fields
+- Script injection prevention testing
+- DOMPurify sanitization verification
+- IndexedDB security inspection
+- Console logger debug mode testing
 
 ---
 
-## 📞 Security Contacts
+## 📞 Reporting Security Issues
 
-**Report Security Issues:**
-- Create issue on GitHub (if public repo)
-- Email: [your-security-email@domain.com]
-- Response time: 48 hours
+**For Security Vulnerabilities:**
+1. **DO NOT** create public GitHub issues for security vulnerabilities
+2. Contact the repository maintainer directly
+3. Expected response time: 48 hours
+4. Provide detailed reproduction steps and impact assessment
+
+**For Security Questions:**
+- Open a GitHub issue with the `security` label
+- Reference this document and related guides
 
 **Security Review Schedule:**
 - Minor review: Quarterly
@@ -420,15 +474,46 @@ For implementation details, see [ARCHITECTURE.md - Storage & Caching](docs/guide
 
 ---
 
-## 📚 References
+## 📚 Related Documentation
 
-- [Content Security Policy (CSP) - MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
-- [Subresource Integrity (SRI) - MDN](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)
-- [DOMPurify Documentation](https://github.com/cure53/DOMPurify)
-- [OWASP XSS Prevention Cheat Sheet](https://cheatsheetsecurity.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
+**Security Implementation:**
+- **[docs/guides/ARCHITECTURE.md](docs/guides/ARCHITECTURE.md)** - XSS protection implementation details
+- **[docs/guides/TEAMS_AUTH_SETUP.md](docs/guides/TEAMS_AUTH_SETUP.md)** - Teams authentication security guide
+- **[docs/TODO.md](docs/TODO.md)** - Outstanding security tasks (SRI hashes, Teams auth)
+
+**Security Audits:**
+- **[docs/audits/xss-audit.md](docs/audits/xss-audit.md)** - XSS vulnerability audit (2025-01-20)
+- **[docs/audits/localstorage-security-audit.md](docs/audits/localstorage-security-audit.md)** - Storage security audit
+- **[docs/audits/console-logger-audit.md](docs/audits/console-logger-audit.md)** - Logger security audit
+
+**Testing & Development:**
+- **[docs/guides/TESTING.md](docs/guides/TESTING.md)** - Security testing procedures
+- **[docs/guides/DEVELOPMENT.md](docs/guides/DEVELOPMENT.md)** - Secure development practices
+- **[docs/guides/DEPLOYMENT.md](docs/guides/DEPLOYMENT.md)** - Production security checklist
 
 ---
 
-**Version:** 1.0
-**Last Review:** 2025-01-20
-**Next Review:** 2025-04-20
+## 📖 External Resources
+
+**Web Security Standards:**
+- [Content Security Policy (CSP) - MDN](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
+- [Subresource Integrity (SRI) - MDN](https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity)
+- [OWASP XSS Prevention Cheat Sheet](https://cheatsheetsecurity.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+
+**Libraries & Tools:**
+- [DOMPurify Documentation](https://github.com/cure53/DOMPurify) - HTML sanitization
+- [Alpine.js Security](https://alpinejs.dev/advanced/csp) - CSP considerations
+- [IndexedDB Security](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API#security) - Storage security
+
+**OAuth & Authentication:**
+- [OAuth 2.0 PKCE Flow](https://oauth.net/2/pkce/) - Secure authentication
+- [Azure AD App Registration](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app)
+- [Microsoft Graph API Security](https://docs.microsoft.com/en-us/graph/security-authorization)
+
+---
+
+**Version:** 2.0
+**Last Review:** 2025-11-21
+**Next Review:** 2026-02-21 (Quarterly)
+**Priority Focus:** SRI implementation, Teams auth configuration
