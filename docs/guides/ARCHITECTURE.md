@@ -215,9 +215,12 @@ PhysRev/
 │       ├── ARCHITECTURE.md   # This file
 │       └── ...               # Other guides
 │
+├── auth-callback.html        # OAuth callback for Teams login
+│
 └── tools/                     # Development utilities
     ├── csv-converter-unified.html # CSV→JSON converter
-    └── auth-callback.html         # OAuth callback for Teams login
+    ├── test-imports.html          # Module import testing
+    └── generate-sri-hashes.js     # SRI hash generator
 ```
 
 ---
