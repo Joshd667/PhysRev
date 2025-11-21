@@ -266,9 +266,13 @@ export const flashcardManagementMethods = {
      */
     getFlashcardDecksForCurrentSection() {
         if (!this.currentRevisionSection) return [];
+        if (!this.currentRevisionTopics || this.currentRevisionTopics.length === 0) return [];
+
+        // Get topic IDs from current revision topics
+        const topicIds = this.currentRevisionTopics.map(topic => topic.id);
 
         return Object.values(this.flashcardDecks || {})
-            .filter(deck => deck.sectionId === this.currentRevisionSection)
+            .filter(deck => deck.tags && deck.tags.some(tag => topicIds.includes(tag)))
             .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
     },
 
