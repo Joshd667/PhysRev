@@ -12,14 +12,14 @@ This directory contains development and build tools for the Physics Audit applic
 
 ## 📦 Available Tools
 
-### CSV to JSON Converters
+### CSV to JSON Converter
 
-#### `csv-converter-unified.html` ⭐ **Recommended**
-The most feature-complete converter with both server and local modes.
+#### `csv-converter.html`
+The all-in-one converter with both server and local modes.
 
 **Features:**
-- Server Mode: Fetches CSVs from running web server
-- Local Mode: Drag-and-drop file uploads (works offline)
+- **Server Mode:** Fetches CSVs from running web server
+- **Local Mode:** Drag-and-drop file uploads (works offline)
 - Processes all 16 CSV files (10 subject + 5 resource + groups.csv)
 - Builds revision mappings and groups configuration
 - **Performance:** Reduces load time from ~20 seconds to ~1 second
@@ -27,20 +27,6 @@ The most feature-complete converter with both server and local modes.
 **When to use:** Whenever you update CSV data files
 
 **Output:** `combined-data.json` → place in `resources/` folder
-
----
-
-#### `csv-converter.html`
-Server-only version that fetches CSVs from web server.
-
-**Use case:** When running app on localhost or web server
-
----
-
-#### `csv-converter-local.html`
-Offline version with drag-and-drop file upload interface.
-
-**Use case:** Quick conversions without running a web server
 
 ---
 
@@ -126,8 +112,6 @@ Module import verification tool for development.
 
 | Tool | Type | Requires Server | Node.js Required |
 |------|------|----------------|------------------|
-| csv-converter-unified.html | Browser | Optional | No |
-| csv-converter.html | Browser | Yes | No |
-| csv-converter-local.html | Browser | No | No |
+| csv-converter.html | Browser | Optional (has both modes) | No |
 | generate-sri-hashes.js | CLI | No | Yes |
 | test-imports.html | Browser | Yes | No |
