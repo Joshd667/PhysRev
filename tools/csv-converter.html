@@ -3,53 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Physics Audit - CSV to JSON Converter</title>
-    <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
-        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-        button { background: #007bff; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; margin: 5px; font-size: 16px; }
-        button:hover { background: #0056b3; }
-        button:disabled { background: #6c757d; cursor: not-allowed; }
-        .progress { width: 100%; background: #e9ecef; border-radius: 5px; margin: 10px 0; }
-        .progress-bar { height: 20px; background: #28a745; border-radius: 5px; transition: width 0.3s; text-align: center; line-height: 20px; color: white; font-size: 12px; }
-        .file-list { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; }
-        .file-status { margin: 5px 0; font-family: monospace; }
-    </style>
-</head>
-<body>
-    <h1>🚀 Physics Audit Tool - CSV to JSON Converter</h1>
-    
-    <div class="info status">
-        <strong>📝 What this does:</strong>
-        <ul>
-            <li>Combines all 15 CSV files into 1 JSON file</li>
-            <li>Reduces load time from ~20 seconds to ~1 second</li>
-            <li>Keeps your CSVs unchanged - they remain your source files</li>
-            <li>When you update CSVs, just re-run this converter</li>
-        </ul>
-    </div>
+    <title>CSV to JSON Converter - Physics Audit</title>
 
-    <button id="convertBtn" onclick="convertAllCSVs()">🔄 Convert All CSVs to JSON</button>
-    <button id="downloadBtn" onclick="downloadJSON()" disabled>📥 Download combined-data.json</button>
-    
-    <div class="progress" style="display: none;" id="progressContainer">
-        <div class="progress-bar" id="progressBar" style="width: 0%">0%</div>
-    </div>
-    
-    <div id="status"></div>
-    
-    <div class="file-list" id="fileList" style="display: none;">
-        <h3>📁 Files to Process:</h3>
-        <div id="fileStatuses"></div>
-    </div>
-
+    <!-- Match main app styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        let combinedData = null;
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <link rel="stylesheet" href="../css/style.css">
+    <script defer src="https://unpkg.com/lucide@0.546.0/dist/umd/lucide.min.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <!-- Header -->
+    <div class="animated-gradient text-white py-6 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="database" class="w-10 h-10"></i>
+                    <h1 class="text-3xl font-bold">CSV to JSON Converter</h1>
+                </div>
+                <a href="index.html" class="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg backdrop-blur-sm transition-colors">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Back</span>
+                </a>
+            </div>
+            <p class="opacity-90">Optimize your app by converting 16 CSV files into one JSON file</p>
+        </div>
+    </div>
 
-        // All your CSV files
+    <div class="max-w-4xl mx-auto px-4 py-6">
+        <!-- Info Box -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-lg p-4 mb-6">
+            <div class="flex items-start gap-3">
+                <i data-lucide="info" class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0"></i>
+                <div class="text-sm text-gray-700 dark:text-gray-300">
+                    <p class="font-semibold mb-2">What this does:</p>
+                    <ul class="space-y-1">
+                        <li>• Combines 16 CSV files into 1 optimized JSON</li>
+                        <li>• Reduces load time from ~20 seconds to ~1 second</li>
+                        <li>• Includes revision mappings and groups</li>
+                        <li>• Run this whenever you update CSV data</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mode Tabs -->
+        <div class="flex gap-2 mb-6 border-b border-gray-200 dark:border-gray-700">
+            <button
+                onclick="switchMode('server')"
+                id="serverTab"
+                class="mode-tab px-6 py-3 font-medium text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 transition-colors">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="server" class="w-4 h-4"></i>
+                    <span>Server Mode</span>
+                </div>
+            </button>
+            <button
+                onclick="switchMode('local')"
+                id="localTab"
+                class="mode-tab px-6 py-3 font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="hard-drive" class="w-4 h-4"></i>
+                    <span>Local Mode</span>
+                </div>
+            </button>
+        </div>
+
+        <!-- Server Mode -->
+        <div id="server-mode" class="mode-content">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                <div class="flex items-start gap-3 mb-4">
+                    <i data-lucide="server" class="w-5 h-5 text-gray-600 dark:text-gray-400 mt-0.5"></i>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Server Mode</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Fetches CSV files from your running web server</p>
+                    </div>
+                </div>
+                <button
+                    id="convertBtnServer"
+                    onclick="convertAllCSVs()"
+                    class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
+                    <i data-lucide="play-circle" class="w-5 h-5"></i>
+                    <span>Convert CSVs from Server</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Local Mode -->
+        <div id="local-mode" class="mode-content hidden">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+                <div class="flex items-start gap-3 mb-4">
+                    <i data-lucide="hard-drive" class="w-5 h-5 text-gray-600 dark:text-gray-400 mt-0.5"></i>
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Local Mode</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Upload CSV files from your computer (works offline)</p>
+                    </div>
+                </div>
+
+                <div
+                    id="dropZone"
+                    onclick="document.getElementById('fileInput').click()"
+                    class="border-3 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 rounded-lg p-12 text-center cursor-pointer transition-all hover:bg-blue-50 dark:hover:bg-blue-900/10">
+                    <i data-lucide="upload-cloud" class="w-16 h-16 mx-auto mb-4 text-gray-400"></i>
+                    <p class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Drop CSV files here</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">or click to select files</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">Select all 16 CSV files (10 subject + 5 resource + groups.csv)</p>
+                </div>
+
+                <input type="file" id="fileInput" multiple accept=".csv" class="hidden" onchange="handleFileSelect(event)">
+
+                <button
+                    id="convertBtnLocal"
+                    onclick="convertLocalCSVs()"
+                    disabled
+                    class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 mt-4">
+                    <i data-lucide="play-circle" class="w-5 h-5"></i>
+                    <span>Convert Selected Files</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="progressContainer" class="hidden mb-6">
+            <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden">
+                <div
+                    id="progressBar"
+                    class="bg-green-600 h-full text-white text-xs font-medium flex items-center justify-center transition-all duration-300"
+                    style="width: 0%">
+                    0%
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Button -->
+        <button
+            id="downloadBtn"
+            onclick="downloadJSON()"
+            disabled
+            class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold px-8 py-4 rounded-lg transition-colors flex items-center justify-center gap-3 mb-6 text-lg">
+            <i data-lucide="download" class="w-6 h-6"></i>
+            <span>Download combined-data.json</span>
+        </button>
+
+        <!-- Status Messages -->
+        <div id="status" class="space-y-3"></div>
+
+        <!-- File Processing List -->
+        <div id="fileList" class="hidden mt-6">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                <h3 class="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                    <i data-lucide="files" class="w-5 h-5"></i>
+                    File Processing Status
+                </h3>
+                <div id="fileStatuses" class="space-y-2 text-sm font-mono"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        let combinedData = null;
+        let selectedFiles = new Map();
+        let currentMode = 'server';
+
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Mode switching
+        window.switchMode = function(mode) {
+            currentMode = mode;
+
+            // Update tabs
+            const serverTab = document.getElementById('serverTab');
+            const localTab = document.getElementById('localTab');
+
+            if (mode === 'server') {
+                serverTab.className = 'mode-tab px-6 py-3 font-medium text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 transition-colors';
+                localTab.className = 'mode-tab px-6 py-3 font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-gray-700 dark:hover:text-gray-200 transition-colors';
+            } else {
+                localTab.className = 'mode-tab px-6 py-3 font-medium text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 transition-colors';
+                serverTab.className = 'mode-tab px-6 py-3 font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-gray-700 dark:hover:text-gray-200 transition-colors';
+            }
+
+            // Update content visibility
+            document.getElementById('server-mode').classList.toggle('hidden', mode !== 'server');
+            document.getElementById('local-mode').classList.toggle('hidden', mode !== 'local');
+
+            // Reset UI
+            document.getElementById('status').innerHTML = '';
+            document.getElementById('downloadBtn').disabled = true;
+            lucide.createIcons();
+        };
+
+        // CSV Files configuration
         const csvFiles = {
             subject: [
                 'resources/subject-cards/measurements.csv',
@@ -69,193 +224,94 @@
                 'resources/revision/simulations.csv',
                 'resources/revision/questions.csv',
                 'resources/revision/revisionsections.csv'
-            ]
+            ],
+            groups: 'resources/groups.csv'
         };
 
-        // CSV parser (same as your app)
-        function parseCSV(csvText) {
-            if (!csvText || !csvText.trim()) return [];
-            const lines = csvText.split('\n').filter(line => line.trim());
-            if (lines.length === 0) return [];
-            
-            const headers = parseLine(lines[0]);
-            const data = [];
-            
-            for (let i = 1; i < lines.length; i++) {
-                const values = parseLine(lines[i]);
-                const row = {};
-                headers.forEach((header, index) => {
-                    let value = values[index] || '';
-                    
-                    if (value.startsWith('"') && value.endsWith('"')) {
-                        value = value.slice(1, -1);
-                    }
-                    
-                    // Clean HTML for notes
-                    if (header === 'notes_html' && value) {
-                        value = value
-                            .replace(/&lt;/g, '<')
-                            .replace(/&gt;/g, '>')
-                            .replace(/&quot;/g, '"')
-                            .replace(/&#x27;/g, "'")
-                            .replace(/&amp;/g, '&');
-                    }
-                    
-                    row[header] = value;
-                });
-                data.push(row);
-            }
-            
-            return data;
-        }
+        // Import shared utilities
+        import { parseCSV } from '../js/utils/csv-parser.js';
+        import { convertSubjectCSV, convertGroupsCSV } from '../js/utils/csv-converter.js';
 
-        function parseLine(line) {
-            const values = [];
-            let current = '';
-            let inQuotes = false;
-            
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-                if (char === '"') {
-                    if (inQuotes && line[i + 1] === '"') {
-                        current += '"';
-                        i++;
-                    } else {
-                        inQuotes = !inQuotes;
-                    }
-                } else if (char === ',' && !inQuotes) {
-                    values.push(current.trim());
-                    current = '';
-                } else {
-                    current += char;
-                }
-            }
-            values.push(current.trim());
-            return values;
-        }
-
-        // Load CSV file with status updates
-        async function loadCSVFile(filepath) {
-            const fileDiv = document.getElementById(`file-${filepath.replace(/[^a-zA-Z0-9]/g, '_')}`);
-            try {
-                if (fileDiv) fileDiv.innerHTML = `⏳ ${filepath} - Loading...`;
-                
-                const response = await fetch(filepath);
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-                const csvText = await response.text();
-                const data = parseCSV(csvText);
-                
-                if (fileDiv) fileDiv.innerHTML = `✅ ${filepath} - ${data.length} rows loaded`;
-                return data;
-            } catch (error) {
-                if (fileDiv) fileDiv.innerHTML = `❌ ${filepath} - ${error.message}`;
-                console.error(`Error loading ${filepath}:`, error);
-                return [];
-            }
-        }
-
-        // Convert subject CSV to your app format
-        function convertSubjectCSV(csvData, revisionMappings) {
-            const sections = {};
-
-            csvData.forEach(row => {
-                if (!row.section_name) return;
-
-                if (!sections[row.section_name]) {
-                    sections[row.section_name] = {
-                        title: row.section_title,
-                        paper: row.section_paper,
-                        icon: row.section_icon,
-                        topics: []
-                    };
-                }
-
-                const learningObjectives = row.learning_objectives ?
-                    row.learning_objectives.split('|').map(obj => obj.trim()).filter(obj => obj) : [];
-                const examples = row.examples ?
-                    row.examples.split('|').map(ex => ex.trim()).filter(ex => ex) : [];
-
-                sections[row.section_name].topics.push({
-                    id: row.topic_id,
-                    title: row.topic_title,
-                    prompt: row.topic_prompt,
-                    learningObjectives: learningObjectives,
-                    examples: examples
-                });
-
-                // Build revision mappings from section_id and revision_section_title
-                if (row.section_id && row.section_id.trim()) {
-                    const sectionId = row.section_id.trim();
-                    const topicId = row.topic_id.trim();
-
-                    // Build revisionMapping: sectionId -> array of topicIds
-                    if (!revisionMappings.revisionMapping[sectionId]) {
-                        revisionMappings.revisionMapping[sectionId] = [];
-                    }
-                    if (!revisionMappings.revisionMapping[sectionId].includes(topicId)) {
-                        revisionMappings.revisionMapping[sectionId].push(topicId);
-                    }
-
-                    // Build revisionSectionTitles: sectionId -> title
-                    if (row.revision_section_title && row.revision_section_title.trim()) {
-                        revisionMappings.revisionSectionTitles[sectionId] = row.revision_section_title.trim();
-                    }
-
-                    // Build reverse mapping: topicId -> sectionId
-                    revisionMappings.topicToSectionMapping[topicId] = sectionId;
-                }
-            });
-
-            return sections;
-        }
-
+        // Helper functions
         function updateProgress(current, total) {
             const percent = Math.round((current / total) * 100);
             const progressBar = document.getElementById('progressBar');
             progressBar.style.width = percent + '%';
             progressBar.textContent = `${percent}% (${current}/${total})`;
-            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('progressContainer').classList.remove('hidden');
         }
 
         function addStatus(message, type = 'info') {
             const statusDiv = document.getElementById('status');
             const div = document.createElement('div');
-            div.className = `status ${type}`;
+
+            const colors = {
+                success: 'bg-green-50 dark:bg-green-900/20 border-green-500 text-green-700 dark:text-green-300',
+                error: 'bg-red-50 dark:bg-red-900/20 border-red-500 text-red-700 dark:text-red-300',
+                info: 'bg-blue-50 dark:bg-blue-900/20 border-blue-500 text-blue-700 dark:text-blue-300'
+            };
+
+            div.className = `border-l-4 rounded p-3 ${colors[type]}`;
             div.innerHTML = message;
             statusDiv.appendChild(div);
         }
 
-        // Create file status list
-        function createFileList() {
+        function createFileList(filesList) {
             const fileListDiv = document.getElementById('fileList');
             const fileStatusesDiv = document.getElementById('fileStatuses');
-            fileListDiv.style.display = 'block';
-            
+            fileListDiv.classList.remove('hidden');
+
             fileStatusesDiv.innerHTML = '';
-            const allFiles = [...csvFiles.subject, ...csvFiles.resources];
-            
-            allFiles.forEach(filepath => {
+
+            filesList.forEach(filepath => {
                 const div = document.createElement('div');
-                div.className = 'file-status';
+                div.className = 'text-gray-600 dark:text-gray-400';
                 div.id = `file-${filepath.replace(/[^a-zA-Z0-9]/g, '_')}`;
                 div.innerHTML = `⏱️ ${filepath} - Waiting...`;
                 fileStatusesDiv.appendChild(div);
             });
         }
 
-        async function convertAllCSVs() {
-            const convertBtn = document.getElementById('convertBtn');
+        // SERVER MODE: Load CSV file with status updates
+        async function loadCSVFile(filepath) {
+            const fileDiv = document.getElementById(`file-${filepath.replace(/[^a-zA-Z0-9]/g, '_')}`);
+            try {
+                if (fileDiv) fileDiv.innerHTML = `⏳ ${filepath} - Loading...`;
+
+                const response = await fetch(`../${filepath}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                const csvText = await response.text();
+                const data = parseCSV(csvText);
+
+                if (fileDiv) {
+                    fileDiv.innerHTML = `✅ ${filepath} - ${data.length} rows loaded`;
+                    fileDiv.className = 'text-green-600 dark:text-green-400';
+                }
+                return data;
+            } catch (error) {
+                if (fileDiv) {
+                    fileDiv.innerHTML = `❌ ${filepath} - ${error.message}`;
+                    fileDiv.className = 'text-red-600 dark:text-red-400';
+                }
+                console.error(`Error loading ${filepath}:`, error);
+                return [];
+            }
+        }
+
+        // SERVER MODE: Convert all CSVs
+        window.convertAllCSVs = async function() {
+            const convertBtn = document.getElementById('convertBtnServer');
             const downloadBtn = document.getElementById('downloadBtn');
 
             convertBtn.disabled = true;
             downloadBtn.disabled = true;
             document.getElementById('status').innerHTML = '';
 
-            createFileList();
+            const allFiles = [...csvFiles.subject, ...csvFiles.resources, csvFiles.groups];
+            createFileList(allFiles);
 
-            // Initialize revision mappings
             const revisionMappings = {
                 revisionMapping: {},
                 revisionSectionTitles: {},
@@ -263,12 +319,11 @@
             };
 
             try {
-                addStatus('🚀 Starting conversion of all CSV files...', 'info');
+                addStatus('🚀 Starting conversion from server...', 'info');
 
-                const allFiles = [...csvFiles.subject, ...csvFiles.resources];
                 let processedFiles = 0;
 
-                // Load subject files in parallel
+                // Load subject files
                 addStatus('📚 Converting subject files...', 'info');
                 const subjectPromises = csvFiles.subject.map(filepath => loadCSVFile(filepath));
                 const subjectResults = await Promise.all(subjectPromises);
@@ -281,7 +336,7 @@
                     updateProgress(processedFiles, allFiles.length);
                 });
 
-                // Load resource files in parallel
+                // Load resource files
                 addStatus('🎯 Converting resource files...', 'info');
                 const resourcePromises = csvFiles.resources.map(filepath => loadCSVFile(filepath));
                 const resourceResults = await Promise.all(resourcePromises);
@@ -294,48 +349,261 @@
                     updateProgress(processedFiles, allFiles.length);
                 });
 
-                // Count revision sections
+                // Load groups
+                addStatus('📋 Loading groups configuration...', 'info');
+                const groupsData = await loadCSVFile(csvFiles.groups);
+                const groups = convertGroupsCSV(groupsData);
+                processedFiles++;
+                updateProgress(processedFiles, allFiles.length);
+
                 const revisionSectionCount = Object.keys(revisionMappings.revisionMapping).length;
 
-                // Create combined data with revision mappings
                 combinedData = {
                     specificationData,
                     resourceData,
                     revisionMappings: revisionMappings,
+                    paperModeGroups: groups.paperModeGroups,
+                    specModeGroups: groups.specModeGroups,
                     buildTime: new Date().toISOString(),
-                    version: '1.1',
+                    version: '2.0',
                     meta: {
                         totalSections: Object.keys(specificationData).length,
                         resourceTypes: Object.keys(resourceData).length,
                         revisionSections: revisionSectionCount,
+                        groupsIncluded: true,
                         filesProcessed: processedFiles,
                         sizeReduction: `${allFiles.length} files → 1 file`
                     }
                 };
 
                 addStatus('✅ Conversion completed successfully!', 'success');
-                addStatus(`📊 Created combined data with ${combinedData.meta.totalSections} sections and ${combinedData.meta.resourceTypes} resource types`, 'success');
-                addStatus(`🎨 Built ${revisionSectionCount} revision section mappings for color coding`, 'success');
+                addStatus(`📊 Created ${combinedData.meta.totalSections} sections and ${combinedData.meta.resourceTypes} resource types`, 'success');
+                addStatus(`🎨 Built ${revisionSectionCount} revision section mappings`, 'success');
                 downloadBtn.disabled = false;
-                
+
             } catch (error) {
                 addStatus(`❌ Conversion failed: ${error.message}`, 'error');
             } finally {
                 convertBtn.disabled = false;
             }
+        };
+
+        // LOCAL MODE: File handling
+        const dropZone = document.getElementById('dropZone');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        }, false);
+
+        window.handleFileSelect = function(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        };
+
+        function handleFiles(files) {
+            selectedFiles.clear();
+
+            Array.from(files).forEach(file => {
+                if (file.name.endsWith('.csv')) {
+                    selectedFiles.set(file.name, file);
+                }
+            });
+
+            const convertBtn = document.getElementById('convertBtnLocal');
+            if (selectedFiles.size > 0) {
+                convertBtn.disabled = false;
+                addStatus(`✅ Selected ${selectedFiles.size} CSV files`, 'success');
+            } else {
+                convertBtn.disabled = true;
+                addStatus('❌ No CSV files selected', 'error');
+            }
         }
 
-        function downloadJSON() {
+        // LOCAL MODE: Load CSV from File object
+        function loadCSVFromFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const csvText = e.target.result;
+                        const data = parseCSV(csvText);
+                        resolve(data);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                reader.onerror = () => reject(reader.error);
+                reader.readAsText(file);
+            });
+        }
+
+        // LOCAL MODE: Convert local CSV files
+        window.convertLocalCSVs = async function() {
+            const convertBtn = document.getElementById('convertBtnLocal');
+            const downloadBtn = document.getElementById('downloadBtn');
+
+            if (selectedFiles.size === 0) {
+                addStatus('❌ No files selected', 'error');
+                return;
+            }
+
+            convertBtn.disabled = true;
+            downloadBtn.disabled = true;
+            document.getElementById('status').innerHTML = '';
+
+            const revisionMappings = {
+                revisionMapping: {},
+                revisionSectionTitles: {},
+                topicToSectionMapping: {}
+            };
+
+            try {
+                addStatus('🚀 Starting local file conversion...', 'info');
+
+                const allFileNames = Array.from(selectedFiles.keys());
+                createFileList(allFileNames);
+
+                let processedFiles = 0;
+                const totalFiles = selectedFiles.size;
+
+                // Categorize files
+                const subjectFiles = [];
+                const resourceFiles = [];
+                let groupsFile = null;
+
+                selectedFiles.forEach((file, name) => {
+                    if (name.includes('groups.csv')) {
+                        groupsFile = file;
+                    } else if (name.match(/(measurements|particles|waves|mechanics|electricity|periodic|thermal|fields|magnetic|nuclear)/)) {
+                        subjectFiles.push(file);
+                    } else {
+                        resourceFiles.push(file);
+                    }
+                });
+
+                // Process subject files
+                addStatus(`📚 Converting ${subjectFiles.length} subject files...`, 'info');
+                let specificationData = {};
+
+                for (const file of subjectFiles) {
+                    const fileDiv = document.getElementById(`file-${file.name.replace(/[^a-zA-Z0-9]/g, '_')}`);
+                    if (fileDiv) fileDiv.innerHTML = `⏳ ${file.name} - Processing...`;
+
+                    const csvData = await loadCSVFromFile(file);
+                    const converted = convertSubjectCSV(csvData, revisionMappings);
+                    specificationData = { ...specificationData, ...converted };
+                    processedFiles++;
+                    updateProgress(processedFiles, totalFiles);
+
+                    if (fileDiv) {
+                        fileDiv.innerHTML = `✅ ${file.name} - ${csvData.length} rows loaded`;
+                        fileDiv.className = 'text-green-600 dark:text-green-400';
+                    }
+                }
+
+                // Process resource files
+                addStatus(`🎯 Converting ${resourceFiles.length} resource files...`, 'info');
+                const resourceData = {};
+
+                for (const file of resourceFiles) {
+                    const fileDiv = document.getElementById(`file-${file.name.replace(/[^a-zA-Z0-9]/g, '_')}`);
+                    if (fileDiv) fileDiv.innerHTML = `⏳ ${file.name} - Processing...`;
+
+                    const csvData = await loadCSVFromFile(file);
+                    const filename = file.name.replace('.csv', '');
+                    resourceData[filename] = csvData;
+                    processedFiles++;
+                    updateProgress(processedFiles, totalFiles);
+
+                    if (fileDiv) {
+                        fileDiv.innerHTML = `✅ ${file.name} - ${csvData.length} rows loaded`;
+                        fileDiv.className = 'text-green-600 dark:text-green-400';
+                    }
+                }
+
+                // Process groups file
+                let groups = { paperModeGroups: {}, specModeGroups: {} };
+                if (groupsFile) {
+                    addStatus('📋 Loading groups configuration...', 'info');
+                    const fileDiv = document.getElementById(`file-${groupsFile.name.replace(/[^a-zA-Z0-9]/g, '_')}`);
+                    if (fileDiv) fileDiv.innerHTML = `⏳ ${groupsFile.name} - Processing...`;
+
+                    const groupsData = await loadCSVFromFile(groupsFile);
+                    groups = convertGroupsCSV(groupsData);
+                    processedFiles++;
+                    updateProgress(processedFiles, totalFiles);
+
+                    if (fileDiv) {
+                        fileDiv.innerHTML = `✅ ${groupsFile.name} - ${groupsData.length} rows loaded`;
+                        fileDiv.className = 'text-green-600 dark:text-green-400';
+                    }
+                }
+
+                const revisionSectionCount = Object.keys(revisionMappings.revisionMapping).length;
+
+                combinedData = {
+                    specificationData,
+                    resourceData,
+                    revisionMappings: revisionMappings,
+                    paperModeGroups: groups.paperModeGroups,
+                    specModeGroups: groups.specModeGroups,
+                    buildTime: new Date().toISOString(),
+                    version: '2.0',
+                    meta: {
+                        totalSections: Object.keys(specificationData).length,
+                        totalResources: Object.values(resourceData).reduce((sum, arr) => sum + arr.length, 0),
+                        revisionSections: revisionSectionCount,
+                        groupsIncluded: true,
+                        filesProcessed: processedFiles,
+                        generatedBy: 'Local CSV Converter',
+                        sizeReduction: `${processedFiles} files → 1 file`
+                    }
+                };
+
+                addStatus('✅ Conversion completed successfully!', 'success');
+                addStatus(`📊 Created ${combinedData.meta.totalSections} sections`, 'success');
+                addStatus(`🎨 Built ${revisionSectionCount} revision section mappings`, 'success');
+                downloadBtn.disabled = false;
+
+            } catch (error) {
+                addStatus(`❌ Conversion failed: ${error.message}`, 'error');
+                console.error(error);
+            } finally {
+                convertBtn.disabled = false;
+            }
+        };
+
+        // Download JSON
+        window.downloadJSON = function() {
             if (!combinedData) {
                 addStatus('❌ No data to download. Run conversion first.', 'error');
                 return;
             }
-            
-            // Minified JSON (no whitespace) - saves ~30% file size
+
             const jsonString = JSON.stringify(combinedData);
             const blob = new Blob([jsonString], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
-            
+
             const a = document.createElement('a');
             a.href = url;
             a.download = 'combined-data.json';
@@ -343,10 +611,12 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            
-            addStatus('✅ Downloaded combined-data.json! Place it in: resources/combined-data.json', 'success');
-            addStatus('💡 Next: Update your app-loader.js to use JSON loading', 'info');
-        }
+
+            const sizeKB = (jsonString.length / 1024).toFixed(1);
+            addStatus(`✅ Downloaded combined-data.json (${sizeKB} KB)`, 'success');
+            addStatus('📁 Place this file in <strong>resources/combined-data.json</strong>', 'info');
+            addStatus('🚀 Your app will now load 10x faster!', 'success');
+        };
     </script>
 </body>
 </html>
