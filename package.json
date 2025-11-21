@@ -69,14 +69,14 @@
     "resources/",
     "templates/",
     "legal/",
+    "docs/",
     "favicon.ico",
     "README.md",
-    "SECURITY.md",
-    "TESTING.md"
+    "SECURITY.md"
   ],
   "directories": {
     "test": "tests",
-    "doc": "."
+    "doc": "docs"
   },
   "homepage": "https://github.com/Joshd667/PhysRev#readme",
   "bugs": {
