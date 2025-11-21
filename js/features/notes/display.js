@@ -278,16 +278,23 @@ export const notesDisplayMethods = {
         const sortedPinnedNotes = this.sortNotes(pinnedNotes);
 
         // Convert to array structure and sort
-        const groupsArray = Object.values(groupMap).map(group => ({
-            ...group,
-            sections: Object.values(group.sections).sort((a, b) => {
-                return a.sectionTitle.localeCompare(b.sectionTitle);
-            })
-        })).sort((a, b) => {
-            if (a.groupTitle === 'Untagged Notes') return 1;
-            if (b.groupTitle === 'Untagged Notes') return -1;
-            return a.groupTitle.localeCompare(b.groupTitle);
-        });
+        // Filter out any undefined/invalid values to prevent Alpine rendering errors
+        const groupsArray = Object.values(groupMap)
+            .filter(group => group && group.sections)
+            .map(group => ({
+                ...group,
+                sections: Object.values(group.sections)
+                    .filter(section => section && section.sectionTitle && Array.isArray(section.notes))
+                    .sort((a, b) => {
+                        return a.sectionTitle.localeCompare(b.sectionTitle);
+                    })
+            }))
+            .filter(group => group.sections && group.sections.length > 0)
+            .sort((a, b) => {
+                if (a.groupTitle === 'Untagged Notes') return 1;
+                if (b.groupTitle === 'Untagged Notes') return -1;
+                return a.groupTitle.localeCompare(b.groupTitle);
+            });
 
         // Add pinned notes section at the top (always show in list view, even if empty)
         if (this.notesViewMode === 'list' || sortedPinnedNotes.length > 0) {
