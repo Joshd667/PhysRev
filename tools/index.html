@@ -3,302 +3,246 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Physics Audit - Developer Tools</title>
+    <title>Developer Tools - Physics Audit</title>
+
+    <!-- Match main app styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <link rel="stylesheet" href="../css/style.css">
+    <script defer src="https://unpkg.com/lucide@0.546.0/dist/umd/lucide.min.js"></script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 2rem;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        header {
-            text-align: center;
-            color: white;
-            margin-bottom: 3rem;
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        .tools-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
         .tool-card {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-decoration: none;
-            color: inherit;
-            display: block;
+            transition: all 0.3s ease;
         }
-
         .tool-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .tool-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            display: block;
-        }
-
-        .tool-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-
-        .tool-description {
-            color: #555;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .tool-meta {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .badge-security {
-            background: #fee;
-            color: #c33;
-        }
-
-        .badge-performance {
-            background: #efe;
-            color: #3a3;
-        }
-
-        .badge-testing {
-            background: #eef;
-            color: #33a;
-        }
-
-        .badge-auth {
-            background: #ffe;
-            color: #a93;
-        }
-
-        .badge-node {
-            background: #f0f0f0;
-            color: #666;
-        }
-
-        .badge-browser {
-            background: #e8f4f8;
-            color: #0066aa;
-        }
-
-        .back-to-app {
-            text-align: center;
-            margin-top: 2rem;
-        }
-
-        .back-to-app a {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            backdrop-filter: blur(10px);
-            transition: background 0.2s;
-        }
-
-        .back-to-app a:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .info-box {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .info-box h2 {
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            font-size: 1.3rem;
-        }
-
-        .info-box ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .info-box li {
-            color: #555;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .info-box li:last-child {
-            border-bottom: none;
-        }
-
-        .info-box li::before {
-            content: "✓ ";
-            color: #28a745;
-            font-weight: bold;
-            margin-right: 0.5rem;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>🛠️ Developer Tools</h1>
-            <p class="subtitle">Build, test, and optimize the Physics Audit Tool</p>
-        </header>
+<body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
+    <!-- Animated gradient header matching main app -->
+    <div class="animated-gradient text-white py-16 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="wrench" class="w-12 h-12"></i>
+                    <h1 class="text-4xl font-bold">Developer Tools</h1>
+                </div>
+                <a href="../index.html" class="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg backdrop-blur-sm transition-colors">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                    <span>Back to App</span>
+                </a>
+            </div>
+            <p class="text-lg opacity-90">Build, test, and optimize the Physics Audit Tool</p>
+        </div>
+    </div>
 
-        <div class="info-box">
-            <h2>📋 Quick Guide</h2>
-            <ul>
-                <li><strong>CSV Converters:</strong> Run these whenever you update CSV data files to regenerate the optimized JSON</li>
-                <li><strong>SRI Hash Generator:</strong> Run when updating CDN library versions to maintain security</li>
-                <li><strong>Import Tester:</strong> Use during development to verify all modules load correctly</li>
-                <li><strong>Auth Callback:</strong> Required for OAuth authentication flows (don't delete!)</li>
-            </ul>
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Quick Guide -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded-lg p-6 mb-8">
+            <div class="flex items-start gap-3">
+                <i data-lucide="info" class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-1"></i>
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Quick Guide</h2>
+                    <ul class="space-y-2 text-gray-700 dark:text-gray-300">
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-600 dark:text-green-400 mt-1 flex-shrink-0"></i>
+                            <span><strong>CSV Converters:</strong> Run whenever you update CSV data files to regenerate optimized JSON</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-600 dark:text-green-400 mt-1 flex-shrink-0"></i>
+                            <span><strong>SRI Hash Generator:</strong> Run when updating CDN library versions to maintain security</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i data-lucide="check" class="w-4 h-4 text-green-600 dark:text-green-400 mt-1 flex-shrink-0"></i>
+                            <span><strong>Import Tester:</strong> Use during development to verify all modules load correctly</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
-        <div class="tools-grid">
+        <!-- Tools Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- CSV Converter Unified -->
-            <a href="csv-converter-unified.html" class="tool-card">
-                <span class="tool-icon">🚀</span>
-                <h2 class="tool-title">CSV to JSON Converter</h2>
-                <p class="tool-description">
-                    <strong>Recommended:</strong> Convert 15 CSV files into one optimized JSON.
-                    Includes both server mode (fetch from web) and local mode (upload files).
-                    Reduces load time from 20s to 1s.
+            <a href="csv-converter-unified.html" class="tool-card bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl p-6 block">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                        <i data-lucide="rocket" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">CSV to JSON Converter</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">
+                    <span class="inline-block px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-xs font-medium rounded mb-2">Recommended</span>
+                    <br>
+                    Convert 15 CSV files into one optimized JSON. Includes server & local modes. Reduces load time from 20s to 1s.
                 </p>
-                <div class="tool-meta">
-                    <span class="badge badge-performance">Performance</span>
-                    <span class="badge badge-browser">Browser</span>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-sm rounded-full">Performance</span>
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm rounded-full">Browser</span>
                 </div>
             </a>
 
-            <!-- CSV Converter (Server) -->
-            <a href="csv-converter.html" class="tool-card">
-                <span class="tool-icon">📡</span>
-                <h2 class="tool-title">CSV Converter (Server Mode)</h2>
-                <p class="tool-description">
-                    Fetches CSV files from running web server and converts to JSON.
-                    Use this if you're running the app on localhost or a web server.
+            <!-- CSV Converter Server -->
+            <a href="csv-converter.html" class="tool-card bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl p-6 block">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                        <i data-lucide="radio" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Server Mode Converter</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">
+                    Fetches CSV files from running web server and converts to JSON. Use when running on localhost.
                 </p>
-                <div class="tool-meta">
-                    <span class="badge badge-performance">Performance</span>
-                    <span class="badge badge-browser">Browser</span>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-sm rounded-full">Performance</span>
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm rounded-full">Browser</span>
                 </div>
             </a>
 
-            <!-- CSV Converter (Local) -->
-            <a href="csv-converter-local.html" class="tool-card">
-                <span class="tool-icon">💾</span>
-                <h2 class="tool-title">CSV Converter (Local Mode)</h2>
-                <p class="tool-description">
-                    Upload CSV files from your computer with drag-and-drop.
-                    Works offline without a web server. Perfect for quick conversions.
+            <!-- CSV Converter Local -->
+            <a href="csv-converter-local.html" class="tool-card bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl p-6 block">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
+                        <i data-lucide="hard-drive" class="w-6 h-6 text-indigo-600 dark:text-indigo-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Local Mode Converter</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">
+                    Upload CSV files with drag-and-drop. Works offline without a web server.
                 </p>
-                <div class="tool-meta">
-                    <span class="badge badge-performance">Performance</span>
-                    <span class="badge badge-browser">Browser</span>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-sm rounded-full">Performance</span>
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm rounded-full">Browser</span>
                 </div>
             </a>
 
             <!-- SRI Hash Generator -->
-            <a href="#" onclick="alert('Run this with Node.js:\n\nnode tools/generate-sri-hashes.js\n\nRequires Node.js and internet connection.'); return false;" class="tool-card">
-                <span class="tool-icon">🔒</span>
-                <h2 class="tool-title">SRI Hash Generator</h2>
-                <p class="tool-description">
-                    Generates Subresource Integrity hashes for CDN dependencies
-                    (Alpine.js, DOMPurify, Chart.js, Lucide). Run when updating library versions.
-                </p>
-                <div class="tool-meta">
-                    <span class="badge badge-security">Security</span>
-                    <span class="badge badge-node">Node.js CLI</span>
+            <div onclick="showSRIInstructions()" class="tool-card bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl p-6 cursor-pointer">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+                        <i data-lucide="shield" class="w-6 h-6 text-red-600 dark:text-red-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">SRI Hash Generator</h3>
                 </div>
-            </a>
+                <p class="text-gray-600 dark:text-gray-300 mb-4">
+                    Generates Subresource Integrity hashes for CDN dependencies. Run when updating library versions.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-sm rounded-full">Security</span>
+                    <span class="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-sm rounded-full">Node.js CLI</span>
+                </div>
+            </div>
 
             <!-- Import Tester -->
-            <a href="test-imports.html" class="tool-card">
-                <span class="tool-icon">🧪</span>
-                <h2 class="tool-title">Module Import Tester</h2>
-                <p class="tool-description">
-                    Tests all JavaScript module imports to verify they load correctly.
-                    Useful for catching broken imports during development.
-                </p>
-                <div class="tool-meta">
-                    <span class="badge badge-testing">Testing</span>
-                    <span class="badge badge-browser">Browser</span>
+            <a href="test-imports.html" class="tool-card bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl p-6 block">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
+                        <i data-lucide="flask-conical" class="w-6 h-6 text-yellow-600 dark:text-yellow-400"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Module Import Tester</h3>
                 </div>
-            </a>
-
-            <!-- Auth Callback -->
-            <a href="auth-callback.html" class="tool-card">
-                <span class="tool-icon">🔐</span>
-                <h2 class="tool-title">OAuth Callback Page</h2>
-                <p class="tool-description">
-                    Handles OAuth authentication redirects from providers like Google.
-                    This page is automatically used by the authentication flow.
+                <p class="text-gray-600 dark:text-gray-300 mb-4">
+                    Tests all JavaScript module imports to verify they load correctly. Useful for catching broken imports.
                 </p>
-                <div class="tool-meta">
-                    <span class="badge badge-auth">Auth</span>
-                    <span class="badge badge-browser">Browser</span>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm rounded-full">Testing</span>
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm rounded-full">Browser</span>
                 </div>
             </a>
         </div>
 
-        <div class="back-to-app">
-            <a href="../index.html">← Back to Main App</a>
+        <!-- Documentation Link -->
+        <div class="mt-8 text-center">
+            <a href="README.md" class="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline">
+                <i data-lucide="book-open" class="w-4 h-4"></i>
+                <span>View Full Documentation</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- SRI Instructions Modal -->
+    <div id="sriModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50" onclick="closeSRIModal(event)">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full p-6" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+                        <i data-lucide="shield" class="w-5 h-5 text-red-600 dark:text-red-400"></i>
+                    </div>
+                    <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">SRI Hash Generator</h3>
+                </div>
+                <button onclick="closeSRIModal(event)" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-gray-700 dark:text-gray-300">
+                <p>This is a <strong>Node.js CLI tool</strong> that must be run from the terminal.</p>
+
+                <div class="bg-gray-100 dark:bg-gray-900 rounded-lg p-4 font-mono text-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-gray-500 dark:text-gray-400">Command:</span>
+                        <button onclick="copyCommand()" class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded transition-colors">
+                            Copy
+                        </button>
+                    </div>
+                    <code id="sriCommand" class="text-blue-600 dark:text-blue-400">node tools/generate-sri-hashes.js</code>
+                </div>
+
+                <div class="border-l-4 border-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded">
+                    <p class="font-semibold text-yellow-800 dark:text-yellow-300 mb-2">Requirements:</p>
+                    <ul class="space-y-1 text-yellow-700 dark:text-yellow-400">
+                        <li>• Node.js installed</li>
+                        <li>• Internet connection (fetches from CDNs)</li>
+                    </ul>
+                </div>
+
+                <p class="text-sm">After running, copy the generated integrity attributes to the <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">&lt;script&gt;</code> tags in <code class="px-2 py-1 bg-gray-200 dark:bg-gray-700 rounded">index.html</code></p>
+            </div>
         </div>
     </div>
 
     <script>
-        // Add keyboard shortcut to go back
+        // Initialize Lucide icons
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+
+        // Dark mode detection
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.documentElement.classList.add('dark');
+        }
+
+        // SRI Modal
+        function showSRIInstructions() {
+            document.getElementById('sriModal').classList.remove('hidden');
+        }
+
+        function closeSRIModal(event) {
+            event.stopPropagation();
+            document.getElementById('sriModal').classList.add('hidden');
+        }
+
+        function copyCommand() {
+            const command = document.getElementById('sriCommand').textContent;
+            navigator.clipboard.writeText(command).then(() => {
+                alert('Command copied to clipboard!');
+            });
+        }
+
+        // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                window.location.href = '../index.html';
+                if (!document.getElementById('sriModal').classList.contains('hidden')) {
+                    closeSRIModal(e);
+                } else {
+                    window.location.href = '../index.html';
+                }
             }
         });
     </script>

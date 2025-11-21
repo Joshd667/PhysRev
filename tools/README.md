@@ -88,22 +88,6 @@ Module import verification tool for development.
 
 ---
 
-### Authentication
-
-#### `auth-callback.html`
-OAuth callback handler for third-party authentication.
-
-**What it does:**
-- Receives OAuth redirects from providers (Google, Microsoft, etc.)
-- Allows parent window to extract authentication tokens
-- Auto-closes after 3 seconds
-
-**Important:**
-- Do not delete this file - required for OAuth flows
-- Automatically used by authentication system
-- No manual interaction needed
-
----
 
 ## 🔄 Typical Workflows
 
@@ -147,4 +131,3 @@ OAuth callback handler for third-party authentication.
 | csv-converter-local.html | Browser | No | No |
 | generate-sri-hashes.js | CLI | No | Yes |
 | test-imports.html | Browser | Yes | No |
-| auth-callback.html | Browser | Yes | No |
