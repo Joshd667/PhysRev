@@ -62,6 +62,52 @@ Add SRI hashes to CDN dependencies to prevent supply chain attacks.
 - Industry best practice for CDN usage
 - Reduces attack surface
 
+## Authentication & Infrastructure
+
+### Microsoft Teams Authentication Setup
+
+**Priority:** Medium (Optional - Guest mode is fully functional)
+**Status:** Teams login button currently ACTIVE but using placeholder credentials
+**Documentation:** See **[TEAMS_AUTH_SETUP.md](guides/TEAMS_AUTH_SETUP.md)** for complete details
+
+**⚠️ Security Risk:** Teams login button is enabled with fake credentials. Users can click it but authentication will fail.
+
+**Immediate Actions:**
+
+1. **🔴 CRITICAL: Disable Teams Login Button**
+   - **File:** `index.html` (line 231-242)
+   - **Action:** Comment out Teams button to prevent user confusion
+   - **Impact:** Prevents failed login attempts while Azure AD is being configured
+   - **Guest Mode:** Fully functional alternative (no setup needed)
+
+2. **🟡 HIGH: Fix Redirect URI Mismatch**
+   - **File:** `js/features/auth/teams.js` (line 11)
+   - **Current:** `REDIRECT_URI: window.location.origin + '/auth-callback.html'`
+   - **Should be:** `REDIRECT_URI: window.location.origin + '/tools/auth-callback.html'`
+   - **Reason:** Callback file is at `/tools/auth-callback.html` not `/auth-callback.html`
+
+**When Azure AD Permissions Are Obtained:**
+
+1. Register app in Azure Portal (see TEAMS_AUTH_SETUP.md)
+2. Create `js/features/auth/teams-config.js` with real credentials
+3. Add `Files.ReadWrite` permission for OneDrive sync (optional)
+4. Test authentication flow thoroughly
+5. Re-enable Teams button in index.html
+
+**Not Implemented Yet (Future Work):**
+- OneDrive data sync (placeholder code exists but not functional)
+- Automatic data migration from Guest mode to Teams mode
+- Refresh token logic for sessions > 24 hours
+- Better error messages for failed authentication
+
+**Notes:**
+- `.gitignore` already protects `teams-config.js` (line 30) ✅
+- `tools/auth-callback.html` exists ✅
+- OAuth PKCE flow is implemented correctly
+- Guest mode is recommended until Teams auth is fully configured
+
+---
+
 ## Content Development
 
 ### Paper 3 Support
