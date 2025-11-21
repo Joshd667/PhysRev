@@ -12,6 +12,25 @@ This directory contains development and build tools for the Physics Audit applic
 
 ## 📦 Available Tools
 
+### Documentation Hub
+
+#### `documentation.html`
+Centralized documentation portal with all guides organized by role.
+
+**What you'll find:**
+- **For Educators:** Content management guide (CSV editing, adding topics)
+- **For Developers:** Architecture, development setup, data flow, testing, console commands
+- **For Admins:** Deployment guide, Teams authentication setup
+- **Reference:** Attribution, licenses, complete index
+- **External Links:** Alpine.js, TailwindCSS, Chart.js, and more
+
+**Quick links by role:**
+- Educators → Content Management
+- Developers → Architecture + Development Setup
+- Admins → Deployment Guide
+
+---
+
 ### CSV to JSON Converter
 
 #### `csv-converter.html`
@@ -112,6 +131,7 @@ Module import verification tool for development.
 
 | Tool | Type | Requires Server | Node.js Required |
 |------|------|----------------|------------------|
+| documentation.html | Browser | No | No |
 | csv-converter.html | Browser | Optional (has both modes) | No |
 | generate-sri-hashes.js | CLI | No | Yes |
 | test-imports.html | Browser | Yes | No |
