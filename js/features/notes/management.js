@@ -195,6 +195,9 @@ export const noteManagementMethods = {
 
             this.userNotes[noteId] = newNote;
 
+            // Force reactivity by reassigning the object
+            this.userNotes = { ...this.userNotes };
+
             // ⚡ PERFORMANCE: Update search index
             this._addNoteToIndex(newNote);
         } else {
@@ -204,6 +207,9 @@ export const noteManagementMethods = {
                 this.userNotes[this.noteEditorId].content = content;
                 this.userNotes[this.noteEditorId].tags = this.noteEditorTags;
                 this.userNotes[this.noteEditorId].updatedAt = timestamp;
+
+                // Force reactivity by reassigning the object
+                this.userNotes = { ...this.userNotes };
 
                 // ⚡ PERFORMANCE: Update search index
                 this._updateNoteInIndex(this.userNotes[this.noteEditorId]);
