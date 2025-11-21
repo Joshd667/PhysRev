@@ -1,4 +1,4 @@
-const BUILD_TIMESTAMP = '20250120-001';
+const BUILD_TIMESTAMP = '20250121-001';
 const CACHE_NAME = `physics-audit-v${BUILD_TIMESTAMP}`;
 const APP_VERSION = BUILD_TIMESTAMP;
 
@@ -137,6 +137,13 @@ async function handleRequest(request) {
     const isJavaScript = url.pathname.endsWith('.js') || url.pathname.includes('/js/');
     const isHTML = request.destination === 'document' || url.pathname.endsWith('.html');
     const isTemplate = url.pathname.includes('/templates/') || url.pathname.includes('/components/');
+
+    // Never cache developer tools - always fetch fresh
+    const isDevTool = url.pathname.includes('/tools/');
+
+    if (isDevTool) {
+        return fetch(request);
+    }
 
     try {
         if (isTemplate) {
