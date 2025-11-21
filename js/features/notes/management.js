@@ -37,8 +37,20 @@ export const noteManagementMethods = {
         this.noteEditorContent = '';
         this.noteEditorId = null;
 
-        // Don't auto-assign tags - user must manually select tags
-        this.noteEditorTags = [];
+        // Auto-populate tags only when in Knowledge Audit revision mode
+        if (this.showingRevision) {
+            // In Knowledge Audit - auto-assign tags from current revision context
+            if (topicId) {
+                this.noteEditorTags = [topicId];
+            } else if (this.currentRevisionTopics && this.currentRevisionTopics.length > 0) {
+                this.noteEditorTags = this.currentRevisionTopics.map(t => t.id);
+            } else {
+                this.noteEditorTags = [];
+            }
+        } else {
+            // Not in Knowledge Audit - don't auto-populate, user must manually select
+            this.noteEditorTags = [];
+        }
 
         this.showNoteEditor = true;
 

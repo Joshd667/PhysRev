@@ -39,8 +39,20 @@ export const flashcardManagementMethods = {
         this.flashcardEditorCurrentCardFront = '';
         this.flashcardEditorCurrentCardBack = '';
 
-        // Don't auto-assign tags - user must manually select tags
-        this.flashcardEditorTags = [];
+        // Auto-populate tags only when in Knowledge Audit revision mode
+        if (this.showingRevision) {
+            // In Knowledge Audit - auto-assign tags from current revision context
+            if (topicId) {
+                this.flashcardEditorTags = [topicId];
+            } else if (this.currentRevisionTopics && this.currentRevisionTopics.length > 0) {
+                this.flashcardEditorTags = this.currentRevisionTopics.map(t => t.id);
+            } else {
+                this.flashcardEditorTags = [];
+            }
+        } else {
+            // Not in Knowledge Audit - don't auto-populate, user must manually select
+            this.flashcardEditorTags = [];
+        }
 
         this.showFlashcardEditor = true;
 
