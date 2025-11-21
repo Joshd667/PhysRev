@@ -1,403 +1,413 @@
-# Physics Knowledge Audit Tool - Legal Compliance Analysis
+# UK Legal Compliance Analysis
 
-## 1. APPLICATION OVERVIEW
-
-**Name:** Physics Knowledge Audit Tool  
-**Type:** Progressive Web App (PWA) - Educational web application  
-**Language:** en-GB (UK English localization)  
-**Target Users:** A-Level physics students  
-**Primary Functions:**
-- Student self-assessment of physics knowledge confidence (1-5 rating scale)
-- Personal study materials (notes, flashcards, mindmaps)
-- Learning analytics and progress tracking
-- Offline-capable revision resources
-
-**Key Technology:**
-- Alpine.js 3.13.3 (reactive UI framework)
-- IndexedDB (client-side database)
-- Service Worker for offline support
-- Client-side only - NO server backend
+**Application:** Physics Knowledge Audit Tool (PWA)
+**Jurisdiction:** United Kingdom
+**Standards:** UK GDPR, UK Data Protection Act 2018, PECR, WCAG 2.1
+**Last Updated:** 2025-11-21
+**Status:** Compliance gaps identified - Privacy Notice required
 
 ---
 
-## 2. USER DATA COLLECTION & STORAGE
+## Purpose of This Document
 
-### Data Collected:
-1. **Confidence Ratings**: Topic-by-topic confidence levels (1-5 scale) for 100+ physics topics
-2. **Analytics History**: Timestamped records of confidence assessments (stored locally, auto-cleanup after 30 days)
-3. **Study Materials**:
-   - Custom notes with rich text formatting
-   - Flashcard decks with Q&A cards
-   - Interactive mindmaps with visual diagrams
-4. **Test Results**: Flashcard test performance metrics
-5. **User Preferences**: View modes, dark mode settings, paper selection preferences
-6. **Authentication Data**: User name, email (if Teams login), timestamp
+This document analyzes the legal compliance status of the Physics Knowledge Audit Tool for UK deployment, focusing specifically on:
+- UK GDPR (General Data Protection Regulation)
+- UK Data Protection Act 2018
+- PECR (Privacy and Electronic Communications Regulations)
+- WCAG 2.1 (Web Content Accessibility Guidelines)
 
-### Storage Location:
-- **Primary**: IndexedDB database ("PhysicsAuditDB") - entirely on client device
-- **Legacy**: localStorage (migrated to IndexedDB on first load)
-- **Service Worker Cache**: HTML, CSS, JS, external libraries (for offline access)
-
-### Storage Capacity:
-- IndexedDB quota: ~50MB+ (typical browser limit)
-- Auto-cleanup: Analytics data older than 30 days automatically deleted
-- User control: Full export/import as JSON, complete data deletion available
-
-**COMPLIANCE NOTE:** All data is stored locally on the user's device. No data is transmitted to external servers unless Teams integration is explicitly enabled by organization.
+**For technical security details**, see [SECURITY.md](../../SECURITY.md).
+**For outstanding action items**, see [TODO.md](../TODO.md).
 
 ---
 
-## 3. COOKIES, STORAGE & TRACKING
+## 1. Data Collection & Processing
 
-### Cookies:
+### What Data is Collected
+
+| Data Type | Details | Retention | Legal Basis |
+|-----------|---------|-----------|-------------|
+| **Confidence Ratings** | 1-5 scale ratings on 100+ physics topics | User-controlled (no auto-deletion) | Legitimate interest (educational analytics) |
+| **Study Materials** | Custom notes, flashcards, mindmaps | User-controlled (no auto-deletion) | Legitimate interest (educational tools) |
+| **Analytics History** | Timestamped confidence assessments | 30 days (auto-cleanup) | Legitimate interest (progress tracking) |
+| **Test Results** | Flashcard test performance metrics | User-controlled (no auto-deletion) | Legitimate interest (learning assessment) |
+| **User Preferences** | View modes, dark mode, paper selection | User-controlled (no auto-deletion) | Consent (optional preferences) |
+| **Authentication Data** | Name, email (Teams only), timestamps | Session-based, cleared on logout | Consent (optional Teams login) |
+
+### Storage Location
+
+- **Primary Storage:** IndexedDB (client-side database on user device)
+- **No Server Transmission:** All data remains on user's device (unless Teams integration explicitly enabled)
+- **Service Worker Cache:** Application assets only (HTML, CSS, JS) - no user data
+
+### Storage Capacity & Limits
+
+- IndexedDB quota: ~50MB+ (browser-dependent)
+- Analytics auto-cleanup: 30 days
+- User controls: Full export (JSON), import, delete
+
+**GDPR Compliance:** Article 20 (Data Portability) - ✅ Implemented via JSON export
+
+---
+
+## 2. Cookies & Tracking
+
+### Cookies
+
 **NONE** - Application does not use cookies (traditional or third-party).
 
-### Client-Side Storage:
-- **IndexedDB** (primary): User data, preferences, analytics history
-- **Service Worker Cache**: Application assets and dependencies (for offline functionality)
-- **sessionStorage** (limited): Teams OAuth state parameter during authentication
+**PECR Compliance:** ✅ **COMPLIANT** - No cookies means no consent banner required.
 
-### No Tracking Technologies:
-- No Google Analytics
-- No Segment, Mixpanel, or Amplitude
-- No Facebook Pixel or similar retargeting
-- No session ID tracking across sites
-- No device fingerprinting
+### Client-Side Storage (Not Cookies)
 
-**COMPLIANCE NOTE:** Application is fully privacy-first with zero analytics external connections.
+- **IndexedDB:** User data and preferences
+- **Service Worker Cache:** Application assets for offline support
+- **sessionStorage:** OAuth state parameter (temporary, during Teams auth only)
 
----
+### External Tracking
 
-## 4. ANALYTICS & TRACKING
+**NONE** - Zero external analytics or tracking:
+- ❌ No Google Analytics
+- ❌ No third-party analytics platforms
+- ❌ No tracking pixels or beacons
+- ❌ No device fingerprinting
+- ❌ No session ID tracking across sites
 
-### Internal Analytics (Local Only):
-The app includes analytics dashboard that tracks:
-- User progress by topic
-- Confidence level distribution
-- Paper-specific progress (Paper 1, Paper 2, Paper 3)
-- Critical topics (low confidence areas)
-- Strong topics (high confidence areas)
-
-### Data Storage:
-- Stored in IndexedDB key: `physics-analytics-history`
-- Format: Timestamped entries with topic ID, confidence level, date
-- Retention: 30-day automatic cleanup (configurable)
-- Encryption: None (unnecessary - client-side only)
-
-### Data Transmission:
-**NONE** - All analytics remain on the user's device. No transmission to external servers, databases, or analytics platforms.
+**Privacy Assessment:** ✅ **EXCELLENT** - Privacy-first architecture
 
 ---
 
-## 5. AUTHENTICATION & CLOUD INTEGRATION
+## 3. Authentication & Cloud Integration
 
-### Two Authentication Methods:
+### Guest Mode (Default - Recommended)
 
-#### A. Guest (Local/Offline - Default)
-- No account required
-- User ID: "guest"
-- Data: Stored locally only
-- Tokens: 24-hour expiration timestamp (local only)
+- **No account required**
+- **User ID:** "guest"
+- **Data location:** IndexedDB on user's device only
+- **Privacy:** 100% local, zero transmission
 
-#### B. Microsoft Teams Integration (Optional)
-- Requires explicit Microsoft Teams organizational setup
-- OAuth 2.0 authentication via Azure AD
-- Endpoints allowed (CSP): 
-  - `https://login.microsoftonline.com` (authentication)
-  - `https://graph.microsoft.com` (user profile data)
-- Data saved to: IndexedDB with user-prefixed keys
-- Architecture note: Current implementation stores data locally (commented as "In production, you might want to use SharePoint or Teams storage")
+### Microsoft Teams Integration (Optional)
 
-### Token Management:
-- JWT tokens decoded locally
-- Token expiration verified client-side
-- No token storage on external services by default
-- Tokens cleared on logout
+⚠️ **Current Status:** Disabled (placeholder credentials) - See [TEAMS_AUTH_SETUP.md](../guides/TEAMS_AUTH_SETUP.md)
 
-**COMPLIANCE NOTE:** Teams integration is commented as requiring organizational deployment configuration. Not enabled by default. Requires CLIENT_ID and TENANT_ID configuration.
+- **OAuth 2.0:** Azure AD authentication
+- **Endpoints:** `login.microsoftonline.com`, `graph.microsoft.com`
+- **Data location:** IndexedDB (Teams user ID prefix)
+- **Cloud sync:** NOT IMPLEMENTED (placeholder code only)
+
+**When Enabled:**
+- Requires Azure AD app registration
+- Organizational Microsoft DPA must be in place
+- User-specific data isolation by Teams ID
 
 ---
 
-## 6. EXTERNAL CONNECTIONS & DEPENDENCIES
+## 4. External Dependencies
 
-### CDN Libraries (cached after first visit):
-| Library | Source | Purpose | Size |
-|---------|--------|---------|------|
-| Alpine.js | `cdn.jsdelivr.net` | UI framework | 50KB |
-| Tailwind CSS | `cdn.tailwindcss.com` | Styling | 3MB |
-| Lucide Icons | `unpkg.com` | Icons | 150KB |
-| Chart.js | `cdn.jsdelivr.net` | Analytics charts | 200KB |
-| KaTeX | `cdn.jsdelivr.net` | Math equations | 350KB |
-| DOMPurify | `cdn.jsdelivr.net` | XSS prevention | 50KB |
+### CDN Libraries (Cached After First Visit)
 
-### CSP (Content Security Policy):
-```
-default-src 'self'
-script-src: self, cdn.jsdelivr.net, unpkg.com, cdn.tailwindcss.com
-connect-src: self, cdn.jsdelivr.net, unpkg.com, graph.microsoft.com, login.microsoftonline.com
-frame-src: 'none' (no iframes)
-object-src: 'none' (no Flash/plugins)
-```
+| Library | Source | Purpose | Notes |
+|---------|--------|---------|-------|
+| Alpine.js | cdn.jsdelivr.net | UI framework | SRI hash missing* |
+| Tailwind CSS | cdn.tailwindcss.com | Styling | SRI hash missing* |
+| Lucide Icons | unpkg.com | Icons | SRI hash missing* |
+| Chart.js | cdn.jsdelivr.net | Analytics charts | SRI hash missing*, version unpinned* |
+| KaTeX | cdn.jsdelivr.net | Math equations | ✅ SRI implemented |
+| DOMPurify | cdn.jsdelivr.net | XSS prevention | SRI hash missing* |
 
-**Notes:**
-- After first load, app works completely offline (Service Worker caches all resources)
-- No tracking pixels or beacon requests
-- No image/font loading from external domains (except CDN libraries)
+*See [TODO.md - Subresource Integrity](../TODO.md#subresource-integrity-sri-hashes) for SRI implementation plan.
+
+**After First Load:** App works completely offline (Service Worker caches all resources).
 
 ---
 
-## 7. PRIVACY & TERMS DOCUMENTATION
+## 5. Privacy & Terms Documentation
 
-### Current Status:
-**NO PRIVACY POLICY, TERMS OF SERVICE, or COOKIE POLICY found in codebase.**
+### Current Status
 
-### Required for UK Legal Compliance:
-
-#### GDPR Requirements:
-- [ ] Privacy Notice/Policy (explaining data processing)
-- [ ] Data retention policy (30-day analytics cleanup is implemented but not documented)
-- [ ] Data subject rights process (access, deletion, export is implemented but not explained to users)
-- [ ] Legal basis for processing (should be "legitimate interest" for student learning analytics)
-- [ ] Data controller/processor information
-
-#### UK DPA 2018 Requirements:
-- [ ] Data protection policy
-- [ ] User consent mechanism (if applicable)
-- [ ] Lawful basis for processing
-
-#### PECR (Cookies) - Low Risk:
-- Compliant: No cookies/tracking, therefore no cookie consent banner needed
-- But: Document "no cookies" policy if making claims about privacy
+| Document | Status | GDPR Requirement | Priority |
+|----------|--------|------------------|----------|
+| **Privacy Notice/Policy** | ❌ NOT FOUND | ✅ Required (Article 13/14) | 🔴 HIGH |
+| **Data Retention Policy** | ❌ NOT DOCUMENTED | ✅ Required (Article 13) | 🔴 HIGH |
+| **Terms of Service** | ❌ NOT FOUND | ⚠️ Recommended | 🟡 MEDIUM |
+| **Cookie Policy** | ✅ N/A (no cookies) | ✅ Compliant (PECR) | ✅ N/A |
+| **Accessibility Statement** | ❌ NOT FOUND | ⚠️ Recommended (WCAG) | 🟡 MEDIUM |
+| **Legal Basis Statement** | ❌ NOT DOCUMENTED | ✅ Required (Article 6) | 🔴 HIGH |
 
 ---
 
-## 8. PROGRESSIVE WEB APP (PWA) FEATURES
+## 6. Data Subject Rights Implementation
 
-### Confirmed PWA Features:
-- **Manifest**: `manifest.json` with app metadata
-  - Name: "Physics Knowledge Audit Tool"
-  - Display: standalone (full-screen app mode)
-  - Theme color: #3b82f6 (blue)
-  - Icons: favicon.ico
-  - Categories: education, productivity
-  - Language: en-GB
-  
-- **Service Worker**: `sw.js` with:
-  - Cache-first strategy for assets
-  - Network-first for data (Teams sync)
-  - Background sync capability
-  - Version management (v20250119-003)
-  
-- **Offline Support**: Full functionality after first load
-  - HTML templates cached
-  - All JS modules cached
-  - CSS and styling cached
-  - Dependencies cached (Alpine, Chart.js, etc.)
-  - IndexedDB for persistent data
-  
-- **Installability**: 
-  - Can be installed on Android/iOS/Desktop
-  - Standalone window (no browser chrome)
-  - Add to home screen supported
+### GDPR Rights Status
+
+| Right | Status | Implementation |
+|-------|--------|----------------|
+| **Right to Access** (Article 15) | ✅ IMPLEMENTED | Export all data as JSON |
+| **Right to Rectification** (Article 16) | ✅ IMPLEMENTED | Users can edit all stored data |
+| **Right to Erasure** (Article 17) | ✅ IMPLEMENTED | "Clear all data" function in settings |
+| **Right to Data Portability** (Article 20) | ✅ IMPLEMENTED | Export/import JSON format |
+| **Right to Object** (Article 21) | ✅ N/A | No automated decision-making |
+| **Information Notice** (Articles 13/14) | ❌ MISSING | Privacy Notice required |
 
 ---
 
-## 9. SECURITY FEATURES
+## 7. Features With Legal Implications
 
-### Implemented:
-- **XSS Prevention**: DOMPurify library for HTML sanitization
-- **CSRF Protection**: State parameter validation for OAuth
-- **Content Security Policy**: Restrictive headers enforcing origin validation
-- **Data Validation**: Backup file validation prevents prototype pollution
-- **Token Verification**: Teams JWT token expiration and subject verification
-- **Data Serialization**: Safe JSON serialization (avoids Alpine.js proxy issues)
+### Student Data Processing
 
-### Not Implemented (May Be Required):
-- [ ] HTTPS enforcement (assume hosting provider enforces)
-- [ ] Subresource Integrity (SRI) for CDN resources
-- [ ] Rate limiting (N/A - client-side only)
-- [ ] Input validation at data import (basic validation present, could be enhanced)
+**Risk:** Processing educational data about A-Level students (typically 16-18 years old)
 
----
+- **Data Collected:** Confidence ratings (not personal identifiers)
+- **Sensitive Data:** None (no special category data under GDPR Article 9)
+- **Minors:** Potential users under 18 (parental consent may be needed if under 13, unlikely for A-Level)
 
-## 10. DATA EXPORT & USER RIGHTS
+**Mitigation:**
+- Guest mode requires no personal information
+- Local-first storage (no external transmission)
+- If school deployment: School acts as data controller, app is data processor
 
-### Available Capabilities:
-- **Export**: Full data backup as JSON file (confidenceLevels, analytics, notes, flashcards, mindmaps, test results)
-- **Import**: Import previously exported backup files
-- **Delete**: Full data deletion via logout or clear storage function
-- **Storage Info**: Users can view storage usage and quota
+**Legal Basis:** Legitimate interest for educational analytics (Article 6(1)(f))
 
-### Implementation:
-```javascript
-// Export format includes:
-{
-  confidenceLevels: {...},
-  analyticsHistory: [...],
-  userNotes: {...},
-  flashcardDecks: {...},
-  mindmaps: {...},
-  testResults: [...],
-  exportDate: "ISO string",
-  exportMethod: "local" or "teams_cloud",
-  version: "1.4"
-}
-```
+### Device Storage Quota Management
 
-**COMPLIANCE NOTE:** Meets GDPR Article 20 right to data portability (export in machine-readable format).
+**Risk:** User device storage limits may prevent data saving
+
+**Mitigation:**
+- 30-day analytics auto-cleanup
+- User warnings at quota exceeded
+- Clear export/delete options
+
+**User Communication:** Should document storage limitations
+
+### Data Retention
+
+**Current Implementation:**
+- Analytics history: 30-day auto-cleanup (implemented in code)
+- User materials: No automatic deletion (user-controlled)
+
+**Missing:** User-facing data retention policy documentation
 
 ---
 
-## 11. FEATURES WITH LEGAL IMPLICATIONS
+## 8. UK Legal Compliance Checklist
 
-### High-Risk Areas:
+### UK GDPR (Post-Brexit)
 
-#### 1. **Student Data Processing**
-- **Risk**: Processing educational data about minors (A-Level students, typically 16-18 years old, may include under-16)
-- **Mitigation**: 
-  - No personal identification required for guest mode
-  - If deployed in school: GDPR School DPA likely required with educational institution
-  - Teams integration: Microsoft maintains own Data Processing Agreement
-- **Action Required**: Establish lawful basis for processing (likely school's legitimate educational interest)
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| Lawful basis for processing | ⚠️ IMPLEMENTED BUT UNDOCUMENTED | Legitimate interest for educational analytics |
+| Privacy Notice (Articles 13/14) | ❌ MISSING | Required before deployment |
+| Data portability (Article 20) | ✅ IMPLEMENTED | JSON export function |
+| Right to erasure (Article 17) | ✅ IMPLEMENTED | Clear data function |
+| Data retention policy | ⚠️ IMPLEMENTED BUT UNDOCUMENTED | 30-day analytics cleanup exists |
+| Data controller designation | ❌ MISSING | School or developer must be designated |
 
-#### 2. **Microsoft Teams Integration**
-- **Risk**: Data sharing with Microsoft (if cloud storage enabled)
-- **Current Status**: Currently disabled (only IndexedDB local storage)
-- **DPA**: Microsoft Graph API calls covered by Microsoft DPA
-- **Action Required**: If Teams cloud sync enabled, ensure organization has Microsoft DPA in place
+### UK Data Protection Act 2018
 
-#### 3. **Device Storage Quota**
-- **Risk**: User device storage limits may prevent data saving
-- **Mitigation**: 
-  - Auto-cleanup of old analytics (30 days)
-  - User warning at quota exceeded
-  - Clear export/delete options
-- **Action Required**: Document storage limitations to users
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| Adequate safeguards | ✅ IMPLEMENTED | Client-side only, no transmission |
+| Data subject rights | ✅ IMPLEMENTED | Access, rectification, erasure, portability |
+| Personal data policy | ❌ MISSING | Privacy Notice required |
 
-#### 4. **Data Retention**
-- **Implemented**: 30-day automatic analytics cleanup
-- **Not Documented**: No retention policy provided to users
-- **Action Required**: Create and communicate data retention policy
+### PECR (Privacy and Electronic Communications Regulations)
 
----
+| Requirement | Status | Notes |
+|-------------|--------|-------|
+| Cookie consent | ✅ N/A | No cookies used |
+| Tracking consent | ✅ N/A | No external tracking |
+| Electronic marketing | ✅ N/A | No marketing functionality |
 
-## 12. UK LEGAL COMPLIANCE CHECKLIST
+**PECR Compliance:** ✅ **FULLY COMPLIANT** - No cookies or tracking
 
-### GDPR (UK-GDPR post-Brexit):
-- [x] Local-first data storage (data controller likely the user/school)
-- [x] Data portability (export function)
-- [x] Right to delete (clear/export options)
-- [ ] **MISSING**: Privacy Notice
-- [ ] **MISSING**: Data retention policy documentation
-- [ ] **MISSING**: Legitimate basis statement
-- [ ] **MISSING**: Third-party assessment (if Teams used)
+### WCAG 2.1 (Web Content Accessibility Guidelines)
 
-### UK Data Protection Act 2018:
-- [x] Adequate safeguards (client-side, no transmission)
-- [x] Data subject rights implemented (export/delete)
-- [ ] **MISSING**: Personal data policy
-
-### PECR (Electronic Privacy Regulations):
-- [x] **COMPLIANT**: No cookies, no tracking, no consent needed
-
-### Children's Online Privacy:
-- [x] No targeted marketing
-- [x] No profiling
-- [x] No third-party tracking
-- [ ] **RECOMMENDED**: Age verification if under-13 users expected (unlikely for A-Level, ages 16-18)
-
-### Accessibility (WCAG 2.1):
-- [x] Dark mode support
-- [x] Keyboard navigation (Alpine.js supports)
-- [ ] **UNKNOWN**: Tested accessibility compliance
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Dark mode support | ✅ IMPLEMENTED | User preference toggle |
+| Keyboard navigation | ✅ SUPPORTED | Alpine.js native support |
+| Accessibility testing | ❌ UNKNOWN | Not tested with assistive technologies |
+| Accessibility statement | ❌ MISSING | Recommended for public deployment |
 
 ---
 
-## 13. DEPLOYMENT RECOMMENDATIONS FOR UK LEGAL COMPLIANCE
+## 9. Deployment Recommendations
 
-### Before Deployment:
+### Before Deployment - REQUIRED
 
-1. **Create Privacy Notice** covering:
+1. **✅ Create Privacy Notice** covering:
    - What data is collected (confidence ratings, notes, flashcards, analytics)
-   - How it's stored (IndexedDB on user device)
-   - Retention period (analytics: 30 days auto-cleanup, other data: no automatic deletion)
+   - How it's stored (IndexedDB on user device, no external transmission)
+   - Retention periods (analytics: 30 days, other data: user-controlled)
    - User rights (export, delete, access)
-   - If Teams: cloud storage data location and Microsoft's role
+   - Legal basis (legitimate interest for educational analytics)
+   - Data controller contact information
 
-2. **Create Retention Policy** detailing:
-   - Analytics: 30 days
-   - User study materials: No automatic deletion (user controlled)
+2. **✅ Document Data Retention Policy**:
+   - Analytics history: 30 days (auto-cleanup)
+   - User study materials: No automatic deletion (user-controlled)
    - Backup files: User-initiated only
+   - Storage quota management approach
 
-3. **If Institutional Deployment**:
-   - Execute Data Processing Agreement with organization
-   - If Teams enabled: Ensure organization has Microsoft DPA
-   - Appoint data controller and processor roles
+3. **✅ Establish Legal Basis**:
+   - Document legitimate interest assessment (educational analytics)
+   - If school deployment: Execute Data Processing Agreement
+   - Designate data controller and processor roles
 
-4. **Add Accessibility Statement** (WCAG 2.1 compliance)
+### Before Deployment - RECOMMENDED
 
-5. **Security Headers** (if self-hosted):
-   - X-Frame-Options: DENY
-   - X-Content-Type-Options: nosniff
-   - X-XSS-Protection: 1; mode=block
-   - Strict-Transport-Security: max-age=31536000 (HTTPS required)
+4. **Add Terms of Service** (optional but recommended)
+   - User responsibilities
+   - Liability limitations
+   - Acceptable use policy
 
-6. **Security/Legal Considerations**:
-   - Implement HTTPS (non-negotiable)
-   - Monitor CDN libraries for security updates
-   - Consider SRI (Subresource Integrity) for CDN scripts
-   - Document incident response plan for data breaches
+5. **Create Accessibility Statement**
+   - WCAG 2.1 compliance status
+   - Known accessibility issues
+   - Contact for accessibility feedback
 
----
+### If Teams Integration Enabled
 
-## 14. SUMMARY: UK LEGAL COMPLIANCE STATUS
-
-### ✅ STRENGTHS:
-1. **Privacy-First Design**: All data stored locally, no external tracking
-2. **No Cookies**: Zero cookie compliance issues
-3. **User Control**: Full export, import, delete capabilities
-4. **Secure**: CSP, XSS prevention, token validation
-5. **GDPR-Friendly**: Portable data format, data subject rights implemented
-6. **Offline-First**: Works without external connections
-
-### ⚠️ COMPLIANCE GAPS:
-1. **NO Privacy Policy/Notice** (GDPR requirement)
-2. **NO Data Retention Policy** (though 30-day cleanup implemented)
-3. **NO Terms of Service** (recommended if user-facing)
-4. **NO Accessibility Statement** (WCAG compliance unknown)
-5. **Weak Legal Basis Documentation** (for educational data)
-6. **Teams Integration Not Secured** (DPA documentation missing if enabled)
-
-### RISK LEVEL: **MEDIUM**
-
-**Current Risk**: If deployed as-is without privacy documentation, organization faces GDPR enforcement action (potential 4% global revenue fine, though unlikely for educational app).
-
-**Mitigating Factors**:
-- Zero external data transmission
-- User has full data control
-- Low personal data sensitivity (confidence ratings ≠ personal identifiers)
-- Educational use case (schools typically have legal framework)
-
-### NEXT STEPS:
-1. **Immediate**: Add Privacy Notice to app
-2. **Important**: Create Data Retention Policy
-3. **Recommended**: Add Terms of Service
-4. **Future**: Accessibility testing and statement
-5. **If Teams**: Secure DPA agreement
+6. **Microsoft DPA Requirements**:
+   - Verify organization has Microsoft Data Processing Agreement
+   - Document Teams data flow
+   - Update Privacy Notice with cloud storage details
+   - Test authentication and data sync thoroughly
 
 ---
 
-## 15. ASSUMPTIONS & CAVEATS
+## 10. Risk Assessment
 
-- Analysis based on codebase review only (no server-side code found)
-- Assumed typical browser security defaults (HTTPS, origin isolation)
-- Assumed educational deployment context (A-Level students)
-- Teams integration security depends on organizational Azure AD setup
-- Accessibility analysis based on code inspection (not tested with assistive technologies)
-- Regulations reviewed: UK GDPR, UK DPA 2018, PECR, WCAG 2.1
+### Overall Risk Level: **MEDIUM**
+
+### ✅ Positive Factors (Risk Mitigation)
+
+- **Zero external data transmission** (unless Teams explicitly enabled)
+- **User has full control** over all data (export/delete)
+- **Strong privacy architecture** (local-first, no tracking)
+- **User rights implemented** (GDPR Articles 15, 16, 17, 20)
+- **Educational use case** (typically lower regulatory scrutiny)
+- **No cookies** (PECR compliant by design)
+- **Client-side only** (no backend server vulnerabilities)
+
+### ⚠️ Risk Factors
+
+- **Missing Privacy Notice** (GDPR Article 13/14 violation)
+- **Undocumented data retention** (policy exists but not communicated)
+- **No legal basis documentation** (legitimate interest not documented)
+- **Educational data processing** (requires lawful basis for student data)
+- **Potential minors** (A-Level students, parental consent may be needed if under 13)
+- **Storage quota limits** (risk of data loss if device storage full)
+- **Teams integration risk** (if enabled without proper DPA)
+- **Accessibility untested** (WCAG compliance unknown)
+
+### Enforcement Risk Analysis
+
+| Risk Type | Level | Likelihood | Impact |
+|-----------|-------|------------|--------|
+| **ICO Investigation** | MEDIUM | Medium | Privacy Notice absence could trigger investigation |
+| **GDPR Fine** | LOW | Low | Privacy-first design mitigates fine risk significantly |
+| **School Liability** | HIGH | High | School deployment without DPA creates liability |
+| **User Complaints** | LOW | Low | No data transmission reduces complaint risk |
+
+### Recommended Mitigation
+
+1. **Add Privacy Notice immediately** (reduces ICO investigation risk)
+2. **Document data retention policy** (demonstrates compliance effort)
+3. **Establish legal basis** (legitimate educational interest)
+4. **If school deployment:** Execute Data Processing Agreement
 
 ---
 
-**Report Generated**: Analysis of codebase at commit 82b897e (Nov 19, 2025)  
-**Jurisdiction**: United Kingdom (GB)  
-**Standards**: GDPR, UK Data Protection Act 2018, PECR, WCAG 2.1
+## 11. Compliance Summary
+
+### ✅ COMPLIANT
+
+- **Data portability** (GDPR Article 20) - JSON export
+- **Right to erasure** (GDPR Article 17) - Clear data function
+- **Right to rectification** (GDPR Article 16) - User editable data
+- **No cookies** (PECR) - Zero cookie usage
+- **No external tracking** - Privacy-first design
+- **Secure storage** - Client-side IndexedDB with user control
+
+### ❌ NON-COMPLIANT (Gaps to Address)
+
+- **Privacy Notice** (GDPR Articles 13/14) - ❌ Missing
+- **Data Retention Policy** (GDPR Article 13) - ⚠️ Implemented but undocumented
+- **Legal Basis Statement** (GDPR Article 6) - ❌ Missing
+- **Data Controller Designation** - ❌ Missing
+- **Accessibility Statement** (WCAG) - ❌ Missing
+- **Terms of Service** - ❌ Missing (recommended, not required)
+
+### ⚠️ CONDITIONAL COMPLIANCE
+
+- **Teams Integration:** If enabled, requires organizational Microsoft DPA
+- **School Deployment:** Requires Data Processing Agreement with school
+- **Under-13 Users:** Requires parental consent (unlikely for A-Level target audience)
+
+---
+
+## 12. Action Items
+
+**All compliance action items have been moved to [TODO.md](../TODO.md#legal--compliance) for tracking.**
+
+Key actions:
+1. Create Privacy Notice/Policy (HIGH priority)
+2. Document Data Retention Policy (HIGH priority)
+3. Establish and document legal basis (HIGH priority)
+4. Create Terms of Service (MEDIUM priority)
+5. Create Accessibility Statement (MEDIUM priority)
+6. Execute DPA if school deployment (HIGH priority if applicable)
+7. Secure Microsoft DPA if Teams enabled (HIGH priority if applicable)
+
+---
+
+## 13. Key Takeaways
+
+### 🎉 What's Working Well
+
+1. **Privacy Architecture:** Excellent - all data local, no external transmission
+2. **User Rights:** GDPR Articles 15, 16, 17, 20 fully implemented
+3. **No Cookies:** PECR compliant by design
+4. **Security:** Strong XSS prevention, CSP, input validation (see SECURITY.md)
+5. **User Control:** Full export, import, delete capabilities
+
+### ⚠️ What Needs Attention
+
+1. **Legal Documentation:** Missing Privacy Notice (GDPR requirement)
+2. **Policy Communication:** Data retention exists but not documented for users
+3. **Legal Basis:** Not documented (legitimate interest for educational analytics)
+4. **Accessibility:** Not tested, statement missing
+
+### 📊 Bottom Line
+
+**This is a well-designed, privacy-conscious educational app** with excellent technical implementation. The main compliance gap is **missing legal documentation** (Privacy Notice), which must be addressed before deployment.
+
+**Technical architecture:** ✅ GDPR-friendly
+**User rights:** ✅ Fully implemented
+**Legal documentation:** ❌ Missing (critical gap)
+
+**Deployment Status:** Not production-ready until Privacy Notice is created.
+
+---
+
+## Related Documentation
+
+**For implementation details:**
+- **[SECURITY.md](../../SECURITY.md)** - Security implementation, XSS prevention, CSP, authentication
+- **[README.md](../../README.md)** - Application overview, features, technology stack
+- **[ARCHITECTURE.md](../guides/ARCHITECTURE.md)** - Technical architecture, PWA features, data flow
+
+**For action tracking:**
+- **[TODO.md](../TODO.md)** - Outstanding compliance tasks and priorities
+
+**For setup guidance:**
+- **[TEAMS_AUTH_SETUP.md](../guides/TEAMS_AUTH_SETUP.md)** - Teams authentication configuration
+- **[DEPLOYMENT.md](../guides/DEPLOYMENT.md)** - Production deployment checklist
+
+---
+
+**Analysis Date:** 2025-11-21
+**Analyst:** Development Team
+**Next Review:** Before production deployment
+
