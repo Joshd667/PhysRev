@@ -25,6 +25,10 @@ export function setupWatchers(app) {
 
     app.$watch('selectedPaper', () => {
         app.saveToLocalStorage();
+        // Close note preview when changing paper
+        if (app.notePreviewId) {
+            app.notePreviewId = null;
+        }
     });
 
     // ⚡ PERFORMANCE: Debounced confidence save prevents excessive writes
@@ -121,6 +125,13 @@ export function setupWatchers(app) {
     app.$watch('expandedGroups', () => {
         if (app.showingAnalytics) {
             app.showingAnalytics = false;
+        }
+    });
+
+    // Close note preview when switching between notes/flashcards/mindmaps/audit
+    app.$watch('viewType', () => {
+        if (app.notePreviewId) {
+            app.notePreviewId = null;
         }
     });
 
