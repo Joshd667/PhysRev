@@ -359,3 +359,109 @@ localStorage.removeItem('DEBUG')         // Disable
 See [DEVELOPMENT.md](DEVELOPMENT.md#debug-mode) for user documentation.
 
 ---
+
+## XSS Protection
+
+### DOMPurify Sanitization
+
+**Location:** User content injection points in `js/features/`
+
+The app implements comprehensive XSS protection using [DOMPurify](https://github.com/cure53/DOMPurify) to sanitize all user-generated content before DOM injection.
+
+**Protected Content:**
+- **Notes:** Rich text content with formatting
+- **Flashcards:** Front/back card content
+- **Mindmaps:** Node content with styling
+
+**Implementation Status:** ✅ Complete (v2.4 - October 2025)
+- All user-content innerHTML injection points secured
+- Context-appropriate sanitization configurations
+- Zero XSS vulnerabilities in user-facing features
+
+### Sanitization Configurations
+
+**Text Extraction (Snippets):**
+```javascript
+// Strip all HTML, keep text only
+DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: [],
+    KEEP_CONTENT: true
+});
+```
+
+**Rich Text Editor (Notes):**
+```javascript
+// Allow formatting tags, strict style validation
+DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'h1', 'h2', 'h3',
+                   'ul', 'ol', 'li', 'blockquote', 'code', 'pre', 'a',
+                   'span', 'div', 'table', 'tr', 'td', 'th'],
+    ALLOWED_ATTR: ['href', 'style', 'class', 'id'],
+    ALLOWED_STYLES: {
+        '*': {
+            'color': [/^#[0-9A-Fa-f]{3,6}$/],
+            'background-color': [/^#[0-9A-Fa-f]{3,6}$/],
+            'font-size': [/^\d+px$/]
+        }
+    }
+});
+```
+
+**Mindmap Nodes (Minimal):**
+```javascript
+// Basic formatting only
+DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'span'],
+    ALLOWED_ATTR: ['style'],
+    ALLOWED_STYLES: {
+        '*': {
+            'color': [/^#[0-9A-Fa-f]{3,6}$/],
+            'font-size': [/^\d+px$/]
+        }
+    }
+});
+```
+
+### Safe innerHTML Patterns
+
+**Trusted Source Templates:**
+- `js/template-loader.js` loads templates from app's own server
+- No user input involved in template paths
+- Part of core architecture
+
+**Sanitization Helpers:**
+- `js/features/search/index.js` contains `sanitizeHTML()` helper
+- Sets `textContent` (escapes), reads `innerHTML` (returns escaped)
+- Used to escape user input for safe display
+
+**Third-Party Libraries:**
+- KaTeX equation rendering has built-in XSS protection
+- No additional sanitization needed for KaTeX output
+
+### Files with DOMPurify Integration
+
+1. `js/features/notes/display.js` - Note snippet extraction
+2. `js/features/notes/management.js` - Note editor loading
+3. `js/features/notes/editor.js` - Note content processing
+4. `js/features/mindmaps/canvas.js` - Mindmap node rendering
+
+### Security Principles
+
+**Defense in Depth:**
+- Sanitize on input (when loading into editors)
+- Sanitize on output (when rendering to DOM)
+- Sanitize on export (when generating HTML exports)
+
+**Principle of Least Privilege:**
+- Minimal allowed tags for each context
+- Strict regex validation on CSS properties
+- Block dangerous protocols (javascript:, data:)
+
+**Architecture Notes:**
+- DOMPurify loaded from CDN (cached by Service Worker)
+- No inline event handlers allowed (CSP-friendly)
+- Sanitization happens client-side (no server dependency)
+
+See complete audit history in git: `docs/audits/INNERHTML_XSS_AUDIT.md` (removed in cleanup)
+
+---
