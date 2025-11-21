@@ -496,11 +496,17 @@ function onSearchInput(query) {
 
 ## Tools & Utilities
 
+**Developer tools dashboard:** `tools/index.html`
+
 **Located in `tools/` directory:**
 
 - **csv-converter-unified.html** - Convert CSV to JSON (10x faster loading)
-- **auth-callback.html** - OAuth redirect endpoint for Teams auth
+- **test-imports.html** - Test JavaScript module imports
 - **generate-sri-hashes.js** - Generate SRI hashes for CDN resources (security)
+
+**Located at project root:**
+
+- **auth-callback.html** - OAuth redirect endpoint for Teams auth (not a dev tool)
 
 ---
 
