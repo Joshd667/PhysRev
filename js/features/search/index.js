@@ -593,7 +593,33 @@ export const searchMethods = {
             if (window.innerWidth < 768) this.sidebarVisible = false;
             this.$nextTick(() => {
                 setTimeout(() => {
-                    const noteElement = document.querySelector(`[data-note-id="${result.id}"]`);
+                    // Check if note element exists in DOM (might be paginated out)
+                    let noteElement = document.querySelector(`[data-note-id="${result.id}"]`);
+
+                    // If not found, try to expand pagination to show all notes
+                    if (!noteElement) {
+                        // Find the notes card view container with pagination
+                        const notesContainer = document.querySelector('[x-data*="notePagination"]');
+                        if (notesContainer && window.Alpine) {
+                            // Access Alpine data and call showAll() to load all notes
+                            const alpineData = window.Alpine.$data(notesContainer);
+                            if (alpineData && alpineData.notePagination && typeof alpineData.notePagination.showAll === 'function') {
+                                alpineData.notePagination.showAll();
+                                // Wait for DOM to update after showing all notes
+                                setTimeout(() => {
+                                    noteElement = document.querySelector(`[data-note-id="${result.id}"]`);
+                                    if (noteElement) {
+                                        noteElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        noteElement.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+                                        setTimeout(() => { noteElement.style.backgroundColor = ''; }, 2000);
+                                    }
+                                }, 150);
+                                return; // Exit to avoid double scrolling
+                            }
+                        }
+                    }
+
+                    // If element found or pagination not available, scroll normally
                     if (noteElement) {
                         noteElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         noteElement.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';

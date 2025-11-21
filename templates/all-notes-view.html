@@ -127,7 +127,8 @@
                                          x-effect="if (sectionExpanded && window.lucide) { $nextTick(() => lucide.createIcons()); }"
                                          class="space-y-3">
                                         <template x-for="note in section.notes" :key="note.id">
-                                            <div x-data="{ noteExpanded: false }"
+                                            <div :data-note-id="note.id"
+                                                 x-data="{ noteExpanded: false }"
                                                  x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); })"
                                                  class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
                                                 <div class="p-4 flex items-start justify-between">
