@@ -51,13 +51,12 @@ However, this proprietary software incorporates the following open-source third-
 - **License Text:** https://github.com/lucide-icons/lucide/blob/main/LICENSE
 
 ### Tailwind CSS
-- **Version:** Latest (via CDN - not recommended for production)
+- **Version:** Latest (via CDN)
 - **License:** MIT License
 - **Copyright:** Copyright (c) Tailwind Labs, Inc.
 - **Source:** https://github.com/tailwindlabs/tailwindcss
 - **Usage:** Utility-first CSS framework
 - **License Text:** https://github.com/tailwindlabs/tailwindcss/blob/master/LICENSE
-- **Note:** CDN version used for development only. Production deployments should use a build process.
 
 ---
 
@@ -139,41 +138,14 @@ The ISC License is functionally equivalent to MIT License. Requirements satisfie
 
 ---
 
-## Subresource Integrity (SRI)
+## Maintenance
 
-For security, all CDN resources should include Subresource Integrity (SRI) hashes to prevent supply chain attacks. SRI hashes can be generated using:
-
-```bash
-node tools/generate-sri-hashes.js
-```
-
-**Current SRI Status:**
-- ✅ KaTeX: SRI hash implemented
-- ⚠️ Alpine.js: SRI hash needed
-- ⚠️ Chart.js: SRI hash needed
-- ⚠️ DOMPurify: SRI hash needed
-- ⚠️ Lucide Icons: SRI hash needed
-- ⚠️ Tailwind CSS: SRI hash needed
-
----
-
-## Contributing
-
-If you add new third-party dependencies to this project, please update this file with:
-1. Library name and version
-2. License type and copyright holder
-3. Source repository link
-4. Brief usage description
-5. Link to license text
-
----
-
-## Questions or Concerns
-
-If you have questions about licensing or attribution, or believe any attribution is incorrect or incomplete, please:
-1. Open an issue on the project repository
-2. Contact the project maintainers
-3. Refer to individual library license files for authoritative information
+When adding new third-party dependencies, update this file with:
+- Library name and version
+- License type and copyright holder
+- Source repository link
+- Brief usage description
+- Link to license text
 
 ---
 
@@ -193,5 +165,5 @@ The open-source licenses above apply only to their respective libraries, not to 
 
 ---
 
-**Last Updated:** 2025-11-20
-**Document Version:** 1.1
+**Last Updated:** 2025-11-21
+**Document Version:** 1.2

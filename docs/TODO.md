@@ -1,0 +1,103 @@
+# TODO List
+
+This document tracks outstanding tasks and improvements for the PhysRev application.
+
+## Security
+
+### Subresource Integrity (SRI) Hashes
+
+**Priority:** High
+**Location:** `index.html`
+
+Add SRI hashes to CDN dependencies to prevent supply chain attacks.
+
+**Current Status:**
+- ✅ **KaTeX** - SRI hash implemented (line 88-90)
+- ⚠️ **Alpine.js** - SRI hash needed (preload at line 62, script tag elsewhere)
+- ⚠️ **DOMPurify** - SRI hash needed (line 97)
+- ⚠️ **Chart.js** - SRI hash needed (line 104+, also needs version pinning)
+- ⚠️ **Lucide Icons** - SRI hash needed
+- ⚠️ **Tailwind CSS** - SRI hash needed (may not be possible with CDN build)
+
+**Outstanding items:**
+
+1. **Alpine.js preload** (line 62)
+   - Add SRI hash to Alpine.js preload link
+   - Current: `<link rel="preload" href="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/module.esm.js" as="script" crossorigin>`
+   - Need: integrity="sha384-HASH" attribute
+
+2. **DOMPurify** (line 97)
+   - Add SRI hash for integrity verification
+   - Current: `<script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>`
+   - Need: integrity="sha384-HASH" crossorigin="anonymous" attributes
+
+3. **Chart.js** (line 104+)
+   - Pin Chart.js version (currently unpinned)
+   - Add SRI hash
+   - Current version in package.json: 4.4.1
+
+4. **Lucide Icons**
+   - Locate script tag in index.html
+   - Add SRI hash
+
+5. **Alpine.js main script**
+   - Locate main Alpine.js script tag (separate from preload)
+   - Add SRI hash
+
+6. **Tailwind CSS** (optional)
+   - Review if SRI is possible with CDN version
+   - May require switching to local build process
+
+**Tool available:** `node tools/generate-sri-hashes.js`
+
+**Implementation steps:**
+1. Run the SRI hash generation tool
+2. Update index.html with integrity attributes
+3. Test that all resources load correctly
+4. Verify CSP compatibility
+
+**Why this matters:**
+- Prevents tampering with CDN resources
+- Ensures scripts haven't been modified
+- Industry best practice for CDN usage
+- Reduces attack surface
+
+## Documentation
+
+### Content Management Guide
+
+**Priority:** Low
+**Location:** `docs/guides/CONTENT_MANAGEMENT.md:372`
+
+- Track TODOs for incomplete content in the content management guide
+- This appears to be a general note about tracking content completeness
+
+## Future Enhancements
+
+From `index.html` comments (lines 37-40):
+
+### CSP Improvements
+
+**Priority:** Medium
+**Status:** Future consideration
+
+Current CSP requires `unsafe-inline` and `unsafe-eval` due to Alpine.js requirements.
+
+**Possible future improvements:**
+- Migrate to CSP Level 3 with nonce support (complex with Service Worker)
+- Migrate to Vue 3/React with strict CSP (major rewrite)
+- Monitor Alpine.js for CSP improvements
+
+**Why not now:**
+- Alpine.js uses inline expressions (x-on, x-bind, etc.)
+- Alpine.js reactive system uses `new Function()` internally
+- TailwindCSS config uses inline script
+- Current mitigation strategy is sufficient (DOMPurify, HMAC, local-first)
+
+---
+
+## Completed ✅
+
+This section tracks completed items for historical reference.
+
+*(No completed items yet)*
