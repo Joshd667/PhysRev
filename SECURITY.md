@@ -356,8 +356,10 @@ For implementation details, see [ARCHITECTURE.md - Storage & Caching](docs/guide
 ### Active Issues
 
 1. **Missing SRI Hashes** - CRITICAL
-   - Impact: Supply chain attack vector
-   - Mitigation: Add SRI (in progress)
+   - Impact: Supply chain attack vector (CDN compromise could inject malicious DOMPurify)
+   - Attack Scenario: Compromised DOMPurify CDN could bypass all XSS sanitization
+   - Mitigation: Add SRI hashes to verify CDN integrity (in progress)
+   - Tool: `tools/generate-sri-hashes.js`
    - Timeline: Complete within 1 week
 
 2. **CSP Weaknesses** - CRITICAL (Accepted)
