@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Imports</title>
+</head>
+<body>
+    <h1>Testing Module Imports</h1>
+    <pre id="output"></pre>
+
+    <script type="module">
+        const output = document.getElementById('output');
+
+        async function testImport(path, description) {
+            try {
+                await import(path);
+                output.textContent += `✅ ${description}: OK\n`;
+            } catch (error) {
+                output.textContent += `❌ ${description}: ${error.message}\n`;
+                output.textContent += `   Stack: ${error.stack}\n`;
+            }
+        }
+
+        // Test each module individually
+        await testImport('../js/utils/indexeddb.js', 'IndexedDB utils');
+        await testImport('../js/utils/storage.js', 'Storage utils');
+        await testImport('../js/features/auth/guest.js', 'Guest auth');
+        await testImport('../js/features/auth/teams.js', 'Teams auth');
+        await testImport('../js/features/auth/data-management.js', 'Data management');
+        await testImport('../js/features/settings/index.js', 'Settings');
+        await testImport('../js/features/flashcards/test.js', 'Flashcard test');
+        await testImport('../js/utils/data-integrity.js', 'Data integrity');
+        await testImport('../js/sw-registration.js', 'Service worker registration');
+        await testImport('../js/core/state.js', 'Core state');
+        await testImport('../js/core/app.js', 'Core app');
+
+        output.textContent += '\n✅ All tests complete!';
+    </script>
+</body>
+</html>

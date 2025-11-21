@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Audit - Developer Tools</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .tool-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .tool-meta {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-security {
+            background: #fee;
+            color: #c33;
+        }
+
+        .badge-performance {
+            background: #efe;
+            color: #3a3;
+        }
+
+        .badge-testing {
+            background: #eef;
+            color: #33a;
+        }
+
+        .badge-auth {
+            background: #ffe;
+            color: #a93;
+        }
+
+        .badge-node {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .badge-browser {
+            background: #e8f4f8;
+            color: #0066aa;
+        }
+
+        .back-to-app {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .back-to-app a {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            transition: background 0.2s;
+        }
+
+        .back-to-app a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .info-box h2 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            color: #555;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-box li:last-child {
+            border-bottom: none;
+        }
+
+        .info-box li::before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛠️ Developer Tools</h1>
+            <p class="subtitle">Build, test, and optimize the Physics Audit Tool</p>
+        </header>
+
+        <div class="info-box">
+            <h2>📋 Quick Guide</h2>
+            <ul>
+                <li><strong>CSV Converters:</strong> Run these whenever you update CSV data files to regenerate the optimized JSON</li>
+                <li><strong>SRI Hash Generator:</strong> Run when updating CDN library versions to maintain security</li>
+                <li><strong>Import Tester:</strong> Use during development to verify all modules load correctly</li>
+                <li><strong>Auth Callback:</strong> Required for OAuth authentication flows (don't delete!)</li>
+            </ul>
+        </div>
+
+        <div class="tools-grid">
+            <!-- CSV Converter Unified -->
+            <a href="csv-converter-unified.html" class="tool-card">
+                <span class="tool-icon">🚀</span>
+                <h2 class="tool-title">CSV to JSON Converter</h2>
+                <p class="tool-description">
+                    <strong>Recommended:</strong> Convert 15 CSV files into one optimized JSON.
+                    Includes both server mode (fetch from web) and local mode (upload files).
+                    Reduces load time from 20s to 1s.
+                </p>
+                <div class="tool-meta">
+                    <span class="badge badge-performance">Performance</span>
+                    <span class="badge badge-browser">Browser</span>
+                </div>
+            </a>
+
+            <!-- CSV Converter (Server) -->
+            <a href="csv-converter.html" class="tool-card">
+                <span class="tool-icon">📡</span>
+                <h2 class="tool-title">CSV Converter (Server Mode)</h2>
+                <p class="tool-description">
+                    Fetches CSV files from running web server and converts to JSON.
+                    Use this if you're running the app on localhost or a web server.
+                </p>
+                <div class="tool-meta">
+                    <span class="badge badge-performance">Performance</span>
+                    <span class="badge badge-browser">Browser</span>
+                </div>
+            </a>
+
+            <!-- CSV Converter (Local) -->
+            <a href="csv-converter-local.html" class="tool-card">
+                <span class="tool-icon">💾</span>
+                <h2 class="tool-title">CSV Converter (Local Mode)</h2>
+                <p class="tool-description">
+                    Upload CSV files from your computer with drag-and-drop.
+                    Works offline without a web server. Perfect for quick conversions.
+                </p>
+                <div class="tool-meta">
+                    <span class="badge badge-performance">Performance</span>
+                    <span class="badge badge-browser">Browser</span>
+                </div>
+            </a>
+
+            <!-- SRI Hash Generator -->
+            <a href="#" onclick="alert('Run this with Node.js:\n\nnode tools/generate-sri-hashes.js\n\nRequires Node.js and internet connection.'); return false;" class="tool-card">
+                <span class="tool-icon">🔒</span>
+                <h2 class="tool-title">SRI Hash Generator</h2>
+                <p class="tool-description">
+                    Generates Subresource Integrity hashes for CDN dependencies
+                    (Alpine.js, DOMPurify, Chart.js, Lucide). Run when updating library versions.
+                </p>
+                <div class="tool-meta">
+                    <span class="badge badge-security">Security</span>
+                    <span class="badge badge-node">Node.js CLI</span>
+                </div>
+            </a>
+
+            <!-- Import Tester -->
+            <a href="test-imports.html" class="tool-card">
+                <span class="tool-icon">🧪</span>
+                <h2 class="tool-title">Module Import Tester</h2>
+                <p class="tool-description">
+                    Tests all JavaScript module imports to verify they load correctly.
+                    Useful for catching broken imports during development.
+                </p>
+                <div class="tool-meta">
+                    <span class="badge badge-testing">Testing</span>
+                    <span class="badge badge-browser">Browser</span>
+                </div>
+            </a>
+
+            <!-- Auth Callback -->
+            <a href="auth-callback.html" class="tool-card">
+                <span class="tool-icon">🔐</span>
+                <h2 class="tool-title">OAuth Callback Page</h2>
+                <p class="tool-description">
+                    Handles OAuth authentication redirects from providers like Google.
+                    This page is automatically used by the authentication flow.
+                </p>
+                <div class="tool-meta">
+                    <span class="badge badge-auth">Auth</span>
+                    <span class="badge badge-browser">Browser</span>
+                </div>
+            </a>
+        </div>
+
+        <div class="back-to-app">
+            <a href="../index.html">← Back to Main App</a>
+        </div>
+    </div>
+
+    <script>
+        // Add keyboard shortcut to go back
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                window.location.href = '../index.html';
+            }
+        });
+    </script>
+</body>
+</html>
