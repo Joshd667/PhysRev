@@ -4,6 +4,8 @@
 
 This guide is for teachers, content creators, and educators who want to add or modify physics topics, learning objectives, and revision resources. **No coding experience required** - all content is managed through Excel or Google Sheets.
 
+> **👨‍💻 Developers:** Looking for technical implementation details? See **[DATA_ARCHITECTURE.md](DATA_ARCHITECTURE.md)** for the technical guide.
+
 ### Overview: How Content Works
 
 The Physics Audit Tool stores all content in **CSV files** (spreadsheet format) that you can edit using Excel or Google Sheets:
