@@ -41,8 +41,20 @@ export const mindmapManagementMethods = {
             viewport: { x: 0, y: 0, scale: 1 }
         };
 
-        // Don't auto-assign tags - user must manually select tags
-        this.mindmapEditorTags = [];
+        // Auto-populate tags only when in Knowledge Audit revision mode
+        if (this.showingRevision) {
+            // In Knowledge Audit - auto-assign tags from current revision context
+            if (topicId) {
+                this.mindmapEditorTags = [topicId];
+            } else if (this.currentRevisionTopics && this.currentRevisionTopics.length > 0) {
+                this.mindmapEditorTags = this.currentRevisionTopics.map(t => t.id);
+            } else {
+                this.mindmapEditorTags = [];
+            }
+        } else {
+            // Not in Knowledge Audit - don't auto-populate, user must manually select
+            this.mindmapEditorTags = [];
+        }
 
         this.showMindmapEditor = true;
 

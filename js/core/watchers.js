@@ -24,11 +24,11 @@ export function setupWatchers(app) {
     });
 
     app.$watch('selectedPaper', () => {
-        app.saveToLocalStorage();
-        // Close note preview when changing paper
+        // Close note preview when changing paper (do this first to prevent flicker)
         if (app.notePreviewId) {
             app.notePreviewId = null;
         }
+        app.saveToLocalStorage();
     });
 
     // ⚡ PERFORMANCE: Debounced confidence save prevents excessive writes

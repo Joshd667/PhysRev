@@ -23,6 +23,12 @@ export const viewManagementMethods = {
      */
     switchViewType(viewType) {
         const previousViewType = this.viewType;
+
+        // Close note preview BEFORE changing view to prevent flicker
+        if (this.notePreviewId) {
+            this.notePreviewId = null;
+        }
+
         this.viewType = viewType;
         this.showViewSelector = false;
 
