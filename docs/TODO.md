@@ -11,6 +11,14 @@ This document tracks outstanding tasks and improvements for the PhysRev applicat
 
 Add SRI hashes to CDN dependencies to prevent supply chain attacks.
 
+**Current Status:**
+- ✅ **KaTeX** - SRI hash implemented (line 88-90)
+- ⚠️ **Alpine.js** - SRI hash needed (preload at line 62, script tag elsewhere)
+- ⚠️ **DOMPurify** - SRI hash needed (line 97)
+- ⚠️ **Chart.js** - SRI hash needed (line 104+, also needs version pinning)
+- ⚠️ **Lucide Icons** - SRI hash needed
+- ⚠️ **Tailwind CSS** - SRI hash needed (may not be possible with CDN build)
+
 **Outstanding items:**
 
 1. **Alpine.js preload** (line 62)
@@ -18,7 +26,7 @@ Add SRI hashes to CDN dependencies to prevent supply chain attacks.
    - Current: `<link rel="preload" href="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/module.esm.js" as="script" crossorigin>`
    - Need: integrity="sha384-HASH" attribute
 
-2. **DOMPurify** (line 93-97)
+2. **DOMPurify** (line 97)
    - Add SRI hash for integrity verification
    - Current: `<script defer src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>`
    - Need: integrity="sha384-HASH" crossorigin="anonymous" attributes
@@ -28,9 +36,17 @@ Add SRI hashes to CDN dependencies to prevent supply chain attacks.
    - Add SRI hash
    - Current version in package.json: 4.4.1
 
-4. **Other CDN dependencies**
-   - Review all external script/style tags in index.html
-   - Generate SRI hashes for: Alpine.js, Lucide Icons, Tailwind CSS (if possible)
+4. **Lucide Icons**
+   - Locate script tag in index.html
+   - Add SRI hash
+
+5. **Alpine.js main script**
+   - Locate main Alpine.js script tag (separate from preload)
+   - Add SRI hash
+
+6. **Tailwind CSS** (optional)
+   - Review if SRI is possible with CDN version
+   - May require switching to local build process
 
 **Tool available:** `node tools/generate-sri-hashes.js`
 
