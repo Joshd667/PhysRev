@@ -33,6 +33,12 @@ export const mindmapsDisplayMethods = {
      * @returns {Array} Array of groups, each containing sections with their mindmaps
      */
     getMindmapsGroupedBySection() {
+        // Critical guards: ensure required data structures exist
+        if (!this.topicLookup || !this.currentGroups || !Array.isArray(this.currentGroups)) {
+            logger.error('getMindmapsGroupedBySection called without required data structures');
+            return [];
+        }
+
         let mindmaps = this.getAllMindmaps();
 
         // Filter by paper mode if in paper mode

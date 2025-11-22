@@ -170,6 +170,12 @@ export const flashcardsDisplayMethods = {
      * @returns {Array} Array of groups, each containing sections with their flashcard decks
      */
     getFlashcardsGroupedBySection() {
+        // Critical guards: ensure required data structures exist
+        if (!this.topicLookup || !this.currentGroups || !Array.isArray(this.currentGroups)) {
+            logger.error('getFlashcardsGroupedBySection called without required data structures');
+            return [];
+        }
+
         let decks = this.getAllFlashcards();
 
         // Reset caches used for sorting/statistics

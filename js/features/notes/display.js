@@ -94,6 +94,12 @@ export const notesDisplayMethods = {
      * @returns {Array} Array of groups, each containing sections with their notes
      */
     getNotesGroupedBySection() {
+        // Critical guards: ensure required data structures exist
+        if (!this.topicLookup || !this.currentGroups || !Array.isArray(this.currentGroups)) {
+            logger.warn('getNotesGroupedBySection called without required data structures');
+            return [];
+        }
+
         let notes = this.getAllNotes();
 
         // Filter by paper mode if in paper mode
