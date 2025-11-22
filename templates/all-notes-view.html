@@ -191,7 +191,7 @@
                          }
                          return notesGroupedBySection.flatMap(g =>
                              (g?.sections || []).flatMap(s => s?.notes || [])
-                         ).filter(note => note && note.id);
+                         ).filter(note => note && note.id !== undefined && note.id !== null);
                      }
                  }">
 

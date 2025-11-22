@@ -234,7 +234,7 @@
                      }
                      return flashcardsGroupedBySection.flatMap(g =>
                          (g?.sections || []).flatMap(s => s?.decks || [])
-                     ).filter(deck => deck && deck.id);
+                     ).filter(deck => deck && deck.id !== undefined && deck.id !== null);
                  },
                  deckPagination: null
              }"
