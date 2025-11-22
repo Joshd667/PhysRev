@@ -145,12 +145,13 @@
                                     <!-- ========== NOTES SECTION ========== -->
                                     <div x-show="shouldShowNotes()">
                                         <!-- User Notes List (Collapsible) -->
-                                        <div x-show="notesForCurrentSectionCached.length > 0" class="space-y-2 mb-6"
-                                             x-data="{
+                                        <div x-data="{
                                                  get safeNotes() {
                                                      return (notesForCurrentSectionCached || []).filter(note => note && note.id !== undefined && note.id !== null);
                                                  }
-                                             }">
+                                             }"
+                                             x-show="safeNotes.length > 0"
+                                             class="space-y-2 mb-6">
                                             <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center space-x-2">
                                                 <i data-lucide="file-text" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i>
                                                 <span>Notes (<span x-text="safeNotes.length"></span>)</span>
@@ -207,12 +208,13 @@
                                     <!-- ========== FLASHCARDS SECTION ========== -->
                                     <div x-show="shouldShowFlashcards()">
                                         <!-- User Flashcard Decks with Test Button -->
-                                        <div x-show="flashcardDecksForCurrentSectionCached.length > 0" class="space-y-2 mb-6"
-                                             x-data="{
+                                        <div x-data="{
                                                  get safeDecks() {
                                                      return (flashcardDecksForCurrentSectionCached || []).filter(deck => deck && deck.id !== undefined && deck.id !== null);
                                                  }
-                                             }">
+                                             }"
+                                             x-show="safeDecks.length > 0"
+                                             class="space-y-2 mb-6">
                                             <!-- Flashcards Header with Test All Button -->
                                             <div class="flex items-center justify-between mb-3">
                                                 <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center space-x-2">
@@ -293,12 +295,13 @@
                                     <!-- ========== MINDMAPS SECTION ========== -->
                                     <div x-show="shouldShowMindmaps()">
                                         <!-- User Mindmaps List -->
-                                        <div x-show="mindmapsForCurrentSectionCached.length > 0" class="space-y-2 mb-6"
-                                             x-data="{
+                                        <div x-data="{
                                                  get safeMindmaps() {
                                                      return (mindmapsForCurrentSectionCached || []).filter(mindmap => mindmap && mindmap.id !== undefined && mindmap.id !== null);
                                                  }
-                                             }">
+                                             }"
+                                             x-show="safeMindmaps.length > 0"
+                                             class="space-y-2 mb-6">
                                             <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center space-x-2">
                                                 <i data-lucide="network" class="w-4 h-4 text-cyan-600 dark:text-cyan-400"></i>
                                                 <span>Mindmaps (<span x-text="safeMindmaps.length"></span>)</span>
