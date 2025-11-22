@@ -275,6 +275,10 @@ export const noteManagementMethods = {
 
         return Object.values(this.userNotes || {})
             .filter(note => {
+                // Defensive: Ensure note exists and has valid ID (critical for Alpine x-for)
+                if (!note || note.id === undefined || note.id === null) {
+                    return false;
+                }
                 // Primary: Check if ANY tag matches ANY topic in the revision section
                 if (note.tags && note.tags.length > 0) {
                     return note.tags.some(tag => topicIds.includes(tag));

@@ -230,26 +230,59 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
 
             get notesForCurrentSectionCached() {
                 if (this._cachedNotesForCurrentSectionDirty) {
-                    this._cachedNotesForCurrentSection = this.getNotesForCurrentSection();
+                    try {
+                        const result = this.getNotesForCurrentSection();
+                        // Ensure we always have a valid array structure
+                        if (!result || !Array.isArray(result)) {
+                            this._cachedNotesForCurrentSection = [];
+                        } else {
+                            this._cachedNotesForCurrentSection = result;
+                        }
+                    } catch (error) {
+                        logger.error('Error in getNotesForCurrentSection:', error);
+                        this._cachedNotesForCurrentSection = [];
+                    }
                     this._cachedNotesForCurrentSectionDirty = false;
                 }
-                return this._cachedNotesForCurrentSection;
+                return this._cachedNotesForCurrentSection || [];
             },
 
             get flashcardDecksForCurrentSectionCached() {
                 if (this._cachedFlashcardDecksForCurrentSectionDirty) {
-                    this._cachedFlashcardDecksForCurrentSection = this.getFlashcardDecksForCurrentSection();
+                    try {
+                        const result = this.getFlashcardDecksForCurrentSection();
+                        // Ensure we always have a valid array structure
+                        if (!result || !Array.isArray(result)) {
+                            this._cachedFlashcardDecksForCurrentSection = [];
+                        } else {
+                            this._cachedFlashcardDecksForCurrentSection = result;
+                        }
+                    } catch (error) {
+                        logger.error('Error in getFlashcardDecksForCurrentSection:', error);
+                        this._cachedFlashcardDecksForCurrentSection = [];
+                    }
                     this._cachedFlashcardDecksForCurrentSectionDirty = false;
                 }
-                return this._cachedFlashcardDecksForCurrentSection;
+                return this._cachedFlashcardDecksForCurrentSection || [];
             },
 
             get mindmapsForCurrentSectionCached() {
                 if (this._cachedMindmapsForCurrentSectionDirty) {
-                    this._cachedMindmapsForCurrentSection = this.getMindmapsForCurrentSection();
+                    try {
+                        const result = this.getMindmapsForCurrentSection();
+                        // Ensure we always have a valid array structure
+                        if (!result || !Array.isArray(result)) {
+                            this._cachedMindmapsForCurrentSection = [];
+                        } else {
+                            this._cachedMindmapsForCurrentSection = result;
+                        }
+                    } catch (error) {
+                        logger.error('Error in getMindmapsForCurrentSection:', error);
+                        this._cachedMindmapsForCurrentSection = [];
+                    }
                     this._cachedMindmapsForCurrentSectionDirty = false;
                 }
-                return this._cachedMindmapsForCurrentSection;
+                return this._cachedMindmapsForCurrentSection || [];
             },
 
             _computeProgressTitleCache() {

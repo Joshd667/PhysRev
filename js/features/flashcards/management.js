@@ -273,6 +273,10 @@ export const flashcardManagementMethods = {
 
         return Object.values(this.flashcardDecks || {})
             .filter(deck => {
+                // Defensive: Ensure deck exists and has valid ID (critical for Alpine x-for)
+                if (!deck || deck.id === undefined || deck.id === null) {
+                    return false;
+                }
                 // Primary: Check if ANY tag matches ANY topic in the revision section
                 if (deck.tags && deck.tags.length > 0) {
                     return deck.tags.some(tag => topicIds.includes(tag));
