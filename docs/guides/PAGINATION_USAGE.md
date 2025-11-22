@@ -10,14 +10,21 @@ This application includes a pagination system to handle large lists efficiently.
 
 Pagination is actively used in these templates:
 
-| Template | Usage | Config |
-|----------|-------|--------|
-| `all-notes-view.html` | Notes list | 30 initial, 15 increment |
-| `all-flashcards-view.html` | Flashcard decks list | 30 initial, 15 increment |
-| `search-results.html` | Search results | Dynamic pagination |
+| Template | Usage | Config | Notes |
+|----------|-------|--------|-------|
+| `all-notes-view.html` | **Removed** (Card view) | N/A | Pagination removed 2025-11-22 - all notes shown |
+| `all-notes-view.html` | Notes list view | No pagination | List view never had pagination |
+| `all-flashcards-view.html` | Flashcard decks card view | 30 initial, 15 increment | Active |
+| `search-results.html` | Search results | Dynamic pagination | Active |
 
 **Implementation:** `js/components/paginated-list.js`
 **Registration:** Loaded in `js/app-loader.js` (available globally as `$paginated` magic helper)
+
+**Notes Card View Change (2025-11-22):**
+- Pagination was removed from notes card view to improve UX
+- Users wanted to see all notes without clicking "Load More"
+- Performance remains acceptable for typical note counts (< 200)
+- Flashcards still use pagination due to richer card content and higher counts
 
 ---
 
@@ -331,5 +338,5 @@ Possible improvements if needed:
 ---
 
 **Created:** 2025-11-20
-**Last Updated:** 2025-11-21
-**Version:** 1.0
+**Last Updated:** 2025-11-22
+**Version:** 1.1
