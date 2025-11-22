@@ -323,6 +323,10 @@ export const mindmapManagementMethods = {
 
         return Object.values(this.mindmaps || {})
             .filter(mindmap => {
+                // Defensive: Ensure mindmap exists and has valid ID (critical for Alpine x-for)
+                if (!mindmap || mindmap.id === undefined || mindmap.id === null) {
+                    return false;
+                }
                 // Primary: Check if ANY tag matches ANY topic in the revision section
                 if (mindmap.tags && mindmap.tags.length > 0) {
                     return mindmap.tags.some(tag => topicIds.includes(tag));
