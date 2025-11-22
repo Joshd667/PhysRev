@@ -145,12 +145,17 @@
                                     <!-- ========== NOTES SECTION ========== -->
                                     <div x-show="shouldShowNotes()">
                                         <!-- User Notes List (Collapsible) -->
-                                        <div x-show="notesForCurrentSectionCached.length > 0" class="space-y-2 mb-6">
+                                        <div x-show="notesForCurrentSectionCached.length > 0" class="space-y-2 mb-6"
+                                             x-data="{
+                                                 get safeNotes() {
+                                                     return (notesForCurrentSectionCached || []).filter(note => note && note.id !== undefined && note.id !== null);
+                                                 }
+                                             }">
                                             <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center space-x-2">
                                                 <i data-lucide="file-text" class="w-4 h-4 text-blue-600 dark:text-blue-400"></i>
-                                                <span>Notes (<span x-text="notesForCurrentSectionCached.length"></span>)</span>
+                                                <span>Notes (<span x-text="safeNotes.length"></span>)</span>
                                             </h4>
-                                            <template x-for="note in notesForCurrentSectionCached" :key="note.id">
+                                            <template x-for="note in safeNotes" :key="note.id">
                                                 <div x-data="{ expanded: false }" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                                                     <!-- Note Header (Clickable) -->
                                                     <div @click="expanded = !expanded" class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
@@ -202,12 +207,17 @@
                                     <!-- ========== FLASHCARDS SECTION ========== -->
                                     <div x-show="shouldShowFlashcards()">
                                         <!-- User Flashcard Decks with Test Button -->
-                                        <div x-show="flashcardDecksForCurrentSectionCached.length > 0" class="space-y-2 mb-6">
+                                        <div x-show="flashcardDecksForCurrentSectionCached.length > 0" class="space-y-2 mb-6"
+                                             x-data="{
+                                                 get safeDecks() {
+                                                     return (flashcardDecksForCurrentSectionCached || []).filter(deck => deck && deck.id !== undefined && deck.id !== null);
+                                                 }
+                                             }">
                                             <!-- Flashcards Header with Test All Button -->
                                             <div class="flex items-center justify-between mb-3">
                                                 <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center space-x-2">
                                                     <i data-lucide="layers" class="w-4 h-4 text-purple-600 dark:text-purple-400"></i>
-                                                    <span>Flashcard Decks (<span x-text="flashcardDecksForCurrentSectionCached.length"></span> decks, <span x-text="getTotalCardsForCurrentSection()"></span> cards)</span>
+                                                    <span>Flashcard Decks (<span x-text="safeDecks.length"></span> decks, <span x-text="getTotalCardsForCurrentSection()"></span> cards)</span>
                                                 </h4>
                                                 <button @click="startFlashcardTest()" class="flex items-center space-x-2 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors text-xs font-medium">
                                                     <i data-lucide="play" class="w-3 h-3"></i>
@@ -215,7 +225,7 @@
                                                 </button>
                                             </div>
 
-                                            <template x-for="deck in flashcardDecksForCurrentSectionCached" :key="deck.id">
+                                            <template x-for="deck in safeDecks" :key="deck.id">
                                                 <div x-data="{ expanded: false }" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                                                     <!-- Deck Header (Clickable) -->
                                                     <div @click="expanded = !expanded" class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
@@ -283,12 +293,17 @@
                                     <!-- ========== MINDMAPS SECTION ========== -->
                                     <div x-show="shouldShowMindmaps()">
                                         <!-- User Mindmaps List -->
-                                        <div x-show="mindmapsForCurrentSectionCached.length > 0" class="space-y-2 mb-6">
+                                        <div x-show="mindmapsForCurrentSectionCached.length > 0" class="space-y-2 mb-6"
+                                             x-data="{
+                                                 get safeMindmaps() {
+                                                     return (mindmapsForCurrentSectionCached || []).filter(mindmap => mindmap && mindmap.id !== undefined && mindmap.id !== null);
+                                                 }
+                                             }">
                                             <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center space-x-2">
                                                 <i data-lucide="network" class="w-4 h-4 text-cyan-600 dark:text-cyan-400"></i>
-                                                <span>Mindmaps (<span x-text="mindmapsForCurrentSectionCached.length"></span>)</span>
+                                                <span>Mindmaps (<span x-text="safeMindmaps.length"></span>)</span>
                                             </h4>
-                                            <template x-for="mindmap in mindmapsForCurrentSectionCached" :key="mindmap.id">
+                                            <template x-for="mindmap in safeMindmaps" :key="mindmap.id">
                                                 <div x-data="{ expanded: false }" class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
                                                     <!-- Mindmap Header (Clickable) -->
                                                     <div @click="expanded = !expanded" class="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
