@@ -186,12 +186,17 @@
             <div x-show="notesViewMode === 'card' && !getNotePreview()"
                  x-data="{
                      get allNotes() {
-                         if (!notesGroupedBySection || !Array.isArray(notesGroupedBySection)) {
+                         try {
+                             const grouped = notesGroupedBySection;
+                             if (!grouped || !Array.isArray(grouped)) {
+                                 return [];
+                             }
+                             return grouped.flatMap(g =>
+                                 (g?.sections || []).flatMap(s => s?.notes || [])
+                             ).filter(note => note && note.id !== undefined && note.id !== null);
+                         } catch (e) {
                              return [];
                          }
-                         return notesGroupedBySection.flatMap(g =>
-                             (g?.sections || []).flatMap(s => s?.notes || [])
-                         ).filter(note => note && note.id !== undefined && note.id !== null);
                      }
                  }">
 
