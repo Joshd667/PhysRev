@@ -304,10 +304,7 @@ export const flashcardManagementMethods = {
 
         deck.pinned = !deck.pinned;
         deck.updatedAt = new Date().toISOString();
-        
-        // Force reactivity by reassigning the object
-        this.flashcardDecks = { ...this.flashcardDecks };
-        
+
         this.saveFlashcardDecks();
 
         // Refresh icons
