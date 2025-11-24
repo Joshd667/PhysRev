@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +16,7 @@
     <link rel="stylesheet" href="../css/style.css">
     <script defer src="https://unpkg.com/lucide@0.546.0/dist/umd/lucide.min.js"></script>
 </head>
+
 <body class="bg-gray-50 dark:bg-gray-900 min-h-screen">
     <!-- Header -->
     <div class="animated-gradient text-white py-6 px-4">
@@ -24,7 +26,8 @@
                     <i data-lucide="database" class="w-10 h-10"></i>
                     <h1 class="text-3xl font-bold">CSV to JSON Converter</h1>
                 </div>
-                <a href="index.html" class="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg backdrop-blur-sm transition-colors">
+                <a href="index.html"
+                    class="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg backdrop-blur-sm transition-colors">
                     <i data-lucide="arrow-left" class="w-4 h-4"></i>
                     <span>Back</span>
                 </a>
@@ -52,18 +55,14 @@
 
         <!-- Mode Tabs -->
         <div class="flex gap-2 mb-6 border-b border-gray-200 dark:border-gray-700">
-            <button
-                onclick="switchMode('server')"
-                id="serverTab"
+            <button onclick="switchMode('server')" id="serverTab"
                 class="mode-tab px-6 py-3 font-medium text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 dark:border-blue-400 transition-colors">
                 <div class="flex items-center gap-2">
                     <i data-lucide="server" class="w-4 h-4"></i>
                     <span>Server Mode</span>
                 </div>
             </button>
-            <button
-                onclick="switchMode('local')"
-                id="localTab"
+            <button onclick="switchMode('local')" id="localTab"
                 class="mode-tab px-6 py-3 font-medium text-gray-500 dark:text-gray-400 border-b-2 border-transparent hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
                 <div class="flex items-center gap-2">
                     <i data-lucide="hard-drive" class="w-4 h-4"></i>
@@ -79,12 +78,11 @@
                     <i data-lucide="server" class="w-5 h-5 text-gray-600 dark:text-gray-400 mt-0.5"></i>
                     <div>
                         <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Server Mode</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Fetches CSV files from your running web server</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Fetches CSV files from your running web
+                            server</p>
                     </div>
                 </div>
-                <button
-                    id="convertBtnServer"
-                    onclick="convertAllCSVs()"
+                <button id="convertBtnServer" onclick="convertAllCSVs()"
                     class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2">
                     <i data-lucide="play-circle" class="w-5 h-5"></i>
                     <span>Convert CSVs from Server</span>
@@ -99,26 +97,24 @@
                     <i data-lucide="hard-drive" class="w-5 h-5 text-gray-600 dark:text-gray-400 mt-0.5"></i>
                     <div>
                         <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Local Mode</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">Upload CSV files from your computer (works offline)</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">Upload CSV files from your computer (works
+                            offline)</p>
                     </div>
                 </div>
 
-                <div
-                    id="dropZone"
-                    onclick="document.getElementById('fileInput').click()"
+                <div id="dropZone" onclick="document.getElementById('fileInput').click()"
                     class="border-3 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 rounded-lg p-12 text-center cursor-pointer transition-all hover:bg-blue-50 dark:hover:bg-blue-900/10">
                     <i data-lucide="upload-cloud" class="w-16 h-16 mx-auto mb-4 text-gray-400"></i>
                     <p class="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">Drop CSV files here</p>
                     <p class="text-sm text-gray-500 dark:text-gray-400">or click to select files</p>
-                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">Select all 16 CSV files (10 subject + 5 resource + groups.csv)</p>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mt-2">Select all 16 CSV files (10 subject + 5
+                        resource + groups.csv)</p>
                 </div>
 
-                <input type="file" id="fileInput" multiple accept=".csv" class="hidden" onchange="handleFileSelect(event)">
+                <input type="file" id="fileInput" multiple accept=".csv" class="hidden"
+                    onchange="handleFileSelect(event)">
 
-                <button
-                    id="convertBtnLocal"
-                    onclick="convertLocalCSVs()"
-                    disabled
+                <button id="convertBtnLocal" onclick="convertLocalCSVs()" disabled
                     class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-lg transition-colors flex items-center justify-center gap-2 mt-4">
                     <i data-lucide="play-circle" class="w-5 h-5"></i>
                     <span>Convert Selected Files</span>
@@ -129,8 +125,7 @@
         <!-- Progress Bar -->
         <div id="progressContainer" class="hidden mb-6">
             <div class="bg-gray-200 dark:bg-gray-700 rounded-full h-6 overflow-hidden">
-                <div
-                    id="progressBar"
+                <div id="progressBar"
                     class="bg-green-600 h-full text-white text-xs font-medium flex items-center justify-center transition-all duration-300"
                     style="width: 0%">
                     0%
@@ -139,10 +134,7 @@
         </div>
 
         <!-- Download Button -->
-        <button
-            id="downloadBtn"
-            onclick="downloadJSON()"
-            disabled
+        <button id="downloadBtn" onclick="downloadJSON()" disabled
             class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold px-8 py-4 rounded-lg transition-colors flex items-center justify-center gap-3 mb-6 text-lg">
             <i data-lucide="download" class="w-6 h-6"></i>
             <span>Download combined-data.json</span>
@@ -179,7 +171,7 @@
         }
 
         // Mode switching
-        window.switchMode = function(mode) {
+        window.switchMode = function (mode) {
             currentMode = mode;
 
             // Update tabs
@@ -301,7 +293,7 @@
         }
 
         // SERVER MODE: Convert all CSVs
-        window.convertAllCSVs = async function() {
+        window.convertAllCSVs = async function () {
             const convertBtn = document.getElementById('convertBtnServer');
             const downloadBtn = document.getElementById('downloadBtn');
 
@@ -362,6 +354,7 @@
                     specificationData,
                     resourceData,
                     revisionMappings: revisionMappings,
+                    revisionSectionTitles: revisionMappings.revisionSectionTitles,
                     paperModeGroups: groups.paperModeGroups,
                     specModeGroups: groups.specModeGroups,
                     buildTime: new Date().toISOString(),
@@ -415,7 +408,7 @@
             handleFiles(files);
         }, false);
 
-        window.handleFileSelect = function(e) {
+        window.handleFileSelect = function (e) {
             const files = e.target.files;
             handleFiles(files);
         };
@@ -458,7 +451,7 @@
         }
 
         // LOCAL MODE: Convert local CSV files
-        window.convertLocalCSVs = async function() {
+        window.convertLocalCSVs = async function () {
             const convertBtn = document.getElementById('convertBtnLocal');
             const downloadBtn = document.getElementById('downloadBtn');
 
@@ -565,6 +558,7 @@
                     specificationData,
                     resourceData,
                     revisionMappings: revisionMappings,
+                    revisionSectionTitles: revisionMappings.revisionSectionTitles,
                     paperModeGroups: groups.paperModeGroups,
                     specModeGroups: groups.specModeGroups,
                     buildTime: new Date().toISOString(),
@@ -594,7 +588,7 @@
         };
 
         // Download JSON
-        window.downloadJSON = function() {
+        window.downloadJSON = function () {
             if (!combinedData) {
                 addStatus('❌ No data to download. Run conversion first.', 'error');
                 return;
@@ -619,4 +613,5 @@
         };
     </script>
 </body>
+
 </html>
