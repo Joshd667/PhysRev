@@ -87,7 +87,7 @@ export const navigationMethods = {
             this.setMindmapsFilterSection(sectionKey);
             // Don't hide sidebar on mobile for mindmaps view
         } else {
-            // Default behavior for audit view
+            // Default behavior for audit view - show topic cards
             this.showingSpecificSection = true;
             this.showingMainMenu = false;
             this.showingRevision = false;

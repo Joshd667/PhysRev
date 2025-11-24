@@ -1,6 +1,6 @@
 import { logger } from './utils/logger.js';
 
-(async function() {
+(async function () {
     try {
         const url = new URL(window.location.href);
         if (url.searchParams.has('_refresh')) {
@@ -60,6 +60,10 @@ import { logger } from './utils/logger.js';
         const { registerPaginationHelpers } = await import('./components/paginated-list.js');
         registerPaginationHelpers(Alpine);
 
+        // Initialize deduplication utilities for Alpine templates
+        const { initializeDeduplicationUtils } = await import('./utils/deduplication.js');
+        initializeDeduplicationUtils();
+
         Alpine.data('physicsAuditTool', createApp(
             dataResult.specificationData,
             dataResult.paperModeGroups,
@@ -68,7 +72,7 @@ import { logger } from './utils/logger.js';
         ));
 
         const originalEvaluate = Alpine.evaluate;
-        Alpine.evaluate = function(el, expression, extras = {}) {
+        Alpine.evaluate = function (el, expression, extras = {}) {
             try {
                 return originalEvaluate.call(this, el, expression, extras);
             } catch (error) {
@@ -102,15 +106,15 @@ import { logger } from './utils/logger.js';
 async function loadDataWithFallback() {
     try {
         const startTime = performance.now();
-        
+
         const response = await fetch('./resources/combined-data.json', {
             cache: 'default'
         });
-        
+
         if (!response.ok) {
             throw new Error(`JSON not available (${response.status})`);
         }
-        
+
         const data = await response.json();
 
         window.getResourcesForSection = await createOptimizedResourceGetter(data.resourceData);
@@ -118,7 +122,7 @@ async function loadDataWithFallback() {
         if (data.revisionMappings) {
             window.revisionMapping = data.revisionMappings.revisionMapping || {};
             window.topicToSectionMapping = data.revisionMappings.topicToSectionMapping || {};
-            window.revisionSectionTitles = data.revisionSectionTitles || {};
+            window.revisionSectionTitles = data.revisionMappings.revisionSectionTitles || {};
         } else {
             window.revisionMapping = {};
             window.topicToSectionMapping = {};
@@ -145,20 +149,20 @@ async function loadDataWithFallback() {
             specModeGroups: specModeGroups
         };
 
-        } catch (jsonError) {
-            // Import and use existing CSV loader
-            const { loadAllData, getResourcesForSection } = await import('./data/unified-csv-loader.js');
-            const result = await loadAllData();
+    } catch (jsonError) {
+        // Import and use existing CSV loader
+        const { loadAllData, getResourcesForSection } = await import('./data/unified-csv-loader.js');
+        const result = await loadAllData();
 
-            window.getResourcesForSection = getResourcesForSection;
+        window.getResourcesForSection = getResourcesForSection;
 
-            return {
-                specificationData: result.specificationData,
-                resourcesLoaded: result.resourcesLoaded,
-                paperModeGroups: result.paperModeGroups,
-                specModeGroups: result.specModeGroups
-            };
-        }
+        return {
+            specificationData: result.specificationData,
+            resourcesLoaded: result.resourcesLoaded,
+            paperModeGroups: result.paperModeGroups,
+            specModeGroups: result.specModeGroups
+        };
+    }
 }
 
 async function createOptimizedResourceGetter(resourceData) {

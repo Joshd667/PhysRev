@@ -57,6 +57,12 @@
 |-------|-------------|------------|
 | **[DEPLOYMENT.md](DEPLOYMENT.md)** | Production deployment guide and checklists | Generating optimized JSON, Service Worker versioning, hosting options (GitHub Pages, Netlify, Vercel) |
 
+#### Performance & Optimization
+
+| Guide | Description | Key Topics |
+|-------|-------------|------------|
+| **[PERFORMANCE.md](PERFORMANCE.md)** | Performance optimization strategies and best practices | Memory optimization, intelligent caching, deduplication, rendering performance, monitoring |
+
 #### Specialized Topics
 
 | Guide | Description | Key Topics |
@@ -69,6 +75,7 @@
 
 | Guide | Description | When to Use |
 |-------|-------------|-------------|
+| **[TEAMS_LOGIN_INTEGRATION.md](TEAMS_LOGIN_INTEGRATION.md)** | Technical guide for Microsoft Teams login integration with Azure database options | Understanding architecture, choosing database options (SQL/Cosmos/Graph), implementing secure authentication and data storage |
 | **[TEAMS_AUTH_SETUP.md](TEAMS_AUTH_SETUP.md)** | Microsoft Teams authentication configuration and Azure AD setup | Setting up organizational authentication, configuring OAuth, troubleshooting Teams login |
 
 > **Current Status:** Teams authentication uses placeholder credentials and should be disabled until Azure AD is configured. Guest mode is fully functional.
@@ -114,6 +121,13 @@
 - **CSV to JSON Pipeline:** [DATA_ARCHITECTURE.md](DATA_ARCHITECTURE.md#data-flow-architecture)
 
 ### Performance Optimization
+- **Performance Guide Overview:** [PERFORMANCE.md](PERFORMANCE.md)
+- **Memory Optimization:** [PERFORMANCE.md](PERFORMANCE.md#memory-optimization-non-reactive-static-data)
+- **Intelligent Caching:** [PERFORMANCE.md](PERFORMANCE.md#rendering-optimization-intelligent-caching)
+- **Deduplication:** [PERFORMANCE.md](PERFORMANCE.md#deduplication-preventing-duplicate-rendering)
+- **Service Worker Caching:** [PERFORMANCE.md](PERFORMANCE.md#service-worker-offline--instant-loading)
+- **IndexedDB Storage:** [PERFORMANCE.md](PERFORMANCE.md#indexeddb-asynchronous-storage)
+- **Web Workers:** [PERFORMANCE.md](PERFORMANCE.md#web-workers-background-serialization)
 - **Non-Reactive Static Data:** [ARCHITECTURE.md](ARCHITECTURE.md#performance-architecture-non-reactive-static-data)
 - **JSON Optimization:** [DATA_ARCHITECTURE.md](DATA_ARCHITECTURE.md#json-optimization)
 - **Pagination System:** [PAGINATION_USAGE.md](PAGINATION_USAGE.md)
@@ -138,6 +152,7 @@
 - **Troubleshooting:** [DEPLOYMENT.md](DEPLOYMENT.md#troubleshooting)
 
 ### Authentication
+- **Teams Login Integration:** [TEAMS_LOGIN_INTEGRATION.md](TEAMS_LOGIN_INTEGRATION.md) (Technical guide with Azure database options)
 - **Teams Auth Setup:** [TEAMS_AUTH_SETUP.md](TEAMS_AUTH_SETUP.md)
 - **Azure AD Configuration:** [TEAMS_AUTH_SETUP.md](TEAMS_AUTH_SETUP.md#step-1-azure-ad-app-registration)
 - **Disabling Teams Login:** [TEAMS_AUTH_SETUP.md](TEAMS_AUTH_SETUP.md#option-1-disable-teams-login)
@@ -165,6 +180,7 @@
 - ✅ **Development Setup** - Complete
 - ✅ **Testing Procedures** - Complete
 - ✅ **Deployment Guide** - Complete
+- ✅ **Performance Optimization** - Complete
 - ✅ **Content Management** - Complete (standalone for educators)
 - ✅ **Console Reference** - Complete
 - ✅ **Data Architecture** - Complete
@@ -197,6 +213,9 @@ All cross-links have been validated. External documentation links point to:
 ### "I need to debug an issue"
 1. **[CONSOLE_COMMANDS.md](CONSOLE_COMMANDS.md#debug-logging)** - Enable debug mode
 2. **[CONSOLE_COMMANDS.md](CONSOLE_COMMANDS.md#common-debugging-workflows)** - Follow relevant workflow
+
+### "The app is running slowly"
+→ **[PERFORMANCE.md](PERFORMANCE.md)** - Complete performance optimization guide with troubleshooting
 3. **[DEVELOPMENT.md](DEVELOPMENT.md#troubleshooting)** - Check common issues
 
 ### "I want to understand how data loading works"
@@ -267,6 +286,6 @@ When updating documentation:
 
 ---
 
-**Last Updated:** 2025-11-21
-**Documentation Version:** 1.0
-**Total Guides:** 10
+**Last Updated:** 2025-11-23
+**Documentation Version:** 1.1
+**Total Guides:** 11

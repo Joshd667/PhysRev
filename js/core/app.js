@@ -298,19 +298,37 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                     this._cachedBannerTitle = 'Learning Analytics Dashboard';
                     this._cachedBannerIcon = 'bar-chart-3';
                 } else if (this.showingRevision) {
-                    this._cachedBannerTitle = 'Revision: ' + this.currentRevisionSectionTitle;
+                    this._cachedBannerTitle = this.currentRevisionSectionTitle;
                     this._cachedBannerIcon = 'book-open';
                 } else if (this.viewType === 'notes') {
-                    this._cachedBannerTitle = 'Notes';
+                    if (this.contentFilterSection) {
+                        this._cachedBannerTitle = this.specificationData[this.contentFilterSection]?.title || 'Notes';
+                    } else if (this.contentFilterGroup) {
+                        this._cachedBannerTitle = this.contentFilterGroup;
+                    } else {
+                        this._cachedBannerTitle = 'Notes';
+                    }
                     this._cachedBannerIcon = 'file-text';
                 } else if (this.viewType === 'flashcards' && this.showTestArea) {
                     this._cachedBannerTitle = 'Test Area';
                     this._cachedBannerIcon = 'clipboard-check';
                 } else if (this.viewType === 'flashcards') {
-                    this._cachedBannerTitle = 'Flashcards';
+                    if (this.contentFilterSection) {
+                        this._cachedBannerTitle = this.specificationData[this.contentFilterSection]?.title || 'Flashcards';
+                    } else if (this.contentFilterGroup) {
+                        this._cachedBannerTitle = this.contentFilterGroup;
+                    } else {
+                        this._cachedBannerTitle = 'Flashcards';
+                    }
                     this._cachedBannerIcon = 'layers';
                 } else if (this.viewType === 'mindmaps') {
-                    this._cachedBannerTitle = 'Mindmaps';
+                    if (this.contentFilterSection) {
+                        this._cachedBannerTitle = this.specificationData[this.contentFilterSection]?.title || 'Mindmaps';
+                    } else if (this.contentFilterGroup) {
+                        this._cachedBannerTitle = this.contentFilterGroup;
+                    } else {
+                        this._cachedBannerTitle = 'Mindmaps';
+                    }
                     this._cachedBannerIcon = 'network';
                 } else if (this.showingMainMenu) {
                     if (this.viewMode === 'spec') {
@@ -349,32 +367,32 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                     this.sidebarVisible = true;
 
                     this._resizeHandler = () => {
-                    if (window.innerWidth >= 768) this.sidebarVisible = true;
+                        if (window.innerWidth >= 768) this.sidebarVisible = true;
                     };
                     window.addEventListener('resize', this._resizeHandler);
 
                     this._onlineHandler = () => {
-                    this.isOnline = true;
-                };
-                this._offlineHandler = () => {
-                    this.isOnline = false;
-                };
+                        this.isOnline = true;
+                    };
+                    this._offlineHandler = () => {
+                        this.isOnline = false;
+                    };
                     window.addEventListener('online', this._onlineHandler);
                     window.addEventListener('offline', this._offlineHandler);
 
                     this.$watch('$el', (value, oldValue) => {
-                    if (!value && oldValue) {
-                        if (this._resizeHandler) {
-                            window.removeEventListener('resize', this._resizeHandler);
-                            this._resizeHandler = null;
+                        if (!value && oldValue) {
+                            if (this._resizeHandler) {
+                                window.removeEventListener('resize', this._resizeHandler);
+                                this._resizeHandler = null;
+                            }
+                            if (this._onlineHandler) {
+                                window.removeEventListener('online', this._onlineHandler);
+                                window.removeEventListener('offline', this._offlineHandler);
+                                this._onlineHandler = null;
+                                this._offlineHandler = null;
+                            }
                         }
-                        if (this._onlineHandler) {
-                            window.removeEventListener('online', this._onlineHandler);
-                            window.removeEventListener('offline', this._offlineHandler);
-                            this._onlineHandler = null;
-                            this._offlineHandler = null;
-                        }
-                    }
                     });
 
                     setupWatchers(this);
@@ -621,7 +639,7 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
             clearAllData() {
                 enhancedDataManagement.clearAllData.call(this);
             },
-            
+
             exportDataBackup() {
                 enhancedDataManagement.exportDataBackup.call(this);
             },
@@ -722,9 +740,9 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 if (window.renderMathInElement) {
                     window.renderMathInElement(div, {
                         delimiters: [
-                            {left: "$$", right: "$$", display: true},
-                            {left: "\\(", right: "\\)", display: false},
-                            {left: "\\[", right: "\\]", display: true}
+                            { left: "$$", right: "$$", display: true },
+                            { left: "\\(", right: "\\)", display: false },
+                            { left: "\\[", right: "\\]", display: true }
                         ],
                         throwOnError: false
                     });
@@ -743,19 +761,19 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
                 if (typeof DOMPurify !== 'undefined') {
                     const strictConfig = {
                         ALLOWED_TAGS: ['b', 'i', 'u', 's', 'strong', 'em', 'p', 'br', 'ul', 'ol', 'li',
-                                       'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-                                       'table', 'thead', 'tbody', 'tr', 'td', 'th',
-                                       'blockquote', 'code', 'pre', 'span', 'div',
-                                       'hr', 'mark'],
+                            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+                            'table', 'thead', 'tbody', 'tr', 'td', 'th',
+                            'blockquote', 'code', 'pre', 'span', 'div',
+                            'hr', 'mark'],
                         ALLOWED_ATTR: ['class', 'data-latex'],
                         FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'link', 'style',
-                                      'form', 'input', 'button', 'textarea', 'select',
-                                      'frame', 'frameset', 'base', 'meta', 'svg'],
+                            'form', 'input', 'button', 'textarea', 'select',
+                            'frame', 'frameset', 'base', 'meta', 'svg'],
                         FORBID_ATTR: ['onerror', 'onclick', 'onload', 'onmouseover', 'onfocus', 'onblur',
-                                      'oninput', 'onchange', 'onsubmit', 'onreset', 'onkeydown', 'onkeyup',
-                                      'onkeypress', 'onmousedown', 'onmouseup', 'onmousemove', 'onmouseenter',
-                                      'onmouseleave', 'onwheel', 'ondrag', 'ondrop', 'onscroll',
-                                      'style', 'src', 'href', 'xlink:href'],
+                            'oninput', 'onchange', 'onsubmit', 'onreset', 'onkeydown', 'onkeyup',
+                            'onkeypress', 'onmousedown', 'onmouseup', 'onmousemove', 'onmouseenter',
+                            'onmouseleave', 'onwheel', 'ondrag', 'ondrop', 'onscroll',
+                            'style', 'src', 'href', 'xlink:href'],
                         ALLOW_DATA_ATTR: false,
                         ALLOW_UNKNOWN_PROTOCOLS: false,
                         SAFE_FOR_TEMPLATES: true,
@@ -790,7 +808,7 @@ export function createApp(specificationData, paperModeGroups, specModeGroups, Al
 
             throttle(func, limit) {
                 let inThrottle;
-                return function(...args) {
+                return function (...args) {
                     if (!inThrottle) {
                         func.apply(this, args);
                         inThrottle = true;
