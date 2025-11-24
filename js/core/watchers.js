@@ -40,9 +40,10 @@ export function setupWatchers(app) {
 
     // ⚡ PERFORMANCE: Banner cache invalidation watchers (reduces initial RAM spike by 25-35MB)
     const bannerDependencies = ['searchVisible', 'showingAnalytics', 'showingRevision',
-                                 'viewType', 'showingMainMenu', 'lastExpandedGroup',
-                                 'showingSpecificSection', 'viewMode', 'selectedPaper',
-                                 'showTestArea', 'currentRevisionSectionTitle'];
+        'viewType', 'showingMainMenu', 'lastExpandedGroup',
+        'showingSpecificSection', 'viewMode', 'selectedPaper',
+        'showTestArea', 'currentRevisionSectionTitle', 'activeSection',
+        'contentFilterSection', 'contentFilterGroup'];
     bannerDependencies.forEach(prop => {
         app.$watch(prop, () => { app._bannerCacheDirty = true; });
     });
