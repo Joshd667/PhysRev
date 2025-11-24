@@ -95,7 +95,7 @@
             </div>
 
             <!-- List View -->
-            <div class="space-y-6 -mt-6" x-show="notesViewMode === 'list' && !getNotePreview()">
+            <div class="space-y-6 -mt-6" x-show="notesViewMode === 'list' && !getNotePreview()" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
                 <template x-for="group in notesGroupedBySection" :key="group.groupTitle">
                     <div x-data="{ groupExpanded: true }">
                         <button @click="groupExpanded = !groupExpanded" class="w-full flex items-center justify-between mb-4 pb-3 border-b-4 border-blue-600 dark:border-blue-500 hover:opacity-80 transition-opacity">
@@ -106,7 +106,7 @@
                                 <i :data-lucide="group.groupIcon" class="w-6 h-6 text-blue-600 dark:text-blue-400"></i>
                                 <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200" x-text="group.groupTitle"></h2>
                             </div>
-                            <span class="text-sm text-slate-500 dark:text-slate-400" x-text="`${group.sections.reduce((sum, s) => sum + s.notes.length, 0)} ${group.sections.reduce((sum, s) => sum + s.notes.length, 0) === 1 ? 'note' : 'notes'}`"></span>
+                            <span class="text-sm text-slate-500 dark:text-slate-400" x-data="{ count: group.sections.reduce((sum, s) => sum + s.notes.length, 0) }" x-text="`${count} ${count === 1 ? 'note' : 'notes'}`"></span>
                         </button>
 
                         <div x-show="groupExpanded" class="ml-6 space-y-6">
@@ -182,27 +182,54 @@
             </div>
 
             <!-- Card View -->
-            <!-- Show all notes without pagination -->
+            <!-- PERFORMANCE: Show all notes with caching and deduplication -->
+            <!-- WHY: Notes with multiple tags appear in multiple sections, causing duplicate
+                      IDs in x-for loops. We deduplicate using the shared utility with caching
+                      to avoid recalculation on every render. -->
             <div x-show="notesViewMode === 'card' && !getNotePreview()"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
                  x-data="{
+                     _cachedNotes: null,
+                     _notesCacheKey: null,
+
                      get allNotes() {
-                         if (!notesGroupedBySection || !Array.isArray(notesGroupedBySection)) {
-                             return [];
+                         // PERFORMANCE: O(1) for cache hits, O(n) for cache misses
+                         // Generate lightweight cache key based on group structure
+                         const currentKey = JSON.stringify(
+                             (notesGroupedBySection || []).map(g => g.groupTitle + ':' + (g.sections || []).length)
+                         );
+
+                         // Return cached result if structure hasn't changed
+                         if (this._notesCacheKey === currentKey && this._cachedNotes) {
+                             return this._cachedNotes;
                          }
-                         return notesGroupedBySection.flatMap(g =>
-                             (g?.sections || []).flatMap(s => s?.notes || [])
-                         ).filter(note => note && note.id !== undefined && note.id !== null);
+
+                         // Recalculate using shared utility (handles null checks and deduplication)
+                         this._cachedNotes = window.flattenAndDeduplicate(notesGroupedBySection, 'notes');
+                         this._notesCacheKey = currentKey;
+
+                         return this._cachedNotes;
                      }
                  }">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); })" x-effect="if (notesViewMode === 'card' && window.lucide) { $nextTick(() => lucide.createIcons()); }">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                     role="list"
+                     aria-label="Notes in card view"
+                     x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); })"
+                     x-effect="if (notesViewMode === 'card' && window.lucide) { $nextTick(() => lucide.createIcons()); }">
                     <template x-for="note in allNotes" :key="note.id">
-                            <div :data-note-id="note.id" class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-2 hover:shadow-lg transition-all flex flex-col h-full" :class="note.pinned ? 'border-yellow-400 dark:border-yellow-500' : 'border-blue-200 dark:border-blue-700'">
+                            <div :data-note-id="note.id"
+                                 role="article"
+                                 :aria-label="`Note: ${note.title}`"
+                                 class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-2 hover:shadow-lg transition-all flex flex-col h-full"
+                                 :class="note.pinned ? 'border-yellow-400 dark:border-yellow-500' : 'border-blue-200 dark:border-blue-700'">
                                 <div class="p-6 flex-1 flex flex-col">
                                     <!-- Header with Actions -->
-                                    <div class="flex items-start justify-between mb-3">
-                                        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 flex-1" x-text="note.title"></h3>
-                                        <div class="flex items-center gap-1 ml-2 flex-shrink-0">
+                                    <div class="flex items-start justify-between mb-3 gap-2">
+                                        <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 flex-1 truncate" x-text="note.title" :title="note.title"></h3>
+                                        <div class="flex items-center gap-1 flex-shrink-0">
                                             <button @click="editNote(note.id)" class="p-1.5 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded transition-colors" title="Edit">
                                                 <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>

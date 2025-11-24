@@ -119,7 +119,7 @@
                         <i :data-lucide="group.groupIcon" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
                         <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200" x-text="group.groupTitle"></h2>
                     </div>
-                    <span class="text-sm text-slate-500 dark:text-slate-400" x-text="`${group.sections.reduce((sum, s) => sum + s.decks.length, 0)} ${group.sections.reduce((sum, s) => sum + s.decks.length, 0) === 1 ? 'deck' : 'decks'}`"></span>
+                    <span class="text-sm text-slate-500 dark:text-slate-400" x-data="{ count: group.sections.reduce((sum, s) => sum + s.decks.length, 0) }" x-text="`${count} ${count === 1 ? 'deck' : 'decks'}`"></span>
                 </button>
 
                 <!-- Sections within this group -->
@@ -186,8 +186,11 @@
                                                 <template x-if="!deck.cards || deck.cards.length === 0">
                                                     <p class="text-sm text-gray-500 dark:text-gray-400 italic">No cards in this deck</p>
                                                 </template>
-                                                <!-- ✅ FIX: Use stable key (deckId + card content) instead of array index -->
-                                                <template x-for="(card, index) in deck.cards" :key="`${deck.id}-card-${index}-${(card.front || '').substring(0, 30)}`">
+                                                <!-- STABILITY: Use hash of card content for stable unique keys -->
+                                                <!-- WHY: Cards don't have IDs. Using index causes instability on reorder.
+                                                          Using substring(0,30) causes collisions if multiple cards
+                                                          start with the same text. Hash function ensures uniqueness. -->
+                                                <template x-for="(card, index) in deck.cards" :key="window.generateCardKey(deck.id, card, index)">
                                                     <div class="grid grid-cols-2 gap-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                                                         <!-- Front Column -->
                                                         <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800">
@@ -225,16 +228,32 @@
         </div>
 
         <!-- Card View Mode -->
-        <!-- ✅ PAGINATION: Flatten and paginate flashcard decks -->
+        <!-- PERFORMANCE: Flatten and paginate flashcard decks with caching -->
+        <!-- WHY: Decks with multiple tags appear in multiple sections, causing duplicate
+                  IDs in x-for loops. We deduplicate using the shared utility with caching
+                  to avoid recalculation on every render. -->
         <div x-show="flashcardsGroupedBySection.length > 0 && flashcardViewMode === 'card'"
              x-data="{
+                 _cachedDecks: null,
+                 _decksCacheKey: null,
+
                  get allDecks() {
-                     if (!flashcardsGroupedBySection || !Array.isArray(flashcardsGroupedBySection)) {
-                         return [];
+                     // PERFORMANCE: O(1) for cache hits, O(n) for cache misses
+                     // Generate lightweight cache key based on group structure
+                     const currentKey = JSON.stringify(
+                         (flashcardsGroupedBySection || []).map(g => g.groupTitle + ':' + (g.sections || []).length)
+                     );
+
+                     // Return cached result if structure hasn't changed
+                     if (this._decksCacheKey === currentKey && this._cachedDecks) {
+                         return this._cachedDecks;
                      }
-                     return flashcardsGroupedBySection.flatMap(g =>
-                         (g?.sections || []).flatMap(s => s?.decks || [])
-                     ).filter(deck => deck && deck.id !== undefined && deck.id !== null);
+
+                     // Recalculate using shared utility (handles null checks and deduplication)
+                     this._cachedDecks = window.flattenAndDeduplicate(flashcardsGroupedBySection, 'decks');
+                     this._decksCacheKey = currentKey;
+
+                     return this._cachedDecks;
                  },
                  deckPagination: null
              }"
@@ -245,14 +264,21 @@
                 Showing <span x-text="deckPagination.visibleItems.length"></span> of <span x-text="deckPagination.totalCount"></span> decks
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); })" x-effect="if (flashcardViewMode === 'card' && window.lucide) { $nextTick(() => lucide.createIcons()); }">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                 role="list"
+                 aria-label="Flashcard decks in card view"
+                 x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); })"
+                 x-effect="if (flashcardViewMode === 'card' && window.lucide) { $nextTick(() => lucide.createIcons()); }">
                 <template x-for="deck in (deckPagination ? deckPagination.visibleItems : allDecks)" :key="deck.id">
-                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-2 hover:shadow-lg transition-all flex flex-col h-full" :class="deck.pinned ? 'border-yellow-400 dark:border-yellow-500' : 'border-gray-200 dark:border-gray-700'">
+                        <div role="article"
+                             :aria-label="`Flashcard deck: ${deck.name}`"
+                             class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-2 hover:shadow-lg transition-all flex flex-col h-full"
+                             :class="deck.pinned ? 'border-yellow-400 dark:border-yellow-500' : 'border-gray-200 dark:border-gray-700'">
                             <div class="p-6 flex-1 flex flex-col">
                                 <!-- Header with Actions -->
-                                <div class="flex items-start justify-between mb-3">
-                                    <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 flex-1" x-text="deck.name"></h3>
-                                    <div class="flex items-center gap-1 ml-2 flex-shrink-0">
+                                <div class="flex items-start justify-between mb-3 gap-2">
+                                    <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200 flex-1 truncate" x-text="deck.name" :title="deck.name"></h3>
+                                    <div class="flex items-center gap-1 flex-shrink-0">
                                         <button @click="editFlashcardDeck(deck.id)" class="p-1.5 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded transition-colors" title="Edit">
                                             <svg class="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>

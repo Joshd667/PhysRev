@@ -21,12 +21,12 @@
          class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-3xl flex flex-col overflow-hidden">
 
         <!-- Header -->
-        <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex items-center space-x-3">
-                <i data-lucide="brain" class="w-6 h-6 text-purple-600 dark:text-purple-400"></i>
-                <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200" x-text="currentTestTitle"></h2>
+        <div class="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 gap-4">
+            <div class="flex items-center space-x-3 flex-1 min-w-0">
+                <i data-lucide="brain" class="w-6 h-6 text-purple-600 dark:text-purple-400 flex-shrink-0"></i>
+                <h2 class="text-2xl font-bold text-slate-800 dark:text-slate-200 truncate" x-text="currentTestTitle" :title="currentTestTitle"></h2>
             </div>
-            <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-4 flex-shrink-0">
                 <!-- Shuffle Button -->
                 <button @click.stop="shuffleTestCards()" class="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium" title="Shuffle cards">
                     <i data-lucide="shuffle" class="w-4 h-4"></i>
