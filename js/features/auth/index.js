@@ -4,6 +4,10 @@
 import { guestAuthMethods } from './guest.js';
 import { logger } from '../../utils/logger.js';
 
+// Backend authentication exports (NEW - for Teams backend integration)
+export { authBackend } from './auth-backend.js';
+export { apiClient, authAPI, userDataAPI, BackgroundSyncManager } from './api-client.js';
+
 let teamsAuthMethods = null;
 
 export async function loadAuthMethods() {
@@ -11,7 +15,7 @@ export async function loadAuthMethods() {
     const authMethods = { ...guestAuthMethods };
 
     // Add lazy Teams auth loader
-    authMethods.loadTeamsAuth = async function(authData) {
+    authMethods.loadTeamsAuth = async function (authData) {
         if (!teamsAuthMethods) {
             logger.log('⚡ Lazy loading Teams auth module...');
             const teamsModule = await import('./teams.js');
@@ -27,7 +31,7 @@ export async function loadAuthMethods() {
     };
 
     // Add Teams login method that lazy-loads the Teams module
-    authMethods.loginWithTeams = async function() {
+    authMethods.loginWithTeams = async function () {
         if (!teamsAuthMethods) {
             logger.log('⚡ Lazy loading Teams auth module...');
             const teamsModule = await import('./teams.js');
@@ -41,7 +45,7 @@ export async function loadAuthMethods() {
     };
 
     // Initiate Teams login - checks privacy notice first
-    authMethods.initiateTeamsLogin = async function() {
+    authMethods.initiateTeamsLogin = async function () {
         try {
             const { idbGet } = await import('../../utils/indexeddb.js');
             const hasSeenNotice = await idbGet('privacyNoticeSeen');

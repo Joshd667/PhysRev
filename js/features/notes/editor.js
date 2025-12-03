@@ -79,7 +79,9 @@ export const noteEditorMethods = {
         const range = selection.getRangeAt(0);
         const selectedText = range.toString() || 'Quote text here...';
 
-        const blockquoteHTML = `<blockquote style="border-left: 4px solid #cbd5e1; padding-left: 16px; margin: 12px 0; color: #64748b; font-style: italic;">${selectedText}</blockquote>`;
+        // ✅ SECURITY: Escape user selection before HTML insertion
+        const escapedText = this.escapeHtml(selectedText);
+        const blockquoteHTML = `<blockquote style="border-left: 4px solid #cbd5e1; padding-left: 16px; margin: 12px 0; color: #64748b; font-style: italic;">${escapedText}</blockquote>`;
 
         range.deleteContents();
         const temp = document.createElement('div');
@@ -111,7 +113,9 @@ export const noteEditorMethods = {
         const range = selection.getRangeAt(0);
         const selectedText = range.toString() || 'code here';
 
-        const codeHTML = `<code style="background-color: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #dc2626;">${selectedText}</code>`;
+        // ✅ SECURITY: Escape user selection before HTML insertion
+        const escapedText = this.escapeHtml(selectedText);
+        const codeHTML = `<code style="background-color: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #dc2626;">${escapedText}</code>`;
 
         range.deleteContents();
         const temp = document.createElement('div');

@@ -873,7 +873,17 @@ export const mindmapCanvasMethods = {
                         editableEl = shapeEl;
                     }
                     if (editableEl) {
-                        editableEl.innerHTML = targetShape.content;
+                        // ✅ SECURITY: Sanitize user content before rendering
+                        if (window.DOMPurify) {
+                            editableEl.innerHTML = DOMPurify.sanitize(targetShape.content, {
+                                ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 's', 'span'],
+                                ALLOWED_ATTR: ['style'],
+                                ALLOW_DATA_ATTR: false
+                            });
+                        } else {
+                            // Fallback: use textContent if DOMPurify unavailable
+                            editableEl.textContent = targetShape.content;
+                        }
                     }
                 }
             } else {
