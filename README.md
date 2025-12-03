@@ -86,29 +86,30 @@ http://localhost:8000
 
 ### 📚 Start Here
 
-**[Complete Documentation Index](docs/guides/README.md)** - Comprehensive guide index organized by audience (educators, developers, admins) and topic
+**[Complete Documentation Index](docs/README.md)** - Comprehensive guide index organized by audience (educators, developers, admins) and topic
 
 ### Quick Links by Role
 
 **For Educators:**
-- **[Content Management](docs/guides/CONTENT_MANAGEMENT.md)** - Standalone guide for managing physics topics (no coding required)
+- **[Content Management](docs/CONTENT_MANAGEMENT.md)** - Standalone guide for managing physics topics (no coding required)
 
 **For Developers:**
-- **[Development Guide](docs/guides/DEVELOPMENT.md)** - Setup, tools, and workflow
-- **[Architecture Guide](docs/guides/ARCHITECTURE.md)** - Technical architecture and design patterns
-- **[Testing Guide](docs/guides/TESTING.md)** - Comprehensive testing procedures
+- **[Development Guide](docs/DEVELOPMENT.md)** - Setup, tools, and workflow
+- **[Architecture Guide](docs/ARCHITECTURE.md)** - Technical architecture and design patterns
+- **[Testing Guide](docs/TESTING.md)** - Comprehensive testing procedures
 - **[Developer Tools](tools/index.html)** - Dashboard with CSV converter, import tester, docs hub, and more
 
 **For System Administrators:**
-- **[Deployment Guide](docs/guides/DEPLOYMENT.md)** - Production deployment
-- **[Teams Authentication](docs/guides/TEAMS_AUTH_SETUP.md)** - Microsoft Teams login setup
+- **[Deployment Guide](docs/DEPLOYMENT.md)** - Production deployment
+- **[Teams Authentication Architecture](docs/TEAMS_AUTH_ARCHITECTURE.md)** - Teams authentication decision guide
+- **[Teams Authentication Implementation](docs/TEAMS_AUTH_IMPLEMENTATION.md)** - Step-by-step setup instructions
 
 ### All Documentation Guides
 
-- **[Console Commands](docs/guides/CONSOLE_COMMANDS.md)** - Browser console debugging reference
-- **[Data Architecture](docs/guides/DATA_ARCHITECTURE.md)** - Technical data implementation
-- **[Pagination Usage](docs/guides/PAGINATION_USAGE.md)** - Pagination system reference
-- **[Attribution](docs/guides/ATTRIBUTION.md)** - Third-party licenses
+- **[Console Commands](docs/CONSOLE_COMMANDS.md)** - Browser console debugging reference
+- **[Data Architecture](docs/DATA_ARCHITECTURE.md)** - Technical data implementation
+- **[Pagination Usage](docs/PAGINATION_USAGE.md)** - Pagination system reference
+- **[Attribution](docs/ATTRIBUTION.md)** - Third-party licenses
 
 ### Security & Compliance
 
@@ -142,7 +143,7 @@ http://localhost:8000
 - **CSV loading**: ~500ms (16 files)
 - **Offline**: Instant (Service Worker cache)
 
-For performance details, see [ARCHITECTURE.md](docs/guides/ARCHITECTURE.md).
+For performance details, see [ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ---
 
@@ -162,13 +163,13 @@ For performance details, see [ARCHITECTURE.md](docs/guides/ARCHITECTURE.md).
 - Avoid private/incognito mode
 - Check DevTools → Application → IndexedDB
 
-For more troubleshooting, see [DEVELOPMENT.md](docs/guides/DEVELOPMENT.md#troubleshooting).
+For more troubleshooting, see [DEVELOPMENT.md](docs/DEVELOPMENT.md#troubleshooting).
 
 ---
 
 ## 📦 Deployment
 
-See the [Deployment Guide](docs/guides/DEPLOYMENT.md) for:
+See the [Deployment Guide](docs/DEPLOYMENT.md) for:
 - GitHub Pages deployment
 - Custom domain setup
 - Production checklist
@@ -199,13 +200,13 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and detailed release notes.
 
 This software is proprietary. All rights reserved. See [LICENSE](LICENSE) for details.
 
-Third-party open-source libraries are used under their respective licenses. See [ATTRIBUTION.md](docs/guides/ATTRIBUTION.md).
+Third-party open-source libraries are used under their respective licenses. See [ATTRIBUTION.md](docs/ATTRIBUTION.md).
 
 ---
 
 ## 🤝 Contributing
 
-See [Architecture Notes](docs/guides/ARCHITECTURE.md) for design principles and patterns.
+See [Architecture Notes](docs/ARCHITECTURE.md) for design principles and patterns.
 
 ---
 
@@ -214,7 +215,7 @@ See [Architecture Notes](docs/guides/ARCHITECTURE.md) for design principles and 
 For issues or questions:
 1. Check browser console for error messages
 2. Review the [troubleshooting section](#-troubleshooting)
-3. See relevant documentation in `docs/guides/`
+3. See relevant documentation in `docs/`
 4. Verify all CSV files are present and properly formatted
 
 ---

@@ -267,7 +267,7 @@
                                                          x-transition:leave-start="opacity-100 transform translate-y-0"
                                                          x-transition:leave-end="opacity-0 transform -translate-y-2"
                                                          class="px-4 pb-4 space-y-2">
-                                                        <template x-for="(card, index) in deck.cards" :key="index">
+                                                        <template x-for="(card, index) in deck.cards" :key="window.generateCardKey(deck.id, card, index)">
                                                             <div class="grid grid-cols-2 gap-4 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
                                                                 <!-- Front Column -->
                                                                 <div class="bg-purple-50 dark:bg-purple-900/20 rounded-lg p-3 border border-purple-200 dark:border-purple-800">

@@ -310,7 +310,7 @@
                             <div x-show="analyticsData?.advanced" class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
                                 <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Recent Study Activity</h3>
                                 <div class="space-y-3 max-h-64 overflow-y-auto">
-                                    <template x-for="(change, index) in (analyticsHistoryData || []).slice(0, 10)" :key="index">
+                                    <template x-for="(change, index) in (analyticsHistoryData || []).slice(0, 10)" :key="change.timestamp || change.topicId + '-' + index">
                                         <div class="flex items-center space-x-3 p-2 rounded-lg" :class="change.newLevel > change.oldLevel ? 'bg-green-50 dark:bg-green-900/20' : change.newLevel < change.oldLevel ? 'bg-red-50 dark:bg-red-900/20' : 'bg-gray-50 dark:bg-gray-700/20'">
                                             <div class="flex items-center space-x-2">
                                                 <div class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold text-white" :style="getConfidenceBarStyle(change.oldLevel)" x-text="change.oldLevel || '-'"></div>

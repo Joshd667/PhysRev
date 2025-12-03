@@ -218,7 +218,7 @@ DOMPurify.sanitize(content, {
 });
 ```
 
-For complete implementation details, see [ARCHITECTURE.md - XSS Protection](docs/guides/ARCHITECTURE.md#xss-protection).
+For complete implementation details, see [ARCHITECTURE.md - XSS Protection](docs/ARCHITECTURE.md#xss-protection).
 
 ---
 
@@ -283,7 +283,7 @@ For complete implementation details, see [ARCHITECTURE.md - XSS Protection](docs
 
 **Option 2: Fix for Production Use**
 
-See **[docs/guides/TEAMS_AUTH_SETUP.md](docs/guides/TEAMS_AUTH_SETUP.md)** for complete setup guide including:
+See **[docs/TEAMS_AUTH_IMPLEMENTATION.md](docs/TEAMS_AUTH_IMPLEMENTATION.md)** for complete setup guide including:
 - Azure AD app registration
 - Creating `js/features/auth/teams-config.js` with real credentials
 - Fixing redirect URI mismatch
@@ -299,7 +299,8 @@ See **[docs/guides/TEAMS_AUTH_SETUP.md](docs/guides/TEAMS_AUTH_SETUP.md)** for c
 
 **See Also:**
 - **[docs/TODO.md](docs/TODO.md#authentication--infrastructure)** - Teams auth TODO items
-- **[docs/guides/TEAMS_AUTH_SETUP.md](docs/guides/TEAMS_AUTH_SETUP.md)** - Complete setup guide
+- **[docs/TEAMS_AUTH_ARCHITECTURE.md](docs/TEAMS_AUTH_ARCHITECTURE.md)** - Architecture and decision guide
+- **[docs/TEAMS_AUTH_IMPLEMENTATION.md](docs/TEAMS_AUTH_IMPLEMENTATION.md)** - Complete setup guide
 
 ---
 
@@ -361,7 +362,7 @@ All saved data is cryptographically signed:
 - ✅ 30-day retention for analytics
 - ✅ No personal data in localStorage
 
-For implementation details, see [ARCHITECTURE.md - Storage & Caching](docs/guides/ARCHITECTURE.md#storage--caching-architecture).
+For implementation details, see [ARCHITECTURE.md - Storage & Caching](docs/ARCHITECTURE.md#storage--caching-architecture).
 
 ---
 
@@ -419,7 +420,7 @@ For implementation details, see [ARCHITECTURE.md - Storage & Caching](docs/guide
 
 ## 📋 Security Checklist (Before Production)
 
-**See [docs/guides/DEPLOYMENT.md](docs/guides/DEPLOYMENT.md)** for complete deployment guide.
+**See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for complete deployment guide.
 
 ### Pre-Deployment
 
@@ -445,7 +446,7 @@ For implementation details, see [ARCHITECTURE.md - Storage & Caching](docs/guide
 
 ### Security Testing
 
-See **[docs/guides/TESTING.md#security-manual-testing](docs/guides/TESTING.md#security-manual-testing)** for:
+See **[docs/TESTING.md#security-manual-testing](docs/TESTING.md#security-manual-testing)** for:
 - XSS attempt testing in all user input fields
 - Script injection prevention testing
 - DOMPurify sanitization verification
@@ -476,8 +477,8 @@ See **[docs/guides/TESTING.md#security-manual-testing](docs/guides/TESTING.md#se
 ## 📚 Related Documentation
 
 **Security Implementation:**
-- **[docs/guides/ARCHITECTURE.md](docs/guides/ARCHITECTURE.md)** - XSS protection implementation details
-- **[docs/guides/TEAMS_AUTH_SETUP.md](docs/guides/TEAMS_AUTH_SETUP.md)** - Teams authentication security guide
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** - XSS protection implementation details
+- **[docs/TEAMS_AUTH_IMPLEMENTATION.md](docs/TEAMS_AUTH_IMPLEMENTATION.md)** - Teams authentication security guide
 - **[docs/TODO.md](docs/TODO.md)** - Outstanding security tasks (SRI hashes, Teams auth)
 
 **Security Audits:**
@@ -486,9 +487,9 @@ See **[docs/guides/TESTING.md#security-manual-testing](docs/guides/TESTING.md#se
 - **[docs/audits/console-logger-audit.md](docs/audits/console-logger-audit.md)** - Logger security audit
 
 **Testing & Development:**
-- **[docs/guides/TESTING.md](docs/guides/TESTING.md)** - Security testing procedures
-- **[docs/guides/DEVELOPMENT.md](docs/guides/DEVELOPMENT.md)** - Secure development practices
-- **[docs/guides/DEPLOYMENT.md](docs/guides/DEPLOYMENT.md)** - Production security checklist
+- **[docs/TESTING.md](docs/TESTING.md)** - Security testing procedures
+- **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** - Secure development practices
+- **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** - Production security checklist
 
 ---
 

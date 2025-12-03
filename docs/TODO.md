@@ -68,7 +68,7 @@ Add SRI hashes to CDN dependencies to prevent supply chain attacks.
 
 **Priority:** Medium (Optional - Guest mode is fully functional)
 **Status:** Teams login button currently ACTIVE but using placeholder credentials
-**Documentation:** See **[TEAMS_AUTH_SETUP.md](guides/TEAMS_AUTH_SETUP.md)** for complete details
+**Documentation:** See **[TEAMS_AUTH_ARCHITECTURE.md](TEAMS_AUTH_ARCHITECTURE.md)** (decision guide) and **[TEAMS_AUTH_IMPLEMENTATION.md](TEAMS_AUTH_IMPLEMENTATION.md)** (setup steps) for complete details
 
 **⚠️ Security Risk:** Teams login button is enabled with fake credentials. Users can click it but authentication will fail.
 
@@ -88,7 +88,7 @@ Add SRI hashes to CDN dependencies to prevent supply chain attacks.
 
 **When Azure AD Permissions Are Obtained:**
 
-1. Register app in Azure Portal (see TEAMS_AUTH_SETUP.md)
+1. Register app in Azure Portal (see TEAMS_AUTH_IMPLEMENTATION.md)
 2. Create `js/features/auth/teams-config.js` with real credentials
 3. Add `Files.ReadWrite` permission for OneDrive sync (optional)
 4. Test authentication flow thoroughly

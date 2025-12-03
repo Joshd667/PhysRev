@@ -156,10 +156,33 @@
     </div>
 
     <!-- Card View -->
-    <div x-show="mindmapsViewMode === 'card'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); })" x-effect="if (mindmapsViewMode === 'card' && window.lucide) { $nextTick(() => lucide.createIcons()); }">
-        <template x-for="group in mindmapsGroupedBySection" :key="group.groupTitle">
-            <template x-for="section in group.sections" :key="section.sectionName">
-                <template x-for="mindmap in section.mindmaps" :key="mindmap.id">
+    <div x-show="mindmapsViewMode === 'card'"
+         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+         x-init="$nextTick(() => { if (window.lucide) lucide.createIcons(); })"
+         x-effect="if (mindmapsViewMode === 'card' && window.lucide) { $nextTick(() => lucide.createIcons()); }"
+         x-data="{
+            _cachedMindmaps: null,
+            _mindmapsCacheKey: null,
+
+            get allMindmaps() {
+                // ⚡ PERFORMANCE: Cache key based on structure (not content)
+                const currentKey = JSON.stringify(
+                    (mindmapsGroupedBySection || []).map(g => g.groupTitle + ':' + (g.sections || []).length)
+                );
+
+                // Return cached if unchanged
+                if (this._mindmapsCacheKey === currentKey && this._cachedMindmaps) {
+                    return this._cachedMindmaps;
+                }
+
+                // ⚡ PERFORMANCE: Deduplicate mindmaps with multiple tags
+                this._cachedMindmaps = window.flattenAndDeduplicate(mindmapsGroupedBySection, 'mindmaps');
+                this._mindmapsCacheKey = currentKey;
+
+                return this._cachedMindmaps;
+            }
+        }">
+        <template x-for="mindmap in allMindmaps" :key="mindmap.id">
                     <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md border-2 hover:shadow-lg transition-all flex flex-col h-full" :class="mindmap.pinned ? 'border-yellow-400 dark:border-yellow-500' : 'border-cyan-200 dark:border-cyan-700'">
                         <div class="p-6 flex-1 flex flex-col">
                             <!-- Header with Actions -->
@@ -225,8 +248,6 @@
                             </div>
                         </div>
                     </div>
-                </template>
-            </template>
         </template>
     </div>
     </div>

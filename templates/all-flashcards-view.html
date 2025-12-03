@@ -618,7 +618,7 @@
 
                             <!-- Cards List (Expanded) -->
                             <div x-show="testSetBuilderExpandedDecks[deck.id]" class="p-3 space-y-2 bg-white dark:bg-gray-800">
-                                <template x-for="(card, index) in deck.cards" :key="index">
+                                <template x-for="(card, index) in deck.cards" :key="window.generateCardKey(deck.id, card, index)">
                                     <div class="flex items-start space-x-2 p-2 bg-gray-50 dark:bg-gray-700/30 rounded">
                                         <div class="flex-1 text-sm">
                                             <div class="text-slate-700 dark:text-slate-300 font-medium line-clamp-1" x-html="sanitizeHTML(card.front)"></div>
@@ -646,7 +646,7 @@
 
                 <!-- Selected Cards List -->
                 <div class="space-y-2 flex-1 overflow-y-auto">
-                    <template x-for="(card, index) in testSetBuilderCards" :key="index">
+                    <template x-for="(card, index) in testSetBuilderCards" :key="card.deckId ? window.generateCardKey(card.deckId, card, index) : (card.front + card.back).substring(0, 50) + index">
                         <div class="flex items-start space-x-2 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                             <div class="flex-1">
                                 <div class="text-sm font-medium text-slate-800 dark:text-slate-200 line-clamp-2" x-html="sanitizeHTML(card.front)"></div>

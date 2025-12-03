@@ -76,18 +76,22 @@
                     <p class="font-semibold mb-2">Quick Start by Role:</p>
                     <ul class="space-y-1">
                         <li><strong>Educators:</strong> <a
-                                href="markdown-viewer.html?file=../docs/guides/CONTENT_MANAGEMENT.md"
+                                href="markdown-viewer.html?file=../docs/CONTENT_MANAGEMENT.md"
                                 class="text-blue-600 dark:text-blue-400 hover:underline">Content Management Guide</a>
                         </li>
                         <li><strong>Developers:</strong> <a
-                                href="markdown-viewer.html?file=../docs/guides/DEVELOPMENT.md"
+                                href="markdown-viewer.html?file=../docs/DEVELOPMENT.md"
                                 class="text-blue-600 dark:text-blue-400 hover:underline">Development Setup</a> → <a
-                                href="markdown-viewer.html?file=../docs/guides/ARCHITECTURE.md"
-                                class="text-blue-600 dark:text-blue-400 hover:underline">Architecture</a></li>
-                        <li><strong>Admins:</strong> <a href="markdown-viewer.html?file=../docs/guides/DEPLOYMENT.md"
+                                href="markdown-viewer.html?file=../docs/ARCHITECTURE.md"
+                                class="text-blue-600 dark:text-blue-400 hover:underline">Architecture</a> → <a
+                                href="markdown-viewer.html?file=../docs/PERFORMANCE.md"
+                                class="text-blue-600 dark:text-blue-400 hover:underline">Performance</a></li>
+                        <li><strong>Admins:</strong> <a href="markdown-viewer.html?file=../docs/DEPLOYMENT.md"
                                 class="text-blue-600 dark:text-blue-400 hover:underline">Deployment Guide</a> | <a
-                                href="markdown-viewer.html?file=../docs/guides/TEAMS_LOGIN_INTEGRATION.md"
-                                class="text-blue-600 dark:text-blue-400 hover:underline">Teams Integration</a></li>
+                                href="markdown-viewer.html?file=../docs/TEAMS_AUTH_ARCHITECTURE.md"
+                                class="text-blue-600 dark:text-blue-400 hover:underline">Teams Architecture</a> | <a
+                                href="markdown-viewer.html?file=../docs/TEAMS_AUTH_IMPLEMENTATION.md"
+                                class="text-blue-600 dark:text-blue-400 hover:underline">Teams Setup</a></li>
                     </ul>
                 </div>
             </div>
@@ -101,7 +105,7 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <a href="markdown-viewer.html?file=../docs/guides/CONTENT_MANAGEMENT.md"
+                <a href="markdown-viewer.html?file=../docs/CONTENT_MANAGEMENT.md"
                     class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
                     <div class="flex items-start gap-3 mb-3">
                         <div
@@ -131,7 +135,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Architecture -->
-                <a href="markdown-viewer.html?file=../docs/guides/ARCHITECTURE.md"
+                <a href="markdown-viewer.html?file=../docs/ARCHITECTURE.md"
                     class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
                     <div class="flex items-start gap-3 mb-3">
                         <div
@@ -151,7 +155,7 @@
                 </a>
 
                 <!-- Development -->
-                <a href="markdown-viewer.html?file=../docs/guides/DEVELOPMENT.md"
+                <a href="markdown-viewer.html?file=../docs/DEVELOPMENT.md"
                     class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
                     <div class="flex items-start gap-3 mb-3">
                         <div
@@ -171,7 +175,7 @@
                 </a>
 
                 <!-- Data Architecture -->
-                <a href="markdown-viewer.html?file=../docs/guides/DATA_ARCHITECTURE.md"
+                <a href="markdown-viewer.html?file=../docs/DATA_ARCHITECTURE.md"
                     class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
                     <div class="flex items-start gap-3 mb-3">
                         <div
@@ -191,7 +195,7 @@
                 </a>
 
                 <!-- Testing -->
-                <a href="markdown-viewer.html?file=../docs/guides/TESTING.md"
+                <a href="markdown-viewer.html?file=../docs/TESTING.md"
                     class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
                     <div class="flex items-start gap-3 mb-3">
                         <div
@@ -211,7 +215,7 @@
                 </a>
 
                 <!-- Console Commands -->
-                <a href="markdown-viewer.html?file=../docs/guides/CONSOLE_COMMANDS.md"
+                <a href="markdown-viewer.html?file=../docs/CONSOLE_COMMANDS.md"
                     class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
                     <div class="flex items-start gap-3 mb-3">
                         <div
@@ -229,8 +233,28 @@
                     </div>
                 </a>
 
+                <!-- Performance -->
+                <a href="markdown-viewer.html?file=../docs/PERFORMANCE.md"
+                    class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div
+                            class="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="zap" class="w-5 h-5 text-orange-600 dark:text-orange-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Performance Guide</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Optimization strategies and performance
+                                best practices</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <i data-lucide="gauge" class="w-3 h-3"></i>
+                        <span>Memory optimization, caching, deduplication, monitoring</span>
+                    </div>
+                </a>
+
                 <!-- Pagination -->
-                <a href="markdown-viewer.html?file=../docs/guides/PAGINATION_USAGE.md"
+                <a href="markdown-viewer.html?file=../docs/PAGINATION_USAGE.md"
                     class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
                     <div class="flex items-start gap-3 mb-3">
                         <div
@@ -248,6 +272,25 @@
                         <span>$paginated helper, load more, virtual scrolling</span>
                     </div>
                 </a>
+
+                                <!-- Database Schemas -->
+                <a href="markdown-viewer.html?file=../docs/database-schemas.md"
+                    class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
+                    <div class="flex items-start gap-3 mb-3">
+                        <div
+                            class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="database" class="w-5 h-5 text-purple-600 dark:text-purple-400"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Database Schemas</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">SQL Server database design for Teams authentication backend</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        <i data-lucide="server" class="w-3 h-3"></i>
+                        <span>Azure SQL, table schemas, indexes, row-level security</span>
+                    </div>
+                </a>
             </div>
         </section>
 
@@ -260,7 +303,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <!-- Deployment -->
-                <a href="markdown-viewer.html?file=../docs/guides/DEPLOYMENT.md"
+                <a href="markdown-viewer.html?file=../docs/DEPLOYMENT.md"
                     class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
                     <div class="flex items-start gap-3 mb-3">
                         <div
@@ -269,8 +312,7 @@
                         </div>
                         <div>
                             <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Deployment Guide</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Production deployment checklists and
-                                procedures</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Production deployment checklists and procedures</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
@@ -279,8 +321,8 @@
                     </div>
                 </a>
 
-                <!-- Teams Login Integration (NEW) -->
-                <a href="markdown-viewer.html?file=../docs/guides/TEAMS_LOGIN_INTEGRATION.md"
+                <!-- Teams Auth Architecture -->
+                <a href="markdown-viewer.html?file=../docs/TEAMS_AUTH_ARCHITECTURE.md"
                     class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
                     <div class="flex items-start gap-3 mb-3">
                         <div
@@ -288,34 +330,32 @@
                             <i data-lucide="shield-check" class="w-5 h-5 text-blue-600 dark:text-blue-400"></i>
                         </div>
                         <div>
-                            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Teams Login Integration</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Technical guide with Azure database
-                                options and security</p>
+                            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Teams Authentication Architecture</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Technical architecture overview of Teams auth system</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                         <i data-lucide="database" class="w-3 h-3"></i>
-                        <span>Azure SQL, Cosmos DB, Graph API, OAuth security</span>
+                        <span>System components, data flow, security patterns</span>
                     </div>
                 </a>
 
-                <!-- Teams Auth -->
-                <a href="markdown-viewer.html?file=../docs/guides/TEAMS_AUTH_SETUP.md"
+                <!-- Teams Implementation Checklist -->
+                <a href="markdown-viewer.html?file=../docs/TEAMS_IMPLEMENTATION_CHECKLIST.md"
                     class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
                     <div class="flex items-start gap-3 mb-3">
                         <div
-                            class="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <i data-lucide="key-round" class="w-5 h-5 text-orange-600 dark:text-orange-400"></i>
+                            class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="clipboard-check" class="w-5 h-5 text-green-600 dark:text-green-400"></i>
                         </div>
                         <div>
-                            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Teams Authentication Setup</h3>
-                            <p class="text-sm text-gray-600 dark:text-gray-400">Azure AD configuration and
-                                troubleshooting</p>
+                            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Teams Implementation Checklist</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Quick reference for technical implementer deploying Teams auth</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                        <i data-lucide="users" class="w-3 h-3"></i>
-                        <span>OAuth setup, Azure AD, organizational auth</span>
+                        <i data-lucide="check-square" class="w-3 h-3"></i>
+                        <span>What exists, what's needed, 4-6 hour timeline</span>
                     </div>
                 </a>
             </div>
@@ -330,7 +370,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <!-- Attribution -->
-                <a href="markdown-viewer.html?file=../docs/guides/ATTRIBUTION.md"
+                <a href="markdown-viewer.html?file=../docs/ATTRIBUTION.md"
                     class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
                     <div class="flex items-start gap-3 mb-3">
                         <div
@@ -350,7 +390,7 @@
                 </a>
 
                 <!-- Full Index -->
-                <a href="markdown-viewer.html?file=../docs/guides/README.md"
+                <a href="markdown-viewer.html?file=../docs/README.md"
                     class="doc-card bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg p-5 block">
                     <div class="flex items-start gap-3 mb-3">
                         <div
@@ -391,7 +431,7 @@
                         <i data-lucide="external-link" class="w-4 h-4"></i>
                         <span>TailwindCSS Documentation</span>
                     </a>
-                    <a href="https://www.chartjs.org/" target="_blank" rel="noopener"
+                    <a href="https://www.chartjs.com/" target="_blank" rel="noopener"
                         class="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline">
                         <i data-lucide="external-link" class="w-4 h-4"></i>
                         <span>Chart.js Documentation</span>
@@ -430,3 +470,4 @@
 </body>
 
 </html>
+

@@ -171,22 +171,22 @@ Implemented unified navigation across developer tools with consistent UX:
 - **Visual Consistency**: All tools match main app styling with Tailwind CSS and Lucide icons
 
 **New Documentation:**
-- **[docs/guides/README.md](docs/guides/README.md)** - Comprehensive documentation index (NEW)
-- **[CONSOLE_COMMANDS.md](docs/guides/CONSOLE_COMMANDS.md)** - Browser console debugging reference (NEW)
+- **[docs/README.md](docs/README.md)** - Comprehensive documentation index (NEW)
+- **[CONSOLE_COMMANDS.md](docs/CONSOLE_COMMANDS.md)** - Browser console debugging reference (NEW)
 - **[TODO.md](docs/TODO.md)** - Outstanding tasks and known issues tracker (NEW)
 
 **Expanded Guides:**
-- **[DEPLOYMENT.md](docs/guides/DEPLOYMENT.md)** - 32 → 462 lines: Comprehensive production deployment guide
-- **[TEAMS_AUTH_SETUP.md](docs/guides/TEAMS_AUTH_SETUP.md)** - 297 → 626 lines: Critical security warnings, implementation details
-- **[TESTING.md](docs/guides/TESTING.md)** - 80 → 192 test items: Comprehensive testing coverage
-- **[DEVELOPMENT.md](docs/guides/DEVELOPMENT.md)** - 281 → 622 lines: Complete developer onboarding guide
-- **[PAGINATION_USAGE.md](docs/guides/PAGINATION_USAGE.md)** - Added current usage context
+- **[DEPLOYMENT.md](docs/DEPLOYMENT.md)** - 32 → 462 lines: Comprehensive production deployment guide
+- **[TEAMS_AUTH_IMPLEMENTATION.md](docs/TEAMS_AUTH_IMPLEMENTATION.md)** (formerly TEAMS_AUTH_SETUP.md) - 297 → 626 lines: Critical security warnings, implementation details
+- **[TESTING.md](docs/TESTING.md)** - 80 → 192 test items: Comprehensive testing coverage
+- **[DEVELOPMENT.md](docs/DEVELOPMENT.md)** - 281 → 622 lines: Complete developer onboarding guide
+- **[PAGINATION_USAGE.md](docs/PAGINATION_USAGE.md)** - Added current usage context
 
 **Updated Documentation:**
 - **[SECURITY.md](SECURITY.md)** - Updated to v2.0 with improved cohesiveness
-- **[ARCHITECTURE.md](docs/guides/ARCHITECTURE.md)** - Clarity improvements
-- **[CONTENT_MANAGEMENT.md](docs/guides/CONTENT_MANAGEMENT.md)** - Enhanced for teachers
-- **[DATA_ARCHITECTURE.md](docs/guides/DATA_ARCHITECTURE.md)** - Technical implementation guide
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Clarity improvements
+- **[CONTENT_MANAGEMENT.md](docs/CONTENT_MANAGEMENT.md)** - Enhanced for teachers
+- **[DATA_ARCHITECTURE.md](docs/DATA_ARCHITECTURE.md)** - Technical implementation guide
 - **[README.md](README.md)** - Updated navigation and categorization
 
 **Key Improvements:**
@@ -203,7 +203,7 @@ Implemented unified navigation across developer tools with consistent UX:
 - 5f454f3 - Create CONSOLE_COMMANDS.md reference guide
 - 6ef27bb - Expand DEVELOPMENT.md
 - 343b1ec - Expand TESTING.md
-- 764e07c - Expand TEAMS_AUTH_SETUP.md with security warnings
+- 764e07c - Expand TEAMS_AUTH_IMPLEMENTATION.md with security warnings (formerly TEAMS_AUTH_SETUP.md)
 - 312f4b2 - Improve PAGINATION_USAGE.md
 - 1684634 - Expand DEPLOYMENT.md
 - 81674e2 - Add DATA_ARCHITECTURE.md
@@ -230,7 +230,7 @@ Complete rewrite of canvas rendering and interaction system:
 - **Memory limits**: Undo stack, test history, analytics limited to prevent unbounded growth
 - **UI improvements**: Background panning, inline formatting, line style editing
 
-**Technical Details:** See [ARCHITECTURE.md](docs/guides/ARCHITECTURE.md) for complete implementation details.
+**Technical Details:** See [ARCHITECTURE.md](docs/ARCHITECTURE.md) for complete implementation details.
 
 ---
 
